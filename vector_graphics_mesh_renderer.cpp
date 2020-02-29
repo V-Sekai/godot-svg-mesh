@@ -64,7 +64,7 @@ public:
 VGAbstractMeshRenderer::VGAbstractMeshRenderer() {
 }
 
-Rect2 VGAbstractMeshRenderer::render_mesh(Ref<ArrayMesh> &p_mesh, Ref<Material> &r_material, Ref<Texture> &r_texture, VGPath *p_path, bool p_hq) {
+Rect2 VGAbstractMeshRenderer::render_mesh(Ref<ArrayMesh> &p_mesh, Ref<Material> &r_material, Ref<Texture> &r_texture, VGPath *p_path, bool p_hq, bool p_spatial) {
 	
     clear_mesh(p_mesh);
 
@@ -82,7 +82,7 @@ Rect2 VGAbstractMeshRenderer::render_mesh(Ref<ArrayMesh> &p_mesh, Ref<Material> 
     Renderer r(tove_mesh, subtree_graphics);
     r.traverse(p_path, Transform2D());
 
-    r_material = copy_mesh(p_mesh, tove_mesh, subtree_graphics, r_texture);
+    r_material = copy_mesh(p_mesh, tove_mesh, subtree_graphics, r_texture, p_spatial);
 
     return tove_bounds_to_rect2(p_path->get_tove_path()->getBounds());
 }

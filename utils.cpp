@@ -24,7 +24,8 @@ Ref<ShaderMaterial> copy_mesh(
     Ref<ArrayMesh> &p_mesh,
     tove::MeshRef &p_tove_mesh,
     const tove::GraphicsRef &p_graphics,
-    Ref<Texture> &r_texture) {
+    Ref<Texture> &r_texture,
+    bool p_spatial) {
 
     const int n = p_tove_mesh->getVertexCount();
     if (n < 1) {
@@ -121,9 +122,7 @@ Ref<ShaderMaterial> copy_mesh(
         feed->beginUpdate();
         feed->endUpdate();
 
-        Vector<uint8_t> paint_seen;
-        ERR_FAIL_COND_V(paint_seen.resize(npaints) != OK, Ref<ShaderMaterial>());
-        memset(paint_seen.ptrw(), 0, npaints);
+        Set<uint8_t> paint_seen;
 
         ERR_FAIL_COND_V(uvs.resize(n) != OK, Ref<ShaderMaterial>());
         {
@@ -132,7 +131,7 @@ Ref<ShaderMaterial> copy_mesh(
                 const float *p = (float*)(vertices + i * stride);
                 int paint_index = p[2];
                 w[i] = Vector2((paint_index + 0.5f) / npaints, 0.0f);
-                paint_seen.write[paint_index] = 1;
+                paint_seen.insert(paint_index);
             }
         }
 
@@ -153,22 +152,23 @@ Ref<ShaderMaterial> copy_mesh(
         StringBuilder code;
         String s;
         //code += "switch(i){\n";
-        for (int i = 0; i < alloc.numPaints; i++) {
-            if (!paint_seen[i]) {
+        for (Set<uint8_t>::Element *paint_i = paint_seen.front(); paint_i; paint_i = paint_i->next()) {
+            const uint8_t paint = paint_i->get();
+            if (!paint) {
                 continue;
             }
 
             code += "if(i==";
-            s = String::num_int64(i);
+            s = String::num_int64(paint);
             code += s;
             code += "){";
 
-            const float &v = arguments_data_write[i];
+            const float &v = arguments_data_write[paint];
             code += "a=";
             s = String::num_real(v);
             code += s; code += ";";
 
-            const int j0 = i * 3 * matrix_rows;
+            const int j0 = paint * 3 * matrix_rows;
             code += "m=mat3(";
 
             for (int j = 0; j < 3; j++) {
@@ -188,6 +188,7 @@ Ref<ShaderMaterial> copy_mesh(
             //code += ");break;\n";
         }
         //code += "}\n";
+        if(!p_spatial) {
 
         String shader_code = String(R"GLSL(
 shader_type canvas_item;
@@ -230,6 +231,54 @@ void fragment()
 
         material.instance();
         material->set_shader(shader);
+        } else {
+
+        String shader_code = String(R"GLSL(
+shader_type spatial;
+
+varying smooth mediump vec2 gradient_pos;
+varying flat mediump vec3 gradient_scale;
+varying flat mediump float paint;
+uniform sampler2D tex : hint_albedo;
+render_mode cull_disabled;
+
+void vertex()
+{
+    int i = int(floor(UV.x * NPAINTS));
+    float a;
+    mat3 m;
+
+)GLSL") +  code.as_string() + String(R"GLSL(
+
+	gradient_pos = (m * vec3(VERTEX.xy, 1)).xy;
+	gradient_scale = vec3(CSTEP, 1.0f - 2.0f * CSTEP, a);
+
+	paint = UV.x;
+}
+
+void fragment()
+{
+	float y = mix(gradient_pos.y, length(gradient_pos), gradient_scale.z);
+	y = gradient_scale.x + gradient_scale.y * y;
+
+	vec2 texture_pos_exact = vec2(paint, -y);
+	ALBEDO = textureLod(tex, texture_pos_exact, 0).rgb; 
+	ALPHA = textureLod(tex, texture_pos_exact, 0).a;
+}
+
+)GLSL");
+
+        String npaints_str = String::num_real(npaints);
+        String cstep_str = String::num_real(0.5f / alloc.numColors);
+
+        shader_code = shader_code.replace("NPAINTS", npaints_str.c_str());
+        shader_code = shader_code.replace("CSTEP", cstep_str.c_str());
+        shader->set_code(shader_code);
+
+        material.instance();
+        material->set_shader_param("tex", texture);
+        material->set_shader(shader);
+        }
     }
 
     Array arr;

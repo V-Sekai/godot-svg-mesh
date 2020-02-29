@@ -19,7 +19,6 @@ import os
 dir_path = Dir('.').abspath
 
 env_tove.Append(CXXFLAGS=[
-    '-std=c++11',
     '-DTOVE_GODOT',
     '-I' + os.path.join(dir_path, 'tove2d/src/thirdparty/fp16/include')])
 
@@ -40,47 +39,3 @@ env_tove.PackageSL(
 env_tove.PackageSL(
 	'tove2d/src/glsl/line.vert.inc',
 	Glob('tove2d/src/glsl/line.vert'))
-
-# patching.
-
-env_vars = Variables(None, ARGUMENTS)
-env_vars.Add(EnumVariable(
-	'svg',
-	'patch for vector graphics svg support?',
-	'nopatch',  allowed_values=('patch', 'nopatch')))
-env_vars.Update(env)
-
-if env['svg'] == 'patch':
-	declare_vector_sprite = '''
-Node *createVectorSprite(Ref<Resource> p_resource);
-void configureVectorSprite(Node *p_child, Ref<Resource> p_texture);
-	'''
-	replace_create = (
-		('child = memnew(Sprite);',
-		'child = createVectorSprite(texture);'),
-
-		('_create_nodes(target_node, child, path, drop_pos);',
-		'_create_nodes(target_node, child, path, drop_pos); configureVectorSprite(child, texture);')
-	)
-
-
-	editor_plugins_path = Dir('../../editor/plugins').abspath
-	file_path = os.path.join(editor_plugins_path, 'canvas_item_editor_plugin.cpp')
-	with open(file_path, 'r+') as f:
-		source_code = f.read()
-		if declare_vector_sprite not in source_code:
-				lines = source_code.split("\n")
-				include_index = None
-				for i, line in enumerate(lines):
-					if line.strip().startswith('#include'):
-						include_index = i
-				lines.insert(include_index + 1, declare_vector_sprite)
-				source_code = "\n".join(lines)
-
-				for a, b in replace_create:
-					source_code = source_code.replace(a, b)
-
-				f.seek(0)
-				f.write(source_code)
-
-				print("patched %s" % file_path)

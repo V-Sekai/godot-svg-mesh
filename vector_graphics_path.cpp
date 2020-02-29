@@ -151,7 +151,7 @@ void VGPath::import_svg(const String &p_path) {
 
 		std::string name = tove_path->getName();
 		if (name.empty()) {
-			name = "path";
+			name = "Path";
 		}
 
 		path->set_name(String(name.c_str()));
@@ -276,7 +276,7 @@ void VGPath::update_mesh_representation() {
 		if (renderer.is_valid()) {
 			Ref<Material> ignored_material; // ignored
 			Ref<Texture> ignored_texture; // ignored
-			renderer->render_mesh(mesh, ignored_material, ignored_texture, this, false);
+			renderer->render_mesh(mesh, ignored_material, ignored_texture, this, false, false);
 			texture = renderer->render_texture(this, false);
 		}
 	}
@@ -379,7 +379,7 @@ void VGPath::_bind_methods() {
 
 	ClassDB::bind_method(D_METHOD("insert_curve", "subpath", "t"), &VGPath::insert_curve);
 	ClassDB::bind_method(D_METHOD("remove_curve", "subpath", "curve"), &VGPath::remove_curve);
-	ClassDB::bind_method(D_METHOD("set_points", "subpath", "points"), &VGPath::set_points);
+	ClassDB::bind_method(D_METHOD("set_points", "subpath", "points"), &VGPath::set_points);\
 
 	ClassDB::bind_method(D_METHOD("_renderer_changed"), &VGPath::_renderer_changed);
 	ClassDB::bind_method(D_METHOD("recenter"), &VGPath::recenter);
@@ -739,7 +739,7 @@ Node2D *VGPath::create_mesh_node() {
 			mesh.instance();
 			Ref<Material> material;
 			Ref<Texture> texture;
-			renderer->render_mesh(mesh, material, texture, this, true);
+			renderer->render_mesh(mesh, material, texture, this, true, false);
 			mesh_inst->set_mesh(mesh);
 			if (material.is_valid()) {
 				mesh_inst->set_material(material);

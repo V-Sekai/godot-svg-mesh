@@ -24,6 +24,7 @@ Ref<ShaderMaterial> copy_mesh(
 	Ref<ArrayMesh> &p_mesh,
 	tove::MeshRef &p_tove_mesh,
 	const tove::GraphicsRef &p_graphics,
-	Ref<Texture> &r_texture);
+	Ref<Texture> &r_texture,
+	bool p_spatial = false);
 
 #endif // VG_UTILS_H
