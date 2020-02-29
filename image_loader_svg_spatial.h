@@ -140,7 +140,7 @@ Error ResourceImporterSVGSpatial::import(const String &p_source_file, const Stri
 		Quat rot;
 		xform.basis.set_quat_scale(rot, Vector3(path_xform.get_scale().x * 0.01f, -path_xform.get_scale().y * 0.01f, 1.0f * 0.01f));
 		Vector2 origin = path_xform.get_origin() - path_xform.get_origin() / 2.0f;
-		xform.origin = Vector3(origin.x , origin.y, i * 0.002f);
+		xform.origin = Vector3(origin.x , origin.y, i * 0.003f);
 		mesh_inst->set_transform(xform);
 		mesh_inst->set_name(String(name.c_str()));
 		root->add_child(mesh_inst);
