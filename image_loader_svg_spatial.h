@@ -122,7 +122,6 @@ Error ResourceImporterSVGSpatial::import(const String &p_source_file, const Stri
 		for (int32_t i = 0; i < mesh->get_surface_count(); i++) {
 			Ref<SpatialMaterial> material;
 			material.instance();
-			material->set_flag(SpatialMaterial::FLAG_SRGB_VERTEX_COLOR, true);
 			material->set_flag(SpatialMaterial::FLAG_ALBEDO_FROM_VERTEX_COLOR, true);
             material->set_cull_mode(SpatialMaterial::CULL_DISABLED);
 			if (texture.is_valid()) {

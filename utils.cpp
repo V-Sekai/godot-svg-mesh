@@ -4,6 +4,7 @@
 
 #include "utils.h"
 #include "core/string_builder.h"
+#include "scene/resources/surface_tool.h"
 
 #include "tove2d/src/cpp/mesh/meshifier.h"
 #include "tove2d/src/cpp/mesh/mesh.h"
@@ -76,7 +77,7 @@ Ref<ShaderMaterial> copy_mesh(
         PoolVector<Color>::Write w = carr.write();
         for (int i = 0; i < n; i++) {
             uint8_t *p = vertices + i * stride + 2 * sizeof(float);
-            w[i] = Color(p[0] / 255.0, p[1] / 255.0, p[2] / 255.0, p[3] / 255.0);
+            w[i] = Color(p[0] / 255.0, p[1] / 255.0, p[2] / 255.0, p[3] / 255.0).to_linear();
         }
     }
 
@@ -292,8 +293,13 @@ void fragment()
         arr[VS::ARRAY_TEX_UV] = uvs;
     }
 
-	const int surface = p_mesh->get_surface_count();
-    p_mesh->add_surface_from_arrays(Mesh::PRIMITIVE_TRIANGLES, arr);
+    Ref<SurfaceTool> surface_tool;
+    surface_tool.instance();
+    surface_tool->create_from_triangle_arrays(arr);
+    surface_tool->index();
+    surface_tool->generate_normals();
+    surface_tool->generate_tangents();
 
+    p_mesh->add_surface_from_arrays(Mesh::PRIMITIVE_TRIANGLES, surface_tool->commit_to_arrays());
     return material;
 }
