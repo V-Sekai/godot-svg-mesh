@@ -5,12 +5,12 @@
 #include "core/os/file_access.h"
 #include "editor/editor_file_system.h"
 #include "scene/3d/mesh_instance.h"
+#include "scene/resources/mesh_data_tool.h"
 #include "scene/resources/packed_scene.h"
 #include "scene/resources/surface_tool.h"
 #include "scene/resources/texture.h"
 #include "vector_graphics_adaptive_renderer.h"
 #include "vector_graphics_path.h"
-#include "scene/resources/mesh_data_tool.h"
 
 class ResourceImporterSVGSpatial : public ResourceImporter {
 	GDCLASS(ResourceImporterSVGSpatial, ResourceImporter);
@@ -132,12 +132,13 @@ Error ResourceImporterSVGSpatial::import(const String &p_source_file, const Stri
 		Transform2D path_xform = path->get_transform();
 		Vector2 origin = path_xform.get_origin();
 		Transform xform;
-		xform.origin = Vector3(center.x * 0.01f, center.y * -0.01f, i * CMP_POINT_IN_PLANE_EPSILON * 64.0f);
+		real_t gap = i * CMP_POINT_IN_PLANE_EPSILON * 64.0f;
+		xform.origin = Vector3(center.x * 0.01f, center.y * -0.01f, gap);
 		st->append_from(mesh, 0, xform);
 	}
 	combined_mesh = st->commit();
 	MeshInstance *mesh_inst = memnew(MeshInstance);
-	memdelete(root_path);	
+	memdelete(root_path);
 	Ref<SpatialMaterial> material;
 	material.instance();
 	material->set_flag(SpatialMaterial::FLAG_ALBEDO_FROM_VERTEX_COLOR, true);
