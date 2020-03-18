@@ -106,6 +106,10 @@ Error ResourceImporterSVGNode2D::import(const String &p_source_file, const Strin
 	int32_t n = tove_graphics->getNumPaths();
 	Ref<VGMeshRenderer> renderer;
 	renderer.instance();
+	VGPath *root_path = memnew(VGPath(tove::tove_make_shared<tove::Path>()));
+	root->add_child(root_path);
+	root_path->set_owner(root);
+	root_path->set_renderer(renderer);
 	for (int i = 0; i < n; i++) {
 		tove::PathRef tove_path = tove_graphics->getPath(i);		
 		Point2 center = compute_center(tove_path);
@@ -117,7 +121,8 @@ Error ResourceImporterSVGNode2D::import(const String &p_source_file, const Strin
 			name = "Path";
 		}
 
-		path->set_renderer(renderer);
+		root_path->add_child(path);
+		path->set_owner(root);
 
 		MeshInstance2D *mesh_inst = memnew(MeshInstance2D);
 		Ref<ArrayMesh> mesh;
@@ -135,7 +140,7 @@ Error ResourceImporterSVGNode2D::import(const String &p_source_file, const Strin
 		root->add_child(mesh_inst);
 		mesh_inst->set_owner(root);
 	}
-
+	memdelete(root_path);
 	Ref<PackedScene> vg_scene;
 	vg_scene.instance();
 	vg_scene->pack(root);

@@ -106,15 +106,21 @@ Error ResourceImporterSVGSpatial::import(const String &p_source_file, const Stri
 	int32_t n = tove_graphics->getNumPaths();
 	Ref<VGMeshRenderer> renderer;
 	renderer.instance();
+	renderer->set_quality(0.5);
 	Ref<SurfaceTool> st;
 	st.instance();
+	VGPath *root_path = memnew(VGPath(tove::tove_make_shared<tove::Path>()));
+	root->add_child(root_path);
+	root_path->set_owner(root);
+	root_path->set_renderer(renderer);
 	for (int i = 0; i < n; i++) {
 		tove::PathRef tove_path = tove_graphics->getPath(i);
 		Point2 center = compute_center(tove_path);
 		tove_path->set(tove_path, tove::nsvg::Transform(1, 0, -center.x, 0, 1, -center.y));
 		VGPath *path = memnew(VGPath(tove_path));
 		path->set_position(center);
-		path->set_renderer(renderer);
+		root_path->add_child(path);
+		path->set_owner(root);
 		Ref<ArrayMesh> mesh;
 		mesh.instance();
 		Ref<Texture> texture;
@@ -135,6 +141,7 @@ Error ResourceImporterSVGSpatial::import(const String &p_source_file, const Stri
 		material->set_cull_mode(SpatialMaterial::CULL_DISABLED);
 		combined_mesh->surface_set_material(i, material);
 	}
+	memdelete(root_path);
 	mesh_inst->set_mesh(combined_mesh);
 	mesh_inst->set_name(String("Path"));
 	root->add_child(mesh_inst);
