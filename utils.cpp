@@ -155,9 +155,6 @@ Ref<ShaderMaterial> copy_mesh(
         //code += "switch(i){\n";
         for (Set<uint8_t>::Element *paint_i = paint_seen.front(); paint_i; paint_i = paint_i->next()) {
             const uint8_t paint = paint_i->get();
-            if (!paint) {
-                continue;
-            }
 
             code += "if(i==";
             s = String::num_int64(paint);
