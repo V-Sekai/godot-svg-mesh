@@ -6,6 +6,7 @@
 #include "editor/editor_file_system.h"
 #include "scene/3d/mesh_instance.h"
 #include "scene/resources/packed_scene.h"
+#include "scene/resources/surface_tool.h"
 #include "scene/resources/texture.h"
 #include "vector_graphics_adaptive_renderer.h"
 #include "vector_graphics_path.h"
@@ -105,51 +106,45 @@ Error ResourceImporterSVGSpatial::import(const String &p_source_file, const Stri
 	int32_t n = tove_graphics->getNumPaths();
 	Ref<VGMeshRenderer> renderer;
 	renderer.instance();
+	Ref<SurfaceTool> st;
+	st.instance();
 	for (int i = 0; i < n; i++) {
 		tove::PathRef tove_path = tove_graphics->getPath(i);
 		Point2 center = compute_center(tove_path);
 		tove_path->set(tove_path, tove::nsvg::Transform(1, 0, -center.x, 0, 1, -center.y));
 		VGPath *path = memnew(VGPath(tove_path));
 		path->set_position(center);
-		std::string name = tove_path->getName();
-		if (name.empty()) {
-			name = "Path";
-		}
+		// std::string name = tove_path->getName();
+		// if (name.empty()) {
+		// 	name = "Path";
+		// }
 
 		path->set_renderer(renderer);
 
-		MeshInstance *mesh_inst = memnew(MeshInstance);
 		Ref<ArrayMesh> mesh;
 		mesh.instance();
 		Ref<Texture> texture;
 		Ref<Material> renderer_material;
 		renderer->render_mesh(mesh, renderer_material, texture, path, true, true);
-		mesh_inst->set_mesh(mesh);
-		for (int32_t i = 0; i < mesh->get_surface_count(); i++) {
-			Ref<SpatialMaterial> material;
-			material.instance();
-			material->set_flag(SpatialMaterial::FLAG_ALBEDO_FROM_VERTEX_COLOR, true);
-			material->set_cull_mode(SpatialMaterial::CULL_DISABLED);
-			if (texture.is_valid()) {
-				material->set_texture(SpatialMaterial::TEXTURE_ALBEDO, texture);
-			}
-			if (!renderer_material.is_valid()) {
-				mesh->surface_set_material(i, material);
-			} else {
-				mesh->surface_set_material(i, renderer_material);
-			}
-		}
-
 		Transform2D path_xform = path->get_transform();
 		Transform xform;
-		xform.origin = Vector3(center.x * 0.01f, center.y * 0.01f, 0.0f);
+		xform.origin = Vector3(center.x * 0.01f, center.y * 0.01f, i * 0.003f);
 		xform.scale(Vector3(1.0f, 1.0f, 1.0f));
-		mesh_inst->set_transform(xform);
-		mesh_inst->set_name(String(name.c_str()));
-		root->add_child(mesh_inst);
-		mesh_inst->set_owner(root);
+		st->append_from(mesh, 0, xform);
 	}
-
+	MeshInstance *mesh_inst = memnew(MeshInstance);
+	Ref<ArrayMesh> combined_mesh = st->commit();
+	for (int32_t i = 0; i < combined_mesh->get_surface_count(); i++) {
+		Ref<SpatialMaterial> material;
+		material.instance();
+		material->set_flag(SpatialMaterial::FLAG_ALBEDO_FROM_VERTEX_COLOR, true);
+		material->set_cull_mode(SpatialMaterial::CULL_DISABLED);
+		combined_mesh->surface_set_material(i, material);
+	}
+	mesh_inst->set_mesh(combined_mesh);
+	mesh_inst->set_name(String("Path"));
+	root->add_child(mesh_inst);
+	mesh_inst->set_owner(root);
 	Ref<PackedScene> vg_scene;
 	vg_scene.instance();
 	vg_scene->pack(root);
