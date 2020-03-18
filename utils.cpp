@@ -67,7 +67,7 @@ Ref<ShaderMaterial> copy_mesh(
         PoolVector<Vector3>::Write w = varr.write();
         for (int i = 0; i < n; i++) {
             float *p = (float*)(vertices + i * stride);
-            w[i] = Vector3(p[0], p[1], 0);
+            w[i] = Vector3(p[0], p[1], 0) * Vector3(0.1, 0.1, 0.1);
         }
     }
 
