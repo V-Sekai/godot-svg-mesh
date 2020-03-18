@@ -10,6 +10,7 @@
 #include "scene/resources/texture.h"
 #include "vector_graphics_adaptive_renderer.h"
 #include "vector_graphics_path.h"
+#include "scene/resources/mesh_data_tool.h"
 
 class ResourceImporterSVGSpatial : public ResourceImporter {
 	GDCLASS(ResourceImporterSVGSpatial, ResourceImporter);
@@ -106,13 +107,15 @@ Error ResourceImporterSVGSpatial::import(const String &p_source_file, const Stri
 	int32_t n = tove_graphics->getNumPaths();
 	Ref<VGMeshRenderer> renderer;
 	renderer.instance();
-	renderer->set_quality(0.5);
-	Ref<SurfaceTool> st;
-	st.instance();
+	renderer->set_quality(0.075);
 	VGPath *root_path = memnew(VGPath(tove::tove_make_shared<tove::Path>()));
 	root->add_child(root_path);
 	root_path->set_owner(root);
 	root_path->set_renderer(renderer);
+	Ref<ArrayMesh> combined_mesh;
+	combined_mesh.instance();
+	Ref<SurfaceTool> st;
+	st.instance();
 	for (int i = 0; i < n; i++) {
 		tove::PathRef tove_path = tove_graphics->getPath(i);
 		Point2 center = compute_center(tove_path);
@@ -132,16 +135,14 @@ Error ResourceImporterSVGSpatial::import(const String &p_source_file, const Stri
 		xform.origin = Vector3(center.x * 0.01f, center.y * -0.01f, i * CMP_POINT_IN_PLANE_EPSILON * 64.0f);
 		st->append_from(mesh, 0, xform);
 	}
+	combined_mesh = st->commit();
 	MeshInstance *mesh_inst = memnew(MeshInstance);
-	Ref<ArrayMesh> combined_mesh = st->commit();
-	for (int32_t i = 0; i < combined_mesh->get_surface_count(); i++) {
-		Ref<SpatialMaterial> material;
-		material.instance();
-		material->set_flag(SpatialMaterial::FLAG_ALBEDO_FROM_VERTEX_COLOR, true);
-		material->set_cull_mode(SpatialMaterial::CULL_DISABLED);
-		combined_mesh->surface_set_material(i, material);
-	}
-	memdelete(root_path);
+	memdelete(root_path);	
+	Ref<SpatialMaterial> material;
+	material.instance();
+	material->set_flag(SpatialMaterial::FLAG_ALBEDO_FROM_VERTEX_COLOR, true);
+	material->set_cull_mode(SpatialMaterial::CULL_DISABLED);
+	combined_mesh->surface_set_material(0, material);
 	mesh_inst->set_mesh(combined_mesh);
 	mesh_inst->set_name(String("Path"));
 	root->add_child(mesh_inst);
