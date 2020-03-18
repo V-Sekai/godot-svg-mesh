@@ -132,7 +132,7 @@ Error ResourceImporterSVGSpatial::import(const String &p_source_file, const Stri
 		Transform2D path_xform = path->get_transform();
 		Vector2 origin = path_xform.get_origin();
 		Transform xform;
-		real_t gap = (i - n - 1) * CMP_POINT_IN_PLANE_EPSILON * 16.0f;
+		real_t gap = i * CMP_POINT_IN_PLANE_EPSILON * 16.0f;
 		xform.origin = Vector3(center.x * 0.001f, center.y * -0.001f, gap);
 		st->append_from(mesh, 0, xform);
 	}
@@ -142,12 +142,12 @@ Error ResourceImporterSVGSpatial::import(const String &p_source_file, const Stri
 	Ref<SpatialMaterial> material;
 	material.instance();
 	material->set_flag(SpatialMaterial::FLAG_ALBEDO_FROM_VERTEX_COLOR, true);
+	material->set_cull_mode(SpatialMaterial::CULL_DISABLED);
 	combined_mesh->surface_set_material(0, material);
 	mesh_inst->set_mesh(combined_mesh);
 	mesh_inst->set_name(String("Path"));
 	Vector3 translate = -combined_mesh->get_aabb().get_size() / 2;
 	translate.y = -translate.y;
-	translate.z = -translate.z;
 	mesh_inst->translate_object_local(translate);
 	root->add_child(mesh_inst);
 	mesh_inst->set_owner(root);
