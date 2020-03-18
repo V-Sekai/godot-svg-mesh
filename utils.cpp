@@ -63,13 +63,13 @@ Ref<ShaderMaterial> copy_mesh(
     PoolVector<Vector3> varr;
     ERR_FAIL_COND_V(varr.resize(n) != OK, Ref<ShaderMaterial>());
 
-    {
-        PoolVector<Vector3>::Write w = varr.write();
-        for (int i = 0; i < n; i++) {
-            float *p = (float*)(vertices + i * stride);
-            w[i] = Vector3(p[0], p[1], 0) * Vector3(0.1, 0.1, 0.1);
-        }
-    }
+	{
+		PoolVector<Vector3>::Write w = varr.write();
+		for (int i = 0; i < n; i++) {
+			float *p = (float *)(vertices + i * stride);
+			w[i] = Vector3(p[0], p[1], 0) * Vector3(0.01, -0.01, 0.01);
+		}
+	}
 
     PoolVector<Color> carr;
     if (!isPaintMesh) {

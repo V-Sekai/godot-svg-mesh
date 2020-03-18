@@ -142,10 +142,8 @@ Error ResourceImporterSVGSpatial::import(const String &p_source_file, const Stri
 
 		Transform2D path_xform = path->get_transform();
 		Transform xform;
-		// Quat rot;
-		// xform.basis.set_quat_scale(rot, Vector3(path_xform.get_scale().x * 0.01f, -path_xform.get_scale().y * 0.01f, 1.0f * 0.01f));
-		// Vector2 origin = path_xform.get_origin() - path_xform.get_origin() / 2.0f;
 		xform.origin = Vector3(center.x * 0.01f, center.y * 0.01f, 0.0f);
+		xform.scale(Vector3(1.0f, 1.0f, 1.0f));
 		mesh_inst->set_transform(xform);
 		mesh_inst->set_name(String(name.c_str()));
 		root->add_child(mesh_inst);
