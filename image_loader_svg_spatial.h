@@ -123,7 +123,7 @@ Error ResourceImporterSVGSpatial::import(const String &p_source_file, const Stri
 		Transform2D path_xform = path->get_transform();
 		Vector2 origin = path_xform.get_origin();
 		Transform xform;
-		xform.origin = Vector3(center.x * 0.01f, center.y * -0.01f, 0.0f);
+		xform.origin = Vector3(center.x * 0.01f, center.y * -0.01f, i * 0.0015f);
 		st->append_from(mesh, 0, xform);
 	}
 	MeshInstance *mesh_inst = memnew(MeshInstance);
