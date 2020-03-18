@@ -27,9 +27,15 @@ public:
 	virtual bool get_option_visibility(const String &p_option, const Map<StringName, Variant> &p_options) const;
 	virtual Error import(const String &p_source_file, const String &p_save_path, const Map<StringName, Variant> &p_options, List<String> *r_platform_variants, List<String> *r_gen_files = NULL, Variant *r_metadata = NULL);
 
+	static Point2 compute_center(const tove::PathRef &p_path) {
+		const float *bounds = p_path->getBounds();
+		return Point2((bounds[0] + bounds[2]) / 2, (bounds[1] + bounds[3]) / 2);
+	}
+
 	ResourceImporterSVGSpatial();
 	~ResourceImporterSVGSpatial();
 };
+
 
 String ResourceImporterSVGSpatial::get_importer_name() const {
 
@@ -74,9 +80,6 @@ void ResourceImporterSVGSpatial::get_import_options(List<ImportOption> *r_option
 Error ResourceImporterSVGSpatial::import(const String &p_source_file, const String &p_save_path, const Map<StringName, Variant> &p_options, List<String> *r_platform_variants, List<String> *r_gen_files, Variant *r_metadata) {
 	Spatial *root = memnew(Spatial);
 
-	Ref<VGMeshRenderer> renderer;
-	renderer.instance();
-
 	String units = "px";
 	float dpi = 100.0;
 
@@ -101,10 +104,14 @@ Error ResourceImporterSVGSpatial::import(const String &p_source_file, const Stri
 		}
 	}
 	int32_t n = tove_graphics->getNumPaths();
+	Ref<VGMeshRenderer> renderer;
+	renderer.instance();
 	for (int i = 0; i < n; i++) {
-		tove::PathRef tove_path = tove_graphics->getPath(i);
+		tove::PathRef tove_path = tove_graphics->getPath(i);		
+		Point2 center = compute_center(tove_path);
+		tove_path->set(tove_path, tove::nsvg::Transform(1, 0, -center.x, 0, 1, -center.y));
 		VGPath *path = memnew(VGPath(tove_path));
-
+		path->set_position(center);
 		std::string name = tove_path->getName();
 		if (name.empty()) {
 			name = "Path";
@@ -138,8 +145,8 @@ Error ResourceImporterSVGSpatial::import(const String &p_source_file, const Stri
 		Transform xform;
 		Quat rot;
 		xform.basis.set_quat_scale(rot, Vector3(path_xform.get_scale().x * 0.01f, -path_xform.get_scale().y * 0.01f, 1.0f * 0.01f));
-		Vector2 origin = path_xform.get_origin() - path_xform.get_origin() / 2.0f;
-		xform.origin = Vector3(origin.x , origin.y, i * 0.003f);
+		Vector2 origin = path_xform.get_origin();
+		xform.origin = Vector3(origin.x * 0.01f, origin.y * 0.01f, i * 0.003f);
 		mesh_inst->set_transform(xform);
 		mesh_inst->set_name(String(name.c_str()));
 		root->add_child(mesh_inst);

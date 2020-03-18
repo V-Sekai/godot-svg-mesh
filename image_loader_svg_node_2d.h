@@ -27,9 +27,15 @@ public:
 	virtual bool get_option_visibility(const String &p_option, const Map<StringName, Variant> &p_options) const;
 	virtual Error import(const String &p_source_file, const String &p_save_path, const Map<StringName, Variant> &p_options, List<String> *r_platform_variants, List<String> *r_gen_files = NULL, Variant *r_metadata = NULL);
 
+	static Point2 compute_center(const tove::PathRef &p_path) {
+		const float *bounds = p_path->getBounds();
+		return Point2((bounds[0] + bounds[2]) / 2, (bounds[1] + bounds[3]) / 2);
+	}
+
 	ResourceImporterSVGNode2D();
 	~ResourceImporterSVGNode2D();
 };
+
 
 String ResourceImporterSVGNode2D::get_importer_name() const {
 
@@ -74,9 +80,6 @@ void ResourceImporterSVGNode2D::get_import_options(List<ImportOption> *r_options
 Error ResourceImporterSVGNode2D::import(const String &p_source_file, const String &p_save_path, const Map<StringName, Variant> &p_options, List<String> *r_platform_variants, List<String> *r_gen_files, Variant *r_metadata) {
 	Node2D *root = memnew(Node2D);
 
-	Ref<VGMeshRenderer> renderer;
-	renderer.instance();
-
 	String units = "px";
 	float dpi = 100.0;
 
@@ -101,10 +104,14 @@ Error ResourceImporterSVGNode2D::import(const String &p_source_file, const Strin
 		}
 	}
 	int32_t n = tove_graphics->getNumPaths();
+	Ref<VGMeshRenderer> renderer;
+	renderer.instance();
 	for (int i = 0; i < n; i++) {
-		tove::PathRef tove_path = tove_graphics->getPath(i);
+		tove::PathRef tove_path = tove_graphics->getPath(i);		
+		Point2 center = compute_center(tove_path);
+		tove_path->set(tove_path, tove::nsvg::Transform(1, 0, -center.x, 0, 1, -center.y));
 		VGPath *path = memnew(VGPath(tove_path));
-
+		path->set_position(center);
 		std::string name = tove_path->getName();
 		if (name.empty()) {
 			name = "Path";
