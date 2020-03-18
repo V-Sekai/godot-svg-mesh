@@ -143,6 +143,7 @@ Error ResourceImporterSVGSpatial::import(const String &p_source_file, const Stri
 		Transform2D path_xform = path->get_transform();
 		Transform xform;
 		xform.origin = Vector3(center.x * 0.01f, center.y * 0.01f, 0.0f);
+		xform.scale(Vector3(1.0f, 1.0f, 1.0f));
 		mesh_inst->set_transform(xform);
 		mesh_inst->set_name(String(name.c_str()));
 		root->add_child(mesh_inst);
