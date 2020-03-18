@@ -114,21 +114,16 @@ Error ResourceImporterSVGSpatial::import(const String &p_source_file, const Stri
 		tove_path->set(tove_path, tove::nsvg::Transform(1, 0, -center.x, 0, 1, -center.y));
 		VGPath *path = memnew(VGPath(tove_path));
 		path->set_position(center);
-		// std::string name = tove_path->getName();
-		// if (name.empty()) {
-		// 	name = "Path";
-		// }
-
 		path->set_renderer(renderer);
-
 		Ref<ArrayMesh> mesh;
 		mesh.instance();
 		Ref<Texture> texture;
 		Ref<Material> renderer_material;
 		renderer->render_mesh(mesh, renderer_material, texture, path, true, true);
 		Transform2D path_xform = path->get_transform();
+		Vector2 origin = path_xform.get_origin();
 		Transform xform;
-		xform.origin = Vector3(center.x * 0.01f, center.y * -0.01f, i * 0.003f);
+		xform.origin = Vector3(center.x * 0.01f, center.y * -0.01f, 0.0f);
 		st->append_from(mesh, 0, xform);
 	}
 	MeshInstance *mesh_inst = memnew(MeshInstance);
