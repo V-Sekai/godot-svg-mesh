@@ -189,6 +189,7 @@ protected:
 			default:
 				assert(false);
 		}
+		return none;
 	}
 
 public:
