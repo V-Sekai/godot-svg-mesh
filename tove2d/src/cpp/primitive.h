@@ -115,6 +115,7 @@ public:
 				return 1 + 4 * 6;
 		}
 		assert(false);
+		return 0;
 	}
 
 	void write(float *p) {
