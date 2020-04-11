@@ -5,6 +5,7 @@
 #ifndef VG_EDITOR_PLUGIN_H
 #define VG_EDITOR_PLUGIN_H
 
+#ifdef TOOLS_ENABLED
 #include "vector_graphics_editor.h"
 
 class VGEditorPlugin : public EditorPlugin {
@@ -27,5 +28,5 @@ public:
 	VGEditorPlugin(EditorNode *p_node);
 	~VGEditorPlugin();
 };
-
 #endif // VG_EDITOR_PLUGIN_H
+#endif

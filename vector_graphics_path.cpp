@@ -829,9 +829,11 @@ Node *createVectorSprite(Ref<Resource> p_resource) {
 }
 
 void configureVectorSprite(Node *p_child, Ref<Resource> p_resource) {
+#ifdef TOOLS_ENABLED
 	if (p_child->is_class_ptr(VGPath::get_class_ptr_static())) {
 		EditorData *editor_data = EditorNode::get_singleton()->get_scene_tree_dock()->get_editor_data();
 		editor_data->get_undo_redo().add_do_method(p_child, "import_svg", p_resource->get_path());
 		editor_data->get_undo_redo().add_do_reference(p_child);
 	}
+#endif
 }

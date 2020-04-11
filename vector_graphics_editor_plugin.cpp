@@ -2,6 +2,7 @@
 /*  vg_editor_plugin.cpp          				                         */
 /*************************************************************************/
 
+#ifdef TOOLS_ENABLED
 #include "vector_graphics_editor_plugin.h"
 #include "editor/plugins/canvas_item_editor_plugin.h"
 
@@ -51,3 +52,4 @@ VGEditorPlugin::VGEditorPlugin(EditorNode *p_node) {
 
 VGEditorPlugin::~VGEditorPlugin() {
 }
+#endif

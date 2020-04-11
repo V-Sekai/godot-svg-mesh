@@ -5,6 +5,7 @@
 #ifndef VG_EDITOR_H
 #define VG_EDITOR_H
 
+#ifdef TOOLS_ENABLED
 #include "editor/editor_node.h"
 #include "editor/editor_plugin.h"
 #include "scene/gui/tool_button.h"
@@ -92,3 +93,4 @@ public:
 };
 
 #endif // VG_EDITOR_H
+#endif

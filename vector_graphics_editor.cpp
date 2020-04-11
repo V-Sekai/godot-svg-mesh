@@ -2,6 +2,7 @@
 /*  vg_editor.cpp         						                         */
 /*************************************************************************/
 
+#ifdef TOOLS_ENABLED
 #include "vector_graphics_editor.h"
 
 #include "editor/plugins/canvas_item_editor_plugin.h"
@@ -1598,3 +1599,4 @@ VGEditor::VGEditor(EditorNode *p_editor) {
 	add_child(create_resource);
 	create_resource->get_ok()->set_text(TTR("Create"));
 }
+#endif
