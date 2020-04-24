@@ -307,7 +307,7 @@ static void nsvg__parseElement(char* s,
 
 	// Get attribs
 	while (!end && *s && nattr < NSVG_XML_MAX_ATTRIBS-3) {
-		char* name = NULL;
+		name = NULL;
 		char* value = NULL;
 
 		// Skip white space before the attrib name
@@ -2964,7 +2964,9 @@ static void nsvg__transformShapes(NSVGshape* shapes, float tx, float ty, float s
 {
 	NSVGshape* shape;
 	NSVGpath* path;
-	float avgs, bounds[4], t[6];
+	float avgs;
+	float bounds[4];
+	float t[6];
 	int i;
 	float* pt;
 

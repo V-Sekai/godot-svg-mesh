@@ -200,7 +200,6 @@ class VGTransformTool : public VGTool {
 
 	void get_corners(Pos4 &r_pos, const Transform2D &p_xform) {
 		Rect2 r = tove_bounds_to_rect2(path->get_subtree_graphics()->getBounds());
-		Vector2 p[4];
 		for (int i = 0; i < 4; i++) {
 			const int j = i ^ (i >> 1);
 			r_pos[i].local = Point2(r.position.x + ((j & 1) ? r.size.x : 0.0f), r.position.y + ((j & 2) ? r.size.y : 0.0f));

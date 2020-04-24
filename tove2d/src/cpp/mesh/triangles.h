@@ -132,7 +132,7 @@ private:
 	void evict();
 
 	inline Triangulation *currentTriangulation() const {
-		assert(current < triangulations.size());
+		assert(current < (int32_t)triangulations.size());
 		return triangulations[current];
 	}
 
@@ -149,7 +149,7 @@ public:
 			return;
 		}
 
-		if (triangulations.size() + 1 > cacheSize) {
+		if (triangulations.size() + 1 > (size_t)cacheSize) {
 			evict();
 		}
 
@@ -196,13 +196,13 @@ public:
 	}
 
 	inline void clear() {
-		if (current < triangulations.size()) {
+		if (current < (int32_t)triangulations.size()) {
 			triangulations[current]->triangles.clear();
 		}
 	}
 
 	inline ToveTrianglesMode getIndexMode() const {
-		if (current < triangulations.size()) {
+		if (current < (int32_t)triangulations.size()) {
 			return triangulations[current]->triangles.mode();
 		} else {
 			return TRIANGLES_LIST;
@@ -210,7 +210,7 @@ public:
 	}
 
 	inline int32_t getIndexCount() const {
-		if (current < triangulations.size()) {
+		if (current < (int32_t)triangulations.size()) {
 			return triangulations[current]->triangles.size();
 		} else {
 			return 0;
@@ -220,8 +220,8 @@ public:
 	inline void copyIndexData(
 		ToveVertexIndex *indices,
 		int32_t indexCount) const {
-
-		if (current < triangulations.size()) {
+		
+		if (current < (int32_t)triangulations.size()) {
 			auto &t = triangulations[current]->triangles;
 			t.copy(indices, indexCount);
 		}

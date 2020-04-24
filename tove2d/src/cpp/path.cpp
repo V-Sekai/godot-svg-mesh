@@ -19,9 +19,9 @@
 BEGIN_TOVE_NAMESPACE
 
 void Path::setSubpathCount(int n) {
-	if (subpaths.size() != n) {
+	if (subpaths.size() != (int32_t)n) {
 		removeSubpaths();
-		while (subpaths.size() < n) {
+		while (subpaths.size() < (int32_t)n) {
 			addSubpath(tove_make_shared<Subpath>());
 		}
 	}

@@ -129,8 +129,6 @@ Error ResourceImporterSVGSpatial::import(const String &p_source_file, const Stri
 		Ref<Texture> texture;
 		Ref<Material> renderer_material;
 		renderer->render_mesh(mesh, renderer_material, texture, path, true, true);
-		Transform2D path_xform = path->get_transform();
-		Vector2 origin = path_xform.get_origin();
 		Transform xform;
 		real_t gap = i * CMP_POINT_IN_PLANE_EPSILON * 16.0f;
 		xform.origin = Vector3(center.x * 0.001f, center.y * -0.001f, gap);

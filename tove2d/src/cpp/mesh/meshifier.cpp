@@ -289,7 +289,6 @@ ToveMeshUpdateFlags RigidTesselator::pathToMesh(
 			}
 
 			if (hasStroke) {
-				const bool closed = path->getSubpath(i)->isClosed();
 				const float miterLimitSquared = miterLimit * miterLimit;
 
 				// note: for compound mode, the call to fill->vertices

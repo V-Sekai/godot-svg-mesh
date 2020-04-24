@@ -45,8 +45,6 @@ protected:
 
 	int determineNumColors(const PaintRef &paint) const {
 		const TovePaintType style = (TovePaintType)paintData.style;
-		ToveGradientData &gradient = paintData.gradient;
-
 		if (style < PAINT_LINEAR_GRADIENT) {
 			return style == PAINT_SOLID ? 1 : 0;
 		} else {
@@ -173,8 +171,8 @@ public:
 
 class PaintFeedBase : public AbstractPaintFeed, public Observer {
 protected:
-	const ToveChangeFlags CHANGED_STYLE;
 	const PathRef path;
+	const ToveChangeFlags CHANGED_STYLE;
 	bool changed;
 
 	inline const PaintRef &getColor() const {

@@ -316,7 +316,7 @@ public:
 		const float errors[] = {f_cr - cr, f_cg - cg, f_cb - cb, f_ca - ca};
 
 		// Distribute errors using sierra dithering.
-		#pragma clang loop vectorize(enable)
+		// #pragma clang loop vectorize(enable)
 		for (int j = 0; j < 4; j++) {
 			const int offset = x * dither_components + j;
 			const float error = errors[j];

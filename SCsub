@@ -5,16 +5,6 @@ Import('env_modules')
 
 env_tove = env_modules.Clone()
 
-env_tove.add_source_files(env.modules_sources, "*.cpp")
-
-env_tove.add_source_files(env.modules_sources, "tove2d/src/cpp/*.cpp")
-env_tove.add_source_files(env.modules_sources, "tove2d/src/cpp/mesh/*.cpp")
-env_tove.add_source_files(env.modules_sources, "tove2d/src/cpp/shader/*.cpp")
-env_tove.add_source_files(env.modules_sources, "tove2d/src/cpp/gpux/*.cpp")
-env_tove.add_source_files(env.modules_sources, "tove2d/src/thirdparty/*.cpp")
-env_tove.add_source_files(env.modules_sources, "tove2d/src/thirdparty/polypartition/src/*.cpp")
-env_tove.add_source_files(env.modules_sources, "tove2d/src/thirdparty/tinyxml2/tinyxml2.cpp")
-
 import os 
 dir_path = Dir('.').abspath
 
@@ -39,3 +29,15 @@ env_tove.PackageSL(
 env_tove.PackageSL(
 	'tove2d/src/glsl/line.vert.inc',
 	Glob('tove2d/src/glsl/line.vert'))
+
+env_thirdparty = env_tove.Clone()
+env_thirdparty.disable_warnings()
+env_thirdparty.add_source_files(env.modules_sources, "tove2d/src/cpp/*.cpp")
+env_thirdparty.add_source_files(env.modules_sources, "tove2d/src/cpp/mesh/*.cpp")
+env_thirdparty.add_source_files(env.modules_sources, "tove2d/src/cpp/shader/*.cpp")
+env_thirdparty.add_source_files(env.modules_sources, "tove2d/src/cpp/gpux/*.cpp")
+env_thirdparty.add_source_files(env.modules_sources, "tove2d/src/thirdparty/*.cpp")
+env_thirdparty.add_source_files(env.modules_sources, "tove2d/src/thirdparty/polypartition/src/*.cpp")
+env_thirdparty.add_source_files(env.modules_sources, "tove2d/src/thirdparty/tinyxml2/tinyxml2.cpp")
+
+env_tove.add_source_files(env.modules_sources, "*.cpp")

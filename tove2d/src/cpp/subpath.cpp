@@ -1145,7 +1145,7 @@ void Subpath::clean(float eps) {
 	}
 	cleaned.insert(cleaned.end(), &nsvg.pts[copied * 2], &nsvg.pts[n * 2]);
 
-	if (cleaned.size() < nsvg.npts * 2) {
+	if (cleaned.size() < (int32_t)nsvg.npts * 2) {
 		nsvg.npts = cleaned.size() / 2;
 		std::memcpy(nsvg.pts, &cleaned[0], sizeof(float) * cleaned.size());
 
