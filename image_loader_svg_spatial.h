@@ -112,12 +112,15 @@ Error ResourceImporterSVGSpatial::import(const String &p_source_file, const Stri
 	root->add_child(root_path);
 	root_path->set_owner(root);
 	root_path->set_renderer(renderer);
-	Ref<ArrayMesh> combined_mesh;
-	combined_mesh.instance();
 	Ref<SurfaceTool> st;
 	st.instance();
-	for (int i = 0; i < n; i++) {
-		tove::PathRef tove_path = tove_graphics->getPath(i);
+	Spatial *spatial = memnew(Spatial);
+	spatial->set_name(root_path->get_name());
+	root->add_child(spatial);
+	spatial->set_owner(root);
+	AABB bounds;
+	for (int mesh_i = 0; mesh_i < n; mesh_i++) {
+		tove::PathRef tove_path = tove_graphics->getPath(mesh_i);
 		Point2 center = compute_center(tove_path);
 		tove_path->set(tove_path, tove::nsvg::Transform(1, 0, -center.x, 0, 1, -center.y));
 		VGPath *path = memnew(VGPath(tove_path));
@@ -130,25 +133,33 @@ Error ResourceImporterSVGSpatial::import(const String &p_source_file, const Stri
 		Ref<Material> renderer_material;
 		renderer->render_mesh(mesh, renderer_material, texture, path, true, true);
 		Transform xform;
-		real_t gap = i * CMP_POINT_IN_PLANE_EPSILON * 16.0f;
-		xform.origin = Vector3(center.x * 0.001f, center.y * -0.001f, gap);
-		st->append_from(mesh, 0, xform);
+		real_t gap = mesh_i * CMP_POINT_IN_PLANE_EPSILON * 16.0f;
+		xform.origin = Vector3(center.x * 0.001f, -center.y * 0.001f, gap);
+		MeshInstance *mesh_inst = memnew(MeshInstance);
+		mesh_inst->set_transform(xform);		
+		Ref<SpatialMaterial> mat;
+		mat.instance();
+		mat->set_flag(SpatialMaterial::FLAG_ALBEDO_FROM_VERTEX_COLOR, true);
+		mat->set_cull_mode(SpatialMaterial::CULL_DISABLED);
+		mesh->surface_set_material(0, mat);
+		mesh_inst->set_mesh(mesh);
+		bounds = bounds.merge(mesh_inst->get_aabb());
+		String name = tove_path->getName();
+		if (!name.empty()) {
+			mesh_inst->set_name(name);
+		}	
+		spatial->add_child(mesh_inst);
+		mesh_inst->set_owner(root);
 	}
-	combined_mesh = st->commit();
-	MeshInstance *mesh_inst = memnew(MeshInstance);
+	Vector3 translate = bounds.get_size();
+	translate.x = -translate.x;
+	translate.x += translate.x / 2.0f;
+	translate.y += translate.y;
+	translate.z = 0;
+	Transform xform;
+	xform.origin = translate;
+	spatial->set_transform(xform);
 	memdelete(root_path);
-	Ref<SpatialMaterial> material;
-	material.instance();
-	material->set_flag(SpatialMaterial::FLAG_ALBEDO_FROM_VERTEX_COLOR, true);
-	material->set_cull_mode(SpatialMaterial::CULL_DISABLED);
-	combined_mesh->surface_set_material(0, material);
-	mesh_inst->set_mesh(combined_mesh);
-	mesh_inst->set_name(String("Path"));
-	Vector3 translate = -combined_mesh->get_aabb().get_size() / 2;
-	translate.y = -translate.y;
-	mesh_inst->translate_object_local(translate);
-	root->add_child(mesh_inst);
-	mesh_inst->set_owner(root);
 	Ref<PackedScene> vg_scene;
 	vg_scene.instance();
 	vg_scene->pack(root);
