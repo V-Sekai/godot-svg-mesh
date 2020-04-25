@@ -107,7 +107,7 @@ Error ResourceImporterSVGSpatial::import(const String &p_source_file, const Stri
 	int32_t n = tove_graphics->getNumPaths();
 	Ref<VGMeshRenderer> renderer;
 	renderer.instance();
-	renderer->set_quality(0.2);
+	renderer->set_quality(0.4);
 	VGPath *root_path = memnew(VGPath(tove::tove_make_shared<tove::Path>()));
 	root->add_child(root_path);
 	root_path->set_owner(root);
