@@ -123,7 +123,9 @@ Ref<ShaderMaterial> copy_mesh(
 		feed->beginUpdate();
 		feed->endUpdate();
 
-		Set<uint8_t> paint_seen;
+		Vector<uint8_t> paint_seen;
+		ERR_FAIL_COND_V(paint_seen.resize(npaints) != OK, Ref<ShaderMaterial>());
+		memset(paint_seen.ptrw(), 0, npaints);
 
 		ERR_FAIL_COND_V(uvs.resize(n) != OK, Ref<ShaderMaterial>());
 		{
@@ -132,7 +134,7 @@ Ref<ShaderMaterial> copy_mesh(
 				const float *p = (float *)(vertices + i * stride);
 				int paint_index = p[2];
 				w[i] = Vector2((paint_index + 0.5f) / npaints, 0.0f);
-				paint_seen.insert(paint_index);
+				paint_seen.write[paint_index] = 1;
 			}
 		}
 
@@ -152,22 +154,27 @@ Ref<ShaderMaterial> copy_mesh(
 
 		StringBuilder code;
 		String s;
-		//code += "switch(i){\n";
-		for (Set<uint8_t>::Element *paint_i = paint_seen.front(); paint_i; paint_i = paint_i->next()) {
-			const uint8_t paint = paint_i->get();
+		for (int32_t paint_i = 0; paint_i < alloc.numPaints; paint_i++) {
+			bool has_seen = paint_seen[paint_i];
+			if (!has_seen) {
+				continue;
+			}
 
 			code += "if(i==";
-			s = String::num_int64(paint);
+			s = String::num_int64(paint_i);
 			code += s;
 			code += "){";
 
-			const float &v = arguments_data_write[paint];
+			const float &v = arguments_data_write[paint_i];
 			code += "a=";
 			s = String::num_real(v);
+			if (!s.is_numeric()) {
+				s = "0.0";
+			}
 			code += s;
 			code += ";";
 
-			const int j0 = paint * 3 * matrix_rows;
+			const int j0 = paint_i * 3 * matrix_rows;
 			code += "m=mat3(";
 
 			for (int j = 0; j < 3; j++) {
@@ -179,14 +186,20 @@ Ref<ShaderMaterial> copy_mesh(
 					if (k > 0) {
 						code += ",";
 					}
-					s = String::num(matrix_data_write[j0 + j + k * 3]);
+					float elem = matrix_data_write[j0 + j + k * 3];
+					if (!Math::is_nan(elem)) {
+						s = String::num_real(elem);
+					} else {
+						s = "0.0f";
+					}
+					if (!s.is_numeric()) {
+						s = "0.0";
+					}
 					code += s;
 				}
 			}
 			code += "));}\n";
-			//code += ");break;\n";
 		}
-		//code += "}\n";
 		if (!p_spatial) {
 			// clang-format off
         String shader_code = String(R"GLSL(
