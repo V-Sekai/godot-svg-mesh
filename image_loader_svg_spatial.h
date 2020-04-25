@@ -82,7 +82,7 @@ Error ResourceImporterSVGSpatial::import(const String &p_source_file, const Stri
 	Spatial *root = memnew(Spatial);
 
 	String units = "px";
-	float dpi = 100.0;
+	float dpi = 96.0;
 
 	Vector<uint8_t> buf = FileAccess::get_file_as_array(p_source_file);
 
@@ -133,21 +133,25 @@ Error ResourceImporterSVGSpatial::import(const String &p_source_file, const Stri
 		Ref<Material> renderer_material;
 		renderer->render_mesh(mesh, renderer_material, texture, path, true, true);
 		Transform xform;
-		real_t gap = mesh_i * CMP_POINT_IN_PLANE_EPSILON * 16.0f;
-		xform.origin = Vector3(center.x * 0.001f, -center.y * 0.001f, gap);
+		real_t gap = mesh_i * 0.00128f;
 		MeshInstance *mesh_inst = memnew(MeshInstance);
-		mesh_inst->set_transform(xform);		
-		Ref<SpatialMaterial> mat;
-		mat.instance();
-		mat->set_flag(SpatialMaterial::FLAG_ALBEDO_FROM_VERTEX_COLOR, true);
-		mat->set_cull_mode(SpatialMaterial::CULL_DISABLED);
-		mesh->surface_set_material(0, mat);
+		mesh_inst->translate(Vector3(center.x * 0.001f, -center.y * 0.001f, gap));
+		if (renderer_material.is_null()) {
+			Ref<SpatialMaterial> mat;
+			mat.instance();
+			mat->set_texture(SpatialMaterial::TEXTURE_ALBEDO, texture);
+			mat->set_flag(SpatialMaterial::FLAG_ALBEDO_FROM_VERTEX_COLOR, true);
+			mat->set_cull_mode(SpatialMaterial::CULL_DISABLED);
+			mesh->surface_set_material(0, mat);
+		} else {
+			mesh->surface_set_material(0, renderer_material);
+		}
 		mesh_inst->set_mesh(mesh);
 		bounds = bounds.merge(mesh_inst->get_aabb());
 		String name = tove_path->getName();
 		if (!name.empty()) {
 			mesh_inst->set_name(name);
-		}	
+		}
 		spatial->add_child(mesh_inst);
 		mesh_inst->set_owner(root);
 	}
@@ -155,10 +159,7 @@ Error ResourceImporterSVGSpatial::import(const String &p_source_file, const Stri
 	translate.x = -translate.x;
 	translate.x += translate.x / 2.0f;
 	translate.y += translate.y;
-	translate.z = 0;
-	Transform xform;
-	xform.origin = translate;
-	spatial->set_transform(xform);
+	spatial->translate(translate);
 	memdelete(root_path);
 	Ref<PackedScene> vg_scene;
 	vg_scene.instance();
