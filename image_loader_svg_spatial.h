@@ -132,8 +132,8 @@ Error ResourceImporterSVGSpatial::import(const String &p_source_file, const Stri
 		Ref<Texture> texture;
 		Ref<Material> renderer_material;
 		renderer->render_mesh(mesh, renderer_material, texture, path, true, true);
-		Transform xform;
-		real_t gap = mesh_i * 0.00128f;
+		Transform xform;		
+		real_t gap = mesh_i * CMP_POINT_IN_PLANE_EPSILON * 16.0f;
 		MeshInstance *mesh_inst = memnew(MeshInstance);
 		mesh_inst->translate(Vector3(center.x * 0.001f, -center.y * 0.001f, gap));
 		if (renderer_material.is_null()) {
