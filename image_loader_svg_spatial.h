@@ -114,53 +114,94 @@ Error ResourceImporterSVGSpatial::import(const String &p_source_file, const Stri
 	root_path->set_renderer(renderer);
 	Ref<SurfaceTool> st;
 	st.instance();
-	Spatial *spatial = memnew(Spatial);
-	spatial->set_name(root_path->get_name());
-	root->add_child(spatial);
-	spatial->set_owner(root);
-	AABB bounds;
-	for (int mesh_i = 0; mesh_i < n; mesh_i++) {
-		tove::PathRef tove_path = tove_graphics->getPath(mesh_i);
-		Point2 center = compute_center(tove_path);
-		tove_path->set(tove_path, tove::nsvg::Transform(1, 0, -center.x, 0, 1, -center.y));
-		VGPath *path = memnew(VGPath(tove_path));
-		path->set_position(center);
-		root_path->add_child(path);
-		path->set_owner(root);
-		Ref<ArrayMesh> mesh;
-		mesh.instance();
-		Ref<Texture> texture;
-		Ref<Material> renderer_material;
-		renderer->render_mesh(mesh, renderer_material, texture, path, true, true);
-		Transform xform;		
-		real_t gap = mesh_i * CMP_POINT_IN_PLANE_EPSILON * 16.0f;
+	bool is_merged = true;
+	if (is_merged) {
+		Ref<ArrayMesh> combined_mesh;
+		combined_mesh.instance();
+		Ref<SurfaceTool> st;
+		st.instance();
+		for (int i = 0; i < n; i++) {
+			tove::PathRef tove_path = tove_graphics->getPath(i);
+			Point2 center = compute_center(tove_path);
+			tove_path->set(tove_path, tove::nsvg::Transform(1, 0, -center.x, 0, 1, -center.y));
+			VGPath *path = memnew(VGPath(tove_path));
+			path->set_position(center);
+			root_path->add_child(path);
+			path->set_owner(root);
+			Ref<ArrayMesh> mesh;
+			mesh.instance();
+			Ref<Texture> texture;
+			Ref<Material> renderer_material;
+			renderer->render_mesh(mesh, renderer_material, texture, path, true, true);
+			Transform xform;
+			real_t gap = i * CMP_POINT_IN_PLANE_EPSILON * 16.0f;
+			xform.origin = Vector3(center.x * 0.001f, center.y * -0.001f, gap);
+			st->append_from(mesh, 0, xform);
+		}
+		combined_mesh = st->commit();
 		MeshInstance *mesh_inst = memnew(MeshInstance);
-		mesh_inst->translate(Vector3(center.x * 0.001f, -center.y * 0.001f, gap));
-		if (renderer_material.is_null()) {
-			Ref<SpatialMaterial> mat;
-			mat.instance();
-			mat->set_texture(SpatialMaterial::TEXTURE_ALBEDO, texture);
-			mat->set_flag(SpatialMaterial::FLAG_ALBEDO_FROM_VERTEX_COLOR, true);
-			mat->set_cull_mode(SpatialMaterial::CULL_DISABLED);
-			mesh->surface_set_material(0, mat);
-		} else {
-			mesh->surface_set_material(0, renderer_material);
-		}
-		mesh_inst->set_mesh(mesh);
-		bounds = bounds.merge(mesh_inst->get_aabb());
-		String name = tove_path->getName();
-		if (!name.empty()) {
-			mesh_inst->set_name(name);
-		}
-		spatial->add_child(mesh_inst);
+		memdelete(root_path);
+		Ref<SpatialMaterial> mat;
+		mat.instance();
+		mat->set_flag(SpatialMaterial::FLAG_ALBEDO_FROM_VERTEX_COLOR, true);
+		mat->set_cull_mode(SpatialMaterial::CULL_DISABLED);
+		combined_mesh->surface_set_material(0, mat);
+		mesh_inst->set_mesh(combined_mesh);
+		mesh_inst->set_name(String("Path"));
+		Vector3 translate = -combined_mesh->get_aabb().get_size() / 2;
+		translate.y = -translate.y;
+		mesh_inst->translate_object_local(translate);
+		root->add_child(mesh_inst);
 		mesh_inst->set_owner(root);
+	} else {
+		Spatial *spatial = memnew(Spatial);
+		spatial->set_name(root_path->get_name());
+		root->add_child(spatial);
+		spatial->set_owner(root);
+		AABB bounds;
+		for (int mesh_i = 0; mesh_i < n; mesh_i++) {
+			tove::PathRef tove_path = tove_graphics->getPath(mesh_i);
+			Point2 center = compute_center(tove_path);
+			tove_path->set(tove_path, tove::nsvg::Transform(1, 0, -center.x, 0, 1, -center.y));
+			VGPath *path = memnew(VGPath(tove_path));
+			path->set_position(center);
+			root_path->add_child(path);
+			path->set_owner(root);
+			Ref<ArrayMesh> mesh;
+			mesh.instance();
+			Ref<Texture> texture;
+			Ref<Material> renderer_material;
+			renderer->render_mesh(mesh, renderer_material, texture, path, true, true);
+			Transform xform;
+			real_t gap = mesh_i * CMP_POINT_IN_PLANE_EPSILON * 16.0f;
+			MeshInstance *mesh_inst = memnew(MeshInstance);
+			mesh_inst->translate(Vector3(center.x * 0.001f, -center.y * 0.001f, gap));
+			if (renderer_material.is_null()) {
+				Ref<SpatialMaterial> mat;
+				mat.instance();
+				mat->set_texture(SpatialMaterial::TEXTURE_ALBEDO, texture);
+				mat->set_flag(SpatialMaterial::FLAG_ALBEDO_FROM_VERTEX_COLOR, true);
+				mat->set_cull_mode(SpatialMaterial::CULL_DISABLED);
+				mesh->surface_set_material(0, mat);
+			} else {
+				mesh->surface_set_material(0, renderer_material);
+			}
+			mesh_inst->set_mesh(mesh);
+			bounds = bounds.merge(mesh_inst->get_aabb());
+			String name = tove_path->getName();
+			if (!name.empty()) {
+				mesh_inst->set_name(name);
+			}
+			spatial->add_child(mesh_inst);
+			mesh_inst->set_owner(root);
+		}
+		Vector3 translate = bounds.get_size();
+		translate.x = -translate.x;
+		translate.x += translate.x / 2.0f;
+		translate.y += translate.y;
+		spatial->translate(translate);
+		memdelete(root_path);
 	}
-	Vector3 translate = bounds.get_size();
-	translate.x = -translate.x;
-	translate.x += translate.x / 2.0f;
-	translate.y += translate.y;
-	spatial->translate(translate);
-	memdelete(root_path);
 	Ref<PackedScene> vg_scene;
 	vg_scene.instance();
 	vg_scene->pack(root);
