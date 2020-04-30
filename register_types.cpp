@@ -39,13 +39,13 @@ void register_vector_graphics_types() {
 #endif
 
 	ClassDB::register_class<VGPath>();
-	//ClassDB::register_class<VGPaint>();
+	ClassDB::register_virtual_class<VGPaint>();
 	ClassDB::register_class<VGColor>();
-	//ClassDB::register_class<VGGradient>();
+	ClassDB::register_class<VGGradient>();
 	ClassDB::register_class<VGLinearGradient>();
 	ClassDB::register_class<VGRadialGradient>();
 
-	//ClassDB::register_class<VGRenderer>();
+	ClassDB::register_virtual_class<VGRenderer>();
 	ClassDB::register_class<VGSpriteRenderer>();
 	ClassDB::register_class<VGMeshRenderer>();
 
