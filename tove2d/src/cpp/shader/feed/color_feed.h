@@ -24,12 +24,12 @@ public:
 	virtual ToveChangeFlags beginUpdate() = 0;
 	virtual ToveChangeFlags endUpdate() = 0;
 
-    virtual ToveShaderData *getData() {
-    	return nullptr;
-    }
+	virtual ToveShaderData *getData() {
+		return nullptr;
+	}
 
 	virtual TovePaintColorAllocation getColorAllocation() const {
-		return TovePaintColorAllocation{0, 0};
+		return TovePaintColorAllocation{ 0, 0 };
 	}
 
 	virtual void bind(const ToveGradientData &data) {
@@ -38,12 +38,10 @@ public:
 
 class ColorFeed : public AbstractFeed {
 private:
-	const float scale;
 	std::vector<PaintFeed> feeds;
 
 public:
-	ColorFeed(const GraphicsRef &graphics, float scale) :
-		scale(scale) {
+	ColorFeed(const GraphicsRef &graphics, float scale) {
 
 		const int n = graphics->getNumPaths();
 		for (int i = 0; i < n; i++) {
@@ -60,7 +58,8 @@ public:
 		}
 		return TovePaintColorAllocation{
 			int16_t(feeds.size()),
-			int16_t(numColors)};
+			int16_t(numColors)
+		};
 	}
 
 	void bind(const ToveGradientData &data) {
@@ -78,13 +77,13 @@ public:
 		return changes;
 	}
 
-    virtual ToveChangeFlags endUpdate() {
+	virtual ToveChangeFlags endUpdate() {
 		ToveChangeFlags changes = 0;
 		for (auto &feed : feeds) {
 			changes |= feed.endUpdate();
 		}
 		return changes;
-    }
+	}
 };
 
 END_TOVE_NAMESPACE
