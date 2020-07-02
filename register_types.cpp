@@ -17,6 +17,7 @@
 #include "vector_graphics_renderer.h"
 #include "vector_graphics_texture_renderer.h"
 
+#include "core/reference.h"
 #include "lottie_composition.h"
 
 #ifdef TOOLS_ENABLED
@@ -33,6 +34,8 @@ static void editor_init_callback() {
   editor->add_editor_plugin(memnew(VGEditorPlugin(editor)));
 }
 #endif
+
+static Ref<LottieFormatLoader> lottie_format_loader;
 
 void register_vector_graphics_types() {
 #if GDTOVE_SVG_RFL
@@ -63,9 +66,15 @@ void register_vector_graphics_types() {
   svg_vg_path_loader.instance();
   ResourceFormatImporter::get_singleton()->add_importer(svg_vg_path_loader);
 
+  ClassDB::register_class<LottieFormatLoader>();
+  lottie_format_loader.instance();
+  ResourceLoader::add_resource_format_loader(lottie_format_loader);
 #ifdef TOOLS_ENABLED
   EditorNode::add_init_callback(editor_init_callback);
 #endif
 }
 
-void unregister_vector_graphics_types() {}
+void unregister_vector_graphics_types() {
+  ResourceLoader::remove_resource_format_loader(lottie_format_loader);
+  lottie_format_loader.unref();
+}
