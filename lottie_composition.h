@@ -90,24 +90,59 @@ class LottieComposition : public Resource {
   Vector<LottieLayer> layer_map;
   Vector<LottieLayer> layers;
   Rect2 bounds;
-  float start_frame;
-  float end_frame;
-  float frame_rate;
+  float start_frame = 0.0f;
+  float end_frame = 0.0f;
+  float frame_rate = 0.0f;
+  String version;
+  bool three_dimentional = false;
 
 protected:
   static void _bind_methods() {}
 
 public:
-  bool from_asset(const String p_path) {
-    FileAccess *f = FileAccess::open(p_path, FileAccess::READ);
-    ERR_FAIL_COND_V(!f, Error::ERR_DOES_NOT_EXIST);
-    String json = f->get_as_utf8_string();
-    Ref<JSONParseResult> result = _JSON::get_singleton()->parse(json);
+  Error import(const String p_raw_document) {
+    Ref<JSONParseResult> result = _JSON::get_singleton()->parse(p_raw_document);
     ERR_FAIL_COND_V(result.is_null(), Error::ERR_PARSE_ERROR);
     Dictionary data = result->get_result();
+
+    version = data["v"];
+    frame_rate = data["fr"];
+    set_name(data["nm"]);
+    three_dimentional = data["ddd"];
+    start_frame = data["ip"];
+    end_frame = data["op"];
+    bounds = Rect2(0, 0, data["w"], data["h"]);
+    Array _assets = data["assets"];
+    Array _layers = data["layers"];
+    Array _fonts = data["fonts"];
+    Array _chars = data["chars"];
 
     return OK;
   }
   float get_duration_frames() { return end_frame - start_frame; }
   LottieComposition() {}
+};
+
+class LottieFormatLoader : public ResourceFormatLoader {
+public:
+  virtual void get_recognized_extensions(List<String> *p_extensions) const {}
+  virtual bool recognize_path(const String &p_path,
+                              const String &p_for_type = String()) const {
+    return p_path.get_extension().to_lower() == "lottiejson";
+  }
+  virtual bool handles_type(const String &p_type) const { return true; }
+  virtual String get_resource_type(const String &p_path) const { return ""; }
+  virtual RES load(const String &p_path, const String &p_original_path = "",
+                   Error *r_error = NULL) {
+    FileAccess *f = FileAccess::open(p_path, FileAccess::READ);
+    ERR_FAIL_COND_V(!f, RES());
+    String json = f->get_as_utf8_string();
+    Ref<LottieComposition> lottie_composition;
+    lottie_composition.instance();
+    Error err = lottie_composition->import(json);
+    if (err != OK) {
+      return RES();
+    }
+    return lottie_composition;
+  }
 };
