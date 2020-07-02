@@ -6,7 +6,6 @@
 #include "image_loader_svg_node_2d.h"
 #include "image_loader_svg_spatial.h"
 #include "image_loader_svg_vgpath.h"
-#include "lottie_document.h"
 #include "resource_format_loader_svg.h"
 #include "vector_graphics_adaptive_renderer.h"
 #include "vector_graphics_color.h"
@@ -17,6 +16,8 @@
 #include "vector_graphics_radial_gradient.h"
 #include "vector_graphics_renderer.h"
 #include "vector_graphics_texture_renderer.h"
+
+#include "lottie_composition.h"
 
 #ifdef TOOLS_ENABLED
 #include "vector_graphics_editor_plugin.h"
@@ -38,7 +39,7 @@ void register_vector_graphics_types() {
   svg_loader = memnew(ResourceFormatLoaderSVG);
   ResourceLoader::add_resource_format_loader(svg_loader);
 #endif
-  ClassDB::register_class<LottieDocument>();
+  ClassDB::register_class<LottieComposition>();
   ClassDB::register_class<VGPath>();
   ClassDB::register_virtual_class<VGPaint>();
   ClassDB::register_class<VGColor>();
