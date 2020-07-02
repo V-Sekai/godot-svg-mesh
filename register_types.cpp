@@ -35,14 +35,12 @@ static void editor_init_callback() {
 }
 #endif
 
-static Ref<LottieFormatLoader> lottie_format_loader;
 
 void register_vector_graphics_types() {
 #if GDTOVE_SVG_RFL
   svg_loader = memnew(ResourceFormatLoaderSVG);
   ResourceLoader::add_resource_format_loader(svg_loader);
 #endif
-  ClassDB::register_class<LottieComposition>();
   ClassDB::register_class<VGPath>();
   ClassDB::register_virtual_class<VGPaint>();
   ClassDB::register_class<VGColor>();
@@ -53,6 +51,9 @@ void register_vector_graphics_types() {
   ClassDB::register_virtual_class<VGRenderer>();
   ClassDB::register_class<VGSpriteRenderer>();
   ClassDB::register_class<VGMeshRenderer>();
+  
+  ClassDB::register_class<LottieComposition>();
+  ClassDB::register_class<LottieFormatLoader>();
 
   Ref<ResourceImporterSVGSpatial> svg_spatial_loader;
   svg_spatial_loader.instance();
@@ -66,15 +67,13 @@ void register_vector_graphics_types() {
   svg_vg_path_loader.instance();
   ResourceFormatImporter::get_singleton()->add_importer(svg_vg_path_loader);
 
-  ClassDB::register_class<LottieFormatLoader>();
+  Ref<LottieFormatLoader> lottie_format_loader;
   lottie_format_loader.instance();
-  ResourceLoader::add_resource_format_loader(lottie_format_loader);
+  ResourceFormatImporter::get_singleton()->add_importer(lottie_format_loader);
 #ifdef TOOLS_ENABLED
   EditorNode::add_init_callback(editor_init_callback);
 #endif
 }
 
 void unregister_vector_graphics_types() {
-  ResourceLoader::remove_resource_format_loader(lottie_format_loader);
-  lottie_format_loader.unref();
 }
