@@ -1,11 +1,11 @@
 #pragma once
 
+#include "core/bind/core_bind.h"
 #include "core/engine.h"
 #include "core/map.h"
 #include "core/resource.h"
 #include "core/vector.h"
 
-// Based on https://github.com/airbnb/lottie-android
 class LottieFont : public Resource {
   GDCLASS(LottieFont, Resource);
 
@@ -54,6 +54,8 @@ public:
 /**
  * After Effects/Bodymovin composition model. This is the serialized model from
  * which the animation will be created.
+ *
+ * Based on https://github.com/airbnb/lottie-android
  */
 class LottieComposition : public Resource {
   GDCLASS(LottieComposition, Resource);
@@ -71,21 +73,20 @@ class LottieComposition : public Resource {
   float start_frame;
   float end_frame;
   float frame_rate;
-  /**
-   * Used to determine if an animation can be drawn with hardware acceleration.
-   */
-  // bool hasDashPattern;
-  /**
-   * Counts the number of mattes and masks. Before Android switched to SKIA
-   * for drawing in Oreo (API 28), using hardware acceleration with mattes and
-   * masks was only faster until you had ~4 masks after which it would actually
-   * become slower.
-   */
-  // int32_t maskAndMatteCount = 0;
 
 protected:
   static void _bind_methods() {}
 
 public:
+  bool from_asset(const String p_path) {
+    FileAccess *f = FileAccess::open(p_path, FileAccess::READ);
+    ERR_FAIL_COND_V(!f, Error::ERR_DOES_NOT_EXIST);
+    String json = f->get_as_utf8_string();
+    Ref<JSONParseResult> result = _JSON::get_singleton()->parse(json);
+    ERR_FAIL_COND_V(result.is_null(), Error::ERR_PARSE_ERROR);
+    Dictionary data = result->get_result();
+    return OK;
+  }
+  float get_duration_frames() { return end_frame - start_frame; }
   LottieComposition() {}
 };
