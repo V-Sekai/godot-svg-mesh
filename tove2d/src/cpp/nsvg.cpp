@@ -33,7 +33,7 @@ namespace nsvg {
 
 thread_local NSVGparser *_parser = nullptr;
 thread_local NSVGrasterizer *rasterizer = nullptr;
-thread_local ToveRasterizeSettings defaultSettings = {-1.0f, -1.0f, 0};
+thread_local ToveRasterizeSettings defaultSettings = {-1.0f, -1.0f};
 
 // scoping the locale should no longer be necessary.
 #define NSVG_SCOPE_LOCALE 0
@@ -261,7 +261,6 @@ const ToveRasterizeSettings *getDefaultRasterizeSettings() {
 
 		defaultSettings.tessTolerance = rasterizer->tessTol;
 		defaultSettings.distTolerance = rasterizer->distTol;
-		defaultSettings.quality = 1; //1;
 	}
 
 	return &defaultSettings;
@@ -282,7 +281,6 @@ static NSVGrasterizer *getRasterizer(
 
 	rasterizer->tessTol = settings->tessTolerance;
 	rasterizer->distTol = settings->distTolerance;
-	rasterizer->quality = settings->quality;
 
 	rasterizer->nedges = 0;
 	rasterizer->npoints = 0;

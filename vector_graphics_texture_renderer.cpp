@@ -24,7 +24,6 @@ static Ref<Image> tove_graphics_rasterize(
 	const ToveRasterizeSettings *defaultSettings = tove::nsvg::getDefaultRasterizeSettings();
 	if (defaultSettings) {
 		ToveRasterizeSettings settings = *defaultSettings;
-		settings.quality = p_hq ? 1 : 0;
 		PoolVector<uint8_t>::Write dw = dst_image.write();
 		p_tove_graphics->rasterize(&dw[0], p_width, p_height, w * 4, p_tx, p_ty, p_scale, &settings);
 	}
