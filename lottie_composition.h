@@ -34,6 +34,23 @@ protected:
 	static void _bind_methods() {}
 
 public:
+	bool threedimensional = false;
+	bool hidden = false;
+	int type = 0;
+	String name = "";
+	int parent_index = 0;
+	float stretch = 0;
+	Transform transform;
+	bool auto_orient = false;
+	float in_point;
+	float out_point;
+	float start_time;
+	// BlendMode blend_mode
+	// BatteMode matte_mode;
+	int index = -1;
+	bool has_masks = false;
+	// Vector<masksProperties> masks;
+	// Vector<Effect> effects;
 	LottieLayer() {}
 };
 
@@ -88,8 +105,8 @@ class LottieComposition : public Resource {
 	Map<String, LottieFont> fonts;
 	Vector<LottieMarker> markers;
 	Vector<LottieFontCharacter> characters;
-	Vector<LottieLayer> layer_map;
-	Vector<LottieLayer> layers;
+	Map<String, Ref<LottieLayer>> layer_map;
+	Vector<Ref<LottieLayer>> layers;
 	Rect2 bounds;
 	float start_frame = 0.0f;
 	float end_frame = 0.0f;
@@ -115,9 +132,22 @@ public:
 		bounds = Rect2(0, 0, data["w"], data["h"]);
 		Array _assets = data["assets"];
 		Array _layers = data["layers"];
+		import_layers(_layers, layer_map, layers);
 		Array _fonts = data["fonts"];
 		Array _chars = data["chars"];
 
+		return OK;
+	}
+	Error import_layers(Array p_layers, Map<String, Ref<LottieLayer>> &r_layer_map, Vector<Ref<LottieLayer>> &r_layers) {
+		for (int32_t i = 0; i < p_layers.size(); i++) {
+			Ref<LottieLayer> layer;
+			layer.instance();
+			Dictionary d = p_layers[i];
+			String name = d["nm"];
+			layer->name = name;
+			r_layer_map.insert(name, layer);
+			r_layers.push_back(layer);
+		}
 		return OK;
 	}
 	float get_duration_frames() { return end_frame - start_frame; }
