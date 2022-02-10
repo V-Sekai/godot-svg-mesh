@@ -1,4 +1,6 @@
-Vector Graphics for Godot.
+# Vector Graphics for Godot.
+
+Work in progress.
 
 * This is an experiment
 * It's written in C++ 11, so it's editor-only
