@@ -1,59 +1,21 @@
 #include "image_loader_svg_spatial.h"
 
-String ResourceImporterSVGSpatial::get_importer_name() const {
-
-	return "svgspatial";
+ResourceImporterSVGSpatial::ResourceImporterSVGSpatial() {
 }
 
-String ResourceImporterSVGSpatial::get_visible_name() const {
-
-	return "SVGSpatial";
+ResourceImporterSVGSpatial::~ResourceImporterSVGSpatial() {
 }
 
-void ResourceImporterSVGSpatial::get_recognized_extensions(List<String> *p_extensions) const {
-	p_extensions->push_back("svg");
-}
-
-String ResourceImporterSVGSpatial::get_save_extension() const {
-	return "scn";
-}
-
-String ResourceImporterSVGSpatial::get_resource_type() const {
-
-	return "PackedScene";
-}
-
-bool ResourceImporterSVGSpatial::get_option_visibility(const String &p_option, const Map<StringName, Variant> &p_options) const {
-
-	return true;
-}
-
-int ResourceImporterSVGSpatial::get_preset_count() const {
-	return 0;
-}
-String ResourceImporterSVGSpatial::get_preset_name(int p_idx) const {
-
-	return String();
-}
-
-void ResourceImporterSVGSpatial::get_import_options(List<ImportOption> *r_options, int p_preset) const {
-}
-
-Error ResourceImporterSVGSpatial::import(const String &p_source_file, const String &p_save_path, const Map<StringName, Variant> &p_options, List<String> *r_platform_variants, List<String> *r_gen_files, Variant *r_metadata) {
+Node *ResourceImporterSVGSpatial::import_scene(const String &p_path, uint32_t p_flags, int p_bake_fps, uint32_t p_compress_flags, List<String> *r_missing_deps, Error *r_err) {
 	Spatial *root = memnew(Spatial);
-
 	String units = "px";
 	float dpi = 96.0;
-
-	Vector<uint8_t> buf = FileAccess::get_file_as_array(p_source_file);
-
+	Vector<uint8_t> buf = FileAccess::get_file_as_array(p_path);
 	if (!buf.size()) {
 		return FAILED;
 	}
-
 	String str;
 	str.parse_utf8((const char *)buf.ptr(), buf.size());
-
 	tove::GraphicsRef tove_graphics = tove::Graphics::createFromSVG(
 			str.utf8().ptr(), units.utf8().ptr(), dpi);
 	{
@@ -122,16 +84,5 @@ Error ResourceImporterSVGSpatial::import(const String &p_source_file, const Stri
 	translate.y += translate.y;
 	spatial->translate(translate);
 	memdelete(root_path);
-	Ref<PackedScene> vg_scene;
-	vg_scene.instance();
-	vg_scene->pack(root);
-	String save_path = p_save_path + ".scn";
-	r_gen_files->push_back(save_path);
-	return ResourceSaver::save(save_path, vg_scene);
-}
-
-ResourceImporterSVGSpatial::ResourceImporterSVGSpatial() {
-}
-
-ResourceImporterSVGSpatial::~ResourceImporterSVGSpatial() {
+	return root;
 }
