@@ -7,7 +7,6 @@ EditorSceneImporterSVG::~EditorSceneImporterSVG() {
 }
 
 Node *EditorSceneImporterSVG::import_scene(const String &p_path, uint32_t p_flags, int p_bake_fps, uint32_t p_compress_flags, List<String> *r_missing_deps, Error *r_err) {
-	Spatial *root = memnew(Spatial);
 	String units = "px";
 	float dpi = 96.0;
 	Vector<uint8_t> buf = FileAccess::get_file_as_array(p_path);
@@ -18,29 +17,21 @@ Node *EditorSceneImporterSVG::import_scene(const String &p_path, uint32_t p_flag
 	str.parse_utf8((const char *)buf.ptr(), buf.size());
 	tove::GraphicsRef tove_graphics = tove::Graphics::createFromSVG(
 			str.utf8().ptr(), units.utf8().ptr(), dpi);
-	{
-		const float *bounds = tove_graphics->getBounds();
-		float s = 256.0f / MAX(bounds[2] - bounds[0], bounds[3] - bounds[1]);
-		if (s > 1.0f) {
-			tove::nsvg::Transform transform(s, 0, 0, 0, s, 0);
-			transform.setWantsScaleLineWidth(true);
-			tove_graphics->set(tove_graphics, transform);
-		}
+	const float *tove_bounds = tove_graphics->getBounds();
+	float s = 256.0f / MAX(tove_bounds[2] - tove_bounds[0], tove_bounds[3] - tove_bounds[1]);
+	if (s > 1.0f) {
+		tove::nsvg::Transform transform(s, 0, 0, 0, s, 0);
+		transform.setWantsScaleLineWidth(true);
+		tove_graphics->set(tove_graphics, transform);
 	}
 	int32_t n = tove_graphics->getNumPaths();
 	Ref<VGMeshRenderer> renderer;
 	renderer.instance();
 	renderer->set_quality(0.4);
 	VGPath *root_path = memnew(VGPath(tove::tove_make_shared<tove::Path>()));
-	root->add_child(root_path);
-	root_path->set_owner(root);
 	root_path->set_renderer(renderer);
 	Ref<SurfaceTool> st;
 	st.instance();
-	Spatial *spatial = memnew(Spatial);
-	spatial->set_name(root_path->get_name());
-	root->add_child(spatial);
-	spatial->set_owner(root);
 	AABB bounds;
 	for (int mesh_i = 0; mesh_i < n; mesh_i++) {
 		tove::PathRef tove_path = tove_graphics->getPath(mesh_i);
@@ -49,7 +40,7 @@ Node *EditorSceneImporterSVG::import_scene(const String &p_path, uint32_t p_flag
 		VGPath *path = memnew(VGPath(tove_path));
 		path->set_position(center);
 		root_path->add_child(path);
-		path->set_owner(root);
+		path->set_owner(root_path);
 		Ref<ArrayMesh> mesh;
 		mesh.instance();
 		Ref<Texture> texture;
@@ -76,15 +67,14 @@ Node *EditorSceneImporterSVG::import_scene(const String &p_path, uint32_t p_flag
 			mesh_inst->set_name(name);
 		}
 		spatial->add_child(mesh_inst);
-		mesh_inst->set_owner(root);
+		mesh_inst->set_owner(root_path);
 	}
 	Vector3 translate = bounds.get_size();
 	translate.x = -translate.x;
 	translate.x += translate.x / 2.0f;
 	translate.y += translate.y;
 	spatial->translate(translate);
-	memdelete(root_path);
-	return root;
+	return root_path;
 }
 
 void EditorSceneImporterSVG::get_extensions(List<String> *r_extensions) const {
