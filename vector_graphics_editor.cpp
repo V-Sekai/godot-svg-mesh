@@ -5,9 +5,9 @@
 #ifdef TOOLS_ENABLED
 #include "vector_graphics_editor.h"
 
-#include "editor/plugins/canvas_item_editor_plugin.h"
 #include "core/os/keyboard.h"
 #include "editor/editor_scale.h"
+#include "editor/plugins/canvas_item_editor_plugin.h"
 #include "tove2d/src/cpp/mesh/meshifier.h"
 
 static Array subpath_points_array(const tove::SubpathRef &subpath) {
@@ -27,7 +27,7 @@ inline bool is_control_point(int pt) {
 
 Vector2 VGTool::global_to_local(CanvasItem *p_node, const Vector2 p_where) const {
 	return p_node->get_global_transform().affine_inverse().xform(
-		canvas_item_editor->snap_point(canvas_item_editor->get_canvas_transform().affine_inverse().xform(p_where)));
+			canvas_item_editor->snap_point(canvas_item_editor->get_canvas_transform().affine_inverse().xform(p_where)));
 }
 
 class GaussJordan {
@@ -76,7 +76,8 @@ private:
 	}
 
 public:
-	GaussJordan(Vector3 A1, Vector3 A2, Vector3 A3, Vector3 b) : b(b) {
+	GaussJordan(Vector3 A1, Vector3 A2, Vector3 A3, Vector3 b) :
+			b(b) {
 		A[0] = A1;
 		A[1] = A2;
 		A[2] = A3;
@@ -104,30 +105,29 @@ public:
 Transform2D mapping_to_transform(const Vector2 &u1, const Vector2 &v1, const Vector2 &u2, const Vector2 &v2, const Vector2 &u3, const Vector2 &v3) {
 
 	GaussJordan gx(
-		Vector3(u1.x, u1.y, 1),
-		Vector3(u2.x, u2.y, 1),
-		Vector3(u3.x, u3.y, 1),
-		Vector3(v1.x, v2.x, v3.x)
-	);
+			Vector3(u1.x, u1.y, 1),
+			Vector3(u2.x, u2.y, 1),
+			Vector3(u3.x, u3.y, 1),
+			Vector3(v1.x, v2.x, v3.x));
 	Vector3 x = gx.solve();
 
 	GaussJordan gy(
-		Vector3(u1.x, u1.y, 1),
-		Vector3(u2.x, u2.y, 1),
-		Vector3(u3.x, u3.y, 1),
-		Vector3(v1.y, v2.y, v3.y)
-	);
+			Vector3(u1.x, u1.y, 1),
+			Vector3(u2.x, u2.y, 1),
+			Vector3(u3.x, u3.y, 1),
+			Vector3(v1.y, v2.y, v3.y));
 	Vector3 y = gy.solve();
 
 	return Transform2D(x[0], y[0], x[1], y[1], x[2], y[2]);
 }
 
 Vector2 ray_ray(const Vector2 &s1, const Vector2 &r1, const Vector2 &s2, const Vector2 &r2) {
-	float t = -((-(r2.y*s1.x) + r2.y*s2.x + r2.x*s1.y - r2.x*s2.y)/(r2.x*r1.y - r1.x*r2.y));
+	float t = -((-(r2.y * s1.x) + r2.y * s2.x + r2.x * s1.y - r2.x * s2.y) / (r2.x * r1.y - r1.x * r2.y));
 	return s1 + t * r1;
 }
 
-VGTool::VGTool() : canvas_item_editor(CanvasItemEditor::get_singleton()) {
+VGTool::VGTool() :
+		canvas_item_editor(CanvasItemEditor::get_singleton()) {
 }
 
 class VGTransformTool : public VGTool {
@@ -236,7 +236,8 @@ class VGTransformTool : public VGTool {
 	}
 
 public:
-	VGTransformTool(VGEditor *p_vg_editor, VGPath *p_path) :vg_editor(p_vg_editor), path(p_path) {
+	VGTransformTool(VGEditor *p_vg_editor, VGPath *p_path) :
+			vg_editor(p_vg_editor), path(p_path) {
 		clicked = WIDGET_NONE;
 		undo_redo = vg_editor->get_editor_node()->get_undo_redo();
 	}
@@ -265,7 +266,7 @@ public:
 						Pos4 p;
 						get_corners(p, path->get_transform());
 						const Point2 q_inv = xform.affine_inverse().xform(q_canvas);
-		
+
 						offset = p[i].global - q_inv;
 						corner_widget.init(p, i);
 						corner_widget.t = xform;
@@ -279,7 +280,7 @@ public:
 						get_corners(p, path->get_transform());
 						const Point2 q_inv = xform.affine_inverse().xform(q_canvas);
 						Vector2 midpoint_inv = (p[i].global + p[(i + 1) % 4].global) / 2;
-				
+
 						offset = midpoint_inv - q_inv;
 						midpoint_widget.init(p, i);
 						midpoint_widget.t = xform;
@@ -316,7 +317,7 @@ public:
 				}
 			} else if (mb->get_button_index() == BUTTON_LEFT && clicked != WIDGET_NONE) {
 				if (clicked != WIDGET_NONE) {
-					if (clicked != WIDGET_ROTATE) {						
+					if (clicked != WIDGET_ROTATE) {
 						undo_redo->create_action(TTR("Transform Path"));
 						undo_redo->add_do_method(path, "set_transform", transform1);
 						undo_redo->add_do_method(path, "recenter");
@@ -330,7 +331,7 @@ public:
 						_commit_action();
 					}
 
-					clicked = WIDGET_NONE;				
+					clicked = WIDGET_NONE;
 				}
 
 				return true;
@@ -358,20 +359,20 @@ public:
 						Vector2 p = ray_ray(corner_widget.opposite.global, corner_widget.u, g, corner_widget.v);
 
 						update(
-							corner_widget.between.local, p,
-							corner_widget.opposite.local, corner_widget.opposite.global,
-							corner_widget.corner.local, g);
+								corner_widget.between.local, p,
+								corner_widget.opposite.local, corner_widget.opposite.global,
+								corner_widget.corner.local, g);
 					} break;
-				
+
 					case WIDGET_MIDPOINT: {
 						Vector2 m = (midpoint_widget.opposite_0.global + midpoint_widget.opposite_1.global) / 2;
 						Vector2 u = midpoint_widget.u;
 						float l = (g - m).dot(u);
 
 						update(
-							midpoint_widget.opposite_0.local, midpoint_widget.opposite_0.global,
-							midpoint_widget.opposite_1.local, midpoint_widget.opposite_1.global,
-							(midpoint_widget.corner_0.local + midpoint_widget.corner_1.local) / 2, m + u * l);
+								midpoint_widget.opposite_0.local, midpoint_widget.opposite_0.global,
+								midpoint_widget.opposite_1.local, midpoint_widget.opposite_1.global,
+								(midpoint_widget.corner_0.local + midpoint_widget.corner_1.local) / 2, m + u * l);
 					} break;
 
 					case WIDGET_ROTATE: {
@@ -402,7 +403,7 @@ public:
 		Transform2D xform = canvas_item_editor->get_canvas_transform() * path->get_global_transform();
 		const Ref<Texture> handle = vg_editor->get_icon("EditorHandle", "EditorIcons");
 		Control *vpc = canvas_item_editor->get_viewport_control();
-		
+
 		Pos4 p;
 		get_corners(p, xform);
 
@@ -435,8 +436,9 @@ class VGEllipseTool : public VGTool {
 	tove::PathRef tove_path;
 	Vector2 point0;
 
-public:	
-	VGEllipseTool(VGPath *p_root) : root(p_root) {
+public:
+	VGEllipseTool(VGPath *p_root) :
+			root(p_root) {
 		path = NULL;
 	}
 
@@ -471,14 +473,14 @@ public:
 					} else if (path) {
 						// commit
 
-						//undo_redo->add_do_method(root, "add_vgpath");
-						//undo_redo->add_undo_method(root, "remove_vgpath", root->get_child_count());
-						
-						//undo_redo->add_do_method(root, "set_child_fill_color", n, subpath_points_array(tove_subpath));
-						//undo_redo->add_do_method(root, "set_child_line_color", n, subpath_points_array(tove_subpath));
-						//undo_redo->add_do_method(root, "set_child_points", n, subpath_points_array(tove_subpath));
-						//undo_redo->add_undo_method(root, "remove_child", n);
-						//undo_redo->commit_action();
+						// undo_redo->add_do_method(root, "add_vgpath");
+						// undo_redo->add_undo_method(root, "remove_vgpath", root->get_child_count());
+
+						// undo_redo->add_do_method(root, "set_child_fill_color", n, subpath_points_array(tove_subpath));
+						// undo_redo->add_do_method(root, "set_child_line_color", n, subpath_points_array(tove_subpath));
+						// undo_redo->add_do_method(root, "set_child_points", n, subpath_points_array(tove_subpath));
+						// undo_redo->add_undo_method(root, "remove_child", n);
+						// undo_redo->commit_action();
 					}
 
 					path = NULL;
@@ -497,17 +499,17 @@ public:
 
 				Vector2 center = (point0 + point1) / 2;
 				Vector2 radius = (point1 - center).abs();
-				//float tx, ty = cx, cy
+				// float tx, ty = cx, cy
 
 				tove::SubpathRef tove_subpath = std::make_shared<tove::Subpath>();
 				tove_subpath->drawEllipse(0, 0, radius.x, radius.y);
-				//tove_path->getSubpath(0)->set(tove_subpath);
+				// tove_path->getSubpath(0)->set(tove_subpath);
 
 				path->set_points(0, subpath_points_array(tove_subpath));
 				path->set_position(center);
 
-				//const float *bounds = path->get_tove_path()->getBounds();
-				//printf("%f %f\n", bounds[0], bounds[1]);
+				// const float *bounds = path->get_tove_path()->getBounds();
+				// printf("%f %f\n", bounds[0], bounds[1]);
 			}
 
 			return true;
@@ -571,7 +573,7 @@ private:
 
 public:
 	PointIterator(
-		const tove::PathRef &p_path_ref);
+			const tove::PathRef &p_path_ref);
 
 	bool next();
 
@@ -600,9 +602,9 @@ private:
 
 public:
 	ControlPointIterator(
-		const tove::PathRef &p_path_ref,
-		const Vertex &p_selected_point,
-		const Vertex &p_edited_point);
+			const tove::PathRef &p_path_ref,
+			const Vertex &p_selected_point,
+			const Vertex &p_edited_point);
 
 	bool next();
 
@@ -644,9 +646,9 @@ class VGCurveTool : public VGTool {
 		return node_vg;
 	}
 
-public:	
+public:
 	VGCurveTool(VGEditor *p_vg_editor, VGPath *p_path) :
-		vg_editor(p_vg_editor), editor(p_vg_editor->get_editor_node()) {
+			vg_editor(p_vg_editor), editor(p_vg_editor->get_editor_node()) {
 
 		node_vg = p_path;
 
@@ -721,7 +723,7 @@ public:
 						}
 					} else {
 						const bool clicked = !edited_path.valid() && mb_down_time > 0 &&
-							OS::get_singleton()->get_ticks_msec() - mb_down_time < 500;
+											 OS::get_singleton()->get_ticks_msec() - mb_down_time < 500;
 						mb_down_time = 0;
 						edited_point = PosVertex();
 
@@ -730,9 +732,9 @@ public:
 
 							const SubpathPos insert = mb_down_at;
 							undo_redo->add_do_method(node_vg, "insert_curve",
-								insert.subpath, insert.t);
+									insert.subpath, insert.t);
 							undo_redo->add_undo_method(node_vg, "set_points",
-								insert.subpath, pre_move_edit);
+									insert.subpath, pre_move_edit);
 
 							_commit_action();
 
@@ -743,9 +745,9 @@ public:
 							undo_redo->create_action(TTR("Edit Path"));
 
 							undo_redo->add_do_method(node_vg, "set_points",
-								edited_path.subpath, _get_points(edited_path));
+									edited_path.subpath, _get_points(edited_path));
 							undo_redo->add_undo_method(node_vg, "set_points",
-								edited_path.subpath, pre_move_edit);
+									edited_path.subpath, pre_move_edit);
 
 							edited_path = SubpathId();
 							_commit_action();
@@ -797,7 +799,7 @@ public:
 
 				if (edited_point.valid()) {
 					Vector2 cpoint = _get_node()->get_global_transform().affine_inverse().xform(canvas_item_editor->snap_point(canvas_item_editor->get_canvas_transform().affine_inverse().xform(gpoint)));
-					//cpoint = node_vg->get_vg_transform().affine_inverse().xform(cpoint);
+					// cpoint = node_vg->get_vg_transform().affine_inverse().xform(cpoint);
 					edited_point = PosVertex(edited_point, cpoint);
 
 					tove::SubpathRef subpath = node_vg->get_subpath(edited_point.subpath);
@@ -807,7 +809,7 @@ public:
 					canvas_item_editor->get_viewport_control()->update();
 				} else if (edited_path.valid()) {
 					Vector2 cpoint = _get_node()->get_global_transform().affine_inverse().xform(canvas_item_editor->snap_point(canvas_item_editor->get_canvas_transform().affine_inverse().xform(gpoint)));
-					//cpoint = node_vg->get_vg_transform().affine_inverse().xform(cpoint);
+					// cpoint = node_vg->get_vg_transform().affine_inverse().xform(cpoint);
 					tove::SubpathRef subpath = node_vg->get_subpath(mb_down_at.subpath);
 					subpath->mould(mb_down_at.t, cpoint.x, cpoint.y);
 
@@ -844,11 +846,10 @@ public:
 		return false;
 	}
 
-	void forward_canvas_draw_over_viewport(Control *p_overlay)
-	{
+	void forward_canvas_draw_over_viewport(Control *p_overlay) {
 		Control *vpc = canvas_item_editor->get_viewport_control();
 		Transform2D xform = canvas_item_editor->get_canvas_transform() *
-			_get_node()->get_global_transform();
+							_get_node()->get_global_transform();
 		const Ref<Texture> handle = vg_editor->get_icon("EditorHandle", "EditorIcons");
 
 		const tove::PathRef path = node_vg->get_tove_path();
@@ -861,7 +862,7 @@ public:
 				Vector2 q = xform.xform(cp_iterator.get_pos());
 				vpc->draw_line(p, q, line_color, 2 * EDSCALE);
 			}
-		}	
+		}
 
 		{
 			const Vertex active_point = get_active_point();
@@ -870,9 +871,10 @@ public:
 			while (pt_iterator.next()) {
 				Vector2 p = xform.xform(pt_iterator.get_pos());
 				const Color modulate = (pt_iterator.get_vertex() == active_point) ?
-					Color(0.5, 1, 2) : Color(1, 1, 1);
+											   Color(0.5, 1, 2) :
+												 Color(1, 1, 1);
 				vpc->draw_texture(handle, p - handle->get_size() * 0.5, modulate);
-			}		
+			}
 		}
 
 		{
@@ -883,7 +885,7 @@ public:
 				Rect2 r = Rect2(p - s / 2, s);
 				vpc->draw_texture_rect(handle, r, false, Color(1, 1, 1));
 			}
-		}		
+		}
 	}
 };
 
@@ -902,14 +904,14 @@ Array VGCurveTool::_get_points(const SubpathId &p_id) {
 }
 
 Node2D *VGEditor::_get_node() const {
-    return node_vg;
+	return node_vg;
 }
 
 void VGEditor::_set_node(Node *p_node_vg) {
 	if (node_vg) {
 		node_vg->remove_change_receptor(this);
 	}
-    node_vg = Object::cast_to<VGPath>(p_node_vg);
+	node_vg = Object::cast_to<VGPath>(p_node_vg);
 	if (node_vg) {
 		node_vg->add_change_receptor(this);
 	}
@@ -919,11 +921,11 @@ void VGEditor::_set_node(Node *p_node_vg) {
 }
 
 SubpathId::SubpathId() :
-	subpath(-1) {
+		subpath(-1) {
 }
 
 SubpathId::SubpathId(int p_subpath) :
-	subpath(p_subpath) {
+		subpath(p_subpath) {
 }
 
 bool SubpathId::operator==(const SubpathId &p_id) const {
@@ -942,17 +944,17 @@ bool SubpathId::valid() const {
 }
 
 Vertex::Vertex() :
-	pt(-1) {
+		pt(-1) {
 	// invalid vertex
 }
 
 Vertex::Vertex(int p_pt) :
-	pt(p_pt) {
+		pt(p_pt) {
 }
 
 Vertex::Vertex(int p_subpath, int p_pt) :
-	SubpathId(p_subpath),
-	pt(p_pt) {
+		SubpathId(p_subpath),
+		pt(p_pt) {
 }
 
 bool Vertex::operator==(const Vertex &p_vertex) const {
@@ -970,38 +972,34 @@ bool Vertex::valid() const {
 	return pt >= 0;
 }
 
-
 PosVertex::PosVertex() {
 	// invalid vertex
 }
 
 PosVertex::PosVertex(const Vertex &p_vertex, const Vector2 &p_pos) :
-	Vertex(p_vertex.subpath, p_vertex.pt),
-	pos(p_pos) {
+		Vertex(p_vertex.subpath, p_vertex.pt),
+		pos(p_pos) {
 }
 
 PosVertex::PosVertex(int p_subpath, int p_pt, const Vector2 &p_pos) :
-	Vertex(p_subpath, p_pt),
-	pos(p_pos) {
+		Vertex(p_subpath, p_pt),
+		pos(p_pos) {
 }
 
-
 SubpathPos::SubpathPos() :
-	t(-1) {
+		t(-1) {
 	// invalid vertex
 }
 
 SubpathPos::SubpathPos(int p_subpath, float p_t) :
-	SubpathId(p_subpath),
-	t(p_t) {
+		SubpathId(p_subpath),
+		t(p_t) {
 	// vertex p_vertex of polygon p_polygon
 }
 
 bool SubpathPos::valid() const {
 	return t >= 0;
 }
-
-
 
 bool VGEditor::_is_empty() const {
 
@@ -1037,9 +1035,9 @@ void VGEditor::_tool_selected(int p_tool) {
 				tool = Ref<VGTool>(memnew(VGCurveTool(this, node_vg)));
 				break;
 
-			/*case TOOL_ELLIPSE:
-				tool = Ref<VGTool>(memnew(VGEllipseTool(node_vg)));
-				break;*/
+				/*case TOOL_ELLIPSE:
+					tool = Ref<VGTool>(memnew(VGEllipseTool(node_vg)));
+					break;*/
 		}
 	}
 
@@ -1049,11 +1047,11 @@ void VGEditor::_tool_selected(int p_tool) {
 void VGEditor::_node_replace_owner_do(Node *p_base, Node *p_node, Node *p_root) {
 
 	if (p_node->get_owner() == p_base && p_node != p_root) {
-		//undo_redo->add_do_method(p_node, "set_owner", p_root);
+		// undo_redo->add_do_method(p_node, "set_owner", p_root);
 	}
 
 	for (int i = 0; i < p_node->get_child_count(); i++) {
-		//undo_redo->add_do_method(p_node, "remove_child", p_node->get_child(i));
+		// undo_redo->add_do_method(p_node, "remove_child", p_node->get_child(i));
 		_node_replace_owner_do(p_base, p_node->get_child(i), p_root);
 	}
 }
@@ -1066,7 +1064,7 @@ void VGEditor::_node_replace_owner_undo(Node *p_base, Node *p_node, Node *p_root
 	undo_redo->add_undo_reference(p_node);
 
 	for (int i = 0; i < p_node->get_child_count(); i++) {
-		//undo_redo->add_undo_method(p_node, "add_child", p_node->get_child(i));
+		// undo_redo->add_undo_method(p_node, "add_child", p_node->get_child(i));
 		_node_replace_owner_undo(p_base, p_node->get_child(i), p_root);
 	}
 }
@@ -1082,7 +1080,7 @@ void VGEditor::_create_mesh_node() {
 		return;
 	}
 
-	//EditorNode::get_singleton()->get_scene_tree_dock()->replace_node(node_vg, baked);
+	// EditorNode::get_singleton()->get_scene_tree_dock()->replace_node(node_vg, baked);
 
 	Node *parent = node_vg->get_parent();
 
@@ -1094,7 +1092,7 @@ void VGEditor::_create_mesh_node() {
 	undo_redo->add_do_method(baked, "set_owner", node_vg->get_owner());
 	_node_replace_owner_do(baked, baked, node_vg->get_owner());
 	undo_redo->add_do_reference(baked);
-	//undo_redo->commit_action();
+	// undo_redo->commit_action();
 
 	undo_redo->add_undo_method(parent, "remove_child", baked);
 	undo_redo->add_undo_method(parent, "add_child", node_vg);
@@ -1103,7 +1101,7 @@ void VGEditor::_create_mesh_node() {
 	_node_replace_owner_undo(node_vg, node_vg, node_vg->get_owner());
 	undo_redo->add_undo_reference(node_vg);
 
-	//undo_redo->create_action(TTR("Remove VG Node"));
+	// undo_redo->create_action(TTR("Remove VG Node"));
 	undo_redo->commit_action();
 }
 
@@ -1115,9 +1113,9 @@ void VGEditor::_notification(int p_what) {
 
 			tool_buttons[0]->set_icon(EditorNode::get_singleton()->get_gui_base()->get_icon("ToolSelect", "EditorIcons"));
 			tool_buttons[1]->set_icon(EditorNode::get_singleton()->get_gui_base()->get_icon("EditBezier", "EditorIcons"));
-			//tool_buttons[2]->set_icon(EditorNode::get_singleton()->get_gui_base()->get_icon("SphereShape", "EditorIcons"));
+			// tool_buttons[2]->set_icon(EditorNode::get_singleton()->get_gui_base()->get_icon("SphereShape", "EditorIcons"));
 
-			button_bake->set_icon(EditorNode::get_singleton()->get_gui_base()->get_icon("MeshInstance2D", "EditorIcons"));			
+			button_bake->set_icon(EditorNode::get_singleton()->get_gui_base()->get_icon("MeshInstance2D", "EditorIcons"));
 
 			get_tree()->connect("node_removed", this, "_node_removed");
 
@@ -1171,9 +1169,9 @@ bool VGEditor::forward_gui_input(const Ref<InputEvent> &p_event) {
 }
 
 PointIterator::PointIterator(
-	const tove::PathRef &p_path_ref) :
-	
-	path_ref(p_path_ref) {
+		const tove::PathRef &p_path_ref) :
+
+		path_ref(p_path_ref) {
 
 	n_subpaths = path_ref->getNumSubpaths();
 
@@ -1227,13 +1225,13 @@ inline int knot_point(int pt) {
 }
 
 ControlPointIterator::ControlPointIterator(
-	const tove::PathRef &p_path_ref,
-	const Vertex &p_selected_point,
-	const Vertex &p_edited_point) :
-	
-	selected_point(p_selected_point),
-	edited_point(p_edited_point),
-	path_ref(p_path_ref) {
+		const tove::PathRef &p_path_ref,
+		const Vertex &p_selected_point,
+		const Vertex &p_edited_point) :
+
+		selected_point(p_selected_point),
+		edited_point(p_edited_point),
+		path_ref(p_path_ref) {
 
 	n_subpaths = path_ref->getNumSubpaths();
 	edited_pt0 = knot_point(edited_point.pt);
@@ -1392,19 +1390,17 @@ void VGCurveTool::remove_point(const Vertex &p_vertex) {
 
 		Array previous = subpath_points_array(subpath);
 		undo_redo->add_do_method(node_vg, "remove_curve",
-			p_vertex.subpath, p_vertex.pt / 3);
+				p_vertex.subpath, p_vertex.pt / 3);
 		undo_redo->add_undo_method(node_vg, "set_points",
-			p_vertex.subpath, previous);
+				p_vertex.subpath, previous);
 
 		_commit_action();
 	} else {
-
-
 	}
 
 	canvas_item_editor->get_viewport_control()->update();
 
-	//if (_is_empty())
+	// if (_is_empty())
 	//	_tool_selected(0);
 
 	hover_point = Vertex();
@@ -1434,7 +1430,7 @@ PosVertex VGCurveTool::closest_point(const Vector2 &p_pos, bool p_cp) const {
 	const real_t grab_threshold = EDITOR_DEF("editors/poly_editor/point_grab_radius", 8);
 
 	const Transform2D xform = canvas_item_editor->get_canvas_transform() *
-		_get_node()->get_global_transform();
+							  _get_node()->get_global_transform();
 
 	const Vector2 pos = xform_inv(xform, p_pos);
 	const float eps = basis_xform_inv(xform, Vector2(grab_threshold, 0)).length();
@@ -1466,7 +1462,6 @@ PosVertex VGCurveTool::closest_point(const Vector2 &p_pos, bool p_cp) const {
 			}
 		}
 	}
-	
 
 	return closest;
 }
@@ -1480,7 +1475,7 @@ SubpathPos VGCurveTool::closest_subpath_point(const Vector2 &p_pos) const {
 	const real_t grab_threshold = EDITOR_DEF("editors/poly_editor/point_grab_radius", 8);
 
 	const Transform2D xform = canvas_item_editor->get_canvas_transform() *
-		_get_node()->get_global_transform();
+							  _get_node()->get_global_transform();
 
 	const Vector2 pos = xform_inv(xform, p_pos);
 	float dmin = basis_xform_inv(xform, Vector2(0.5, 0)).length();
@@ -1489,7 +1484,7 @@ SubpathPos VGCurveTool::closest_subpath_point(const Vector2 &p_pos) const {
 	const int n_subpaths = node_vg->get_num_subpaths();
 	for (int j = 0; j < n_subpaths; j++) {
 		const tove::SubpathRef subpath = node_vg->get_subpath(j);
-	    ToveNearest nearest = subpath->nearest(pos.x, pos.y, dmin, dmax);
+		ToveNearest nearest = subpath->nearest(pos.x, pos.y, dmin, dmax);
 		if (nearest.t >= 0) {
 			return SubpathPos(j, nearest.t);
 		}
@@ -1505,7 +1500,7 @@ bool VGEditor::is_inside(const Vector2 &p_pos) const {
 	}
 
 	const Transform2D xform = canvas_item_editor->get_canvas_transform() *
-		_get_node()->get_global_transform();
+							  _get_node()->get_global_transform();
 
 	return node_vg->is_inside(xform_inv(xform, p_pos));
 }
@@ -1517,7 +1512,7 @@ void VGEditor::_update_overlay(bool p_always_update) {
 	}
 
 	Transform2D xform = canvas_item_editor->get_canvas_transform() *
-		node_vg->get_global_transform();
+						node_vg->get_global_transform();
 
 	overlay_draw_xform = Transform2D().translated(xform.elements[2]);
 
@@ -1532,9 +1527,8 @@ void VGEditor::_update_overlay(bool p_always_update) {
 	}
 
 	tove::nsvg::Transform transform(
-		xform.elements[0].x, xform.elements[1].x, 0,
-		xform.elements[0].y, xform.elements[1].y, 0
-	);
+			xform.elements[0].x, xform.elements[1].x, 0,
+			xform.elements[0].y, xform.elements[1].y, 0);
 
 	tove::PathRef tove_path = tove::tove_make_shared<tove::Path>();
 	tove_path->set(node_vg->get_tove_path(), transform);
@@ -1546,12 +1540,12 @@ void VGEditor::_update_overlay(bool p_always_update) {
 	tove_path->setLineColor(tove::tove_make_shared<tove::Color>(0.4, 0.4, 0.8));
 	tove_path->setLineWidth(2);
 
-    overlay = Ref<ArrayMesh>(memnew(ArrayMesh));
+	overlay = Ref<ArrayMesh>(memnew(ArrayMesh));
 	if (overlay_graphics->getNumPaths() > 0) {
 		tove::TesselatorRef tesselator = tove::tove_make_shared<tove::AdaptiveTesselator>(
-			new tove::AdaptiveFlattener<tove::DefaultCurveFlattener>(
-				tove::DefaultCurveFlattener(100, 6)));
-	    tove::MeshRef tove_mesh = tove::tove_make_shared<tove::ColorMesh>(); 
+				new tove::AdaptiveFlattener<tove::DefaultCurveFlattener>(
+						tove::DefaultCurveFlattener(100, 6)));
+		tove::MeshRef tove_mesh = tove::tove_make_shared<tove::ColorMesh>();
 		tesselator->graphicsToMesh(overlay_graphics.get(), UPDATE_MESH_EVERYTHING, tove_mesh, tove_mesh);
 		Ref<Texture> ignored_texture;
 		copy_mesh(overlay, tove_mesh, overlay_graphics, ignored_texture);
@@ -1567,14 +1561,14 @@ void VGEditor::_changed_callback(Object *p_changed, const char *p_prop) {
 }
 
 VGEditor::VGEditor(EditorNode *p_editor) {
-    node_vg = NULL;
+	node_vg = NULL;
 
 	canvas_item_editor = NULL;
 	editor = p_editor;
 	undo_redo = editor->get_undo_redo();
 
 	add_child(memnew(VSeparator));
-	
+
 	const int n_tools = 3;
 	for (int i = 0; i < n_tools; i++) {
 		ToolButton *button = memnew(ToolButton);

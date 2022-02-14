@@ -2,10 +2,10 @@
 
 Work in progress.
 
-* This is an experiment
-* It's written in C++ 11, so it's editor-only
-* All vector graphics can be converted into `MeshInstance2D`s
-* I have very little time to work on this
+- This is an experiment
+- It's written in C++ 11, so it's editor-only
+- All vector graphics can be converted into `MeshInstance2D`s
+- I have very little time to work on this
 
 Live Demo:
 
@@ -13,9 +13,9 @@ https://www.youtube.com/watch?v=EsTSf5dytbs&feature=youtu.be
 
 # Install and build
 
-* Check out this repo as `git clone --recurse-submodules https://github.com/poke1024/godot_vector_graphics`
-* Rename the whole repo folder to `vector_graphics` and move it into your Godot `/modules` folder (i.e. as `/modules/vector_graphics`).
-* Build godot using `scons platform=your_platform`.
+- Check out this repo as `git clone --recurse-submodules https://github.com/poke1024/godot_vector_graphics`
+- Rename the whole repo folder to `vector_graphics` and move it into your Godot `/modules` folder (i.e. as `/modules/vector_graphics`).
+- Build godot using `scons platform=your_platform`.
 
 # Basic usage in Godot
 

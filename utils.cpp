@@ -234,7 +234,7 @@ void fragment()
 
 )GLSL");
 					// clang-format on
-			String npaints_str = String::num_real(npaints);
+					String npaints_str = String::num_real(npaints);
 			String cstep_str = String::num_real(0.5f / alloc.numColors);
 
 			shader_code = shader_code.replace("NPAINTS", npaints_str.c_str());
@@ -280,8 +280,8 @@ void fragment()
 }
 
 )GLSL");
-            // clang-format on
-            String npaints_str = String::num_real(npaints);
+					// clang-format on
+					String npaints_str = String::num_real(npaints);
 			String cstep_str = String::num_real(0.5f / alloc.numColors);
 
 			shader_code = shader_code.replace("NPAINTS", npaints_str.c_str());

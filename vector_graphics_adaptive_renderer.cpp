@@ -5,14 +5,15 @@
 #include "vector_graphics_adaptive_renderer.h"
 #include "tove2d/src/cpp/mesh/meshifier.h"
 
-VGMeshRenderer::VGMeshRenderer() : quality(1) {
+VGMeshRenderer::VGMeshRenderer() :
+		quality(1) {
 	create_tesselator();
 }
 
 void VGMeshRenderer::create_tesselator() {
 	tesselator = tove::tove_make_shared<tove::AdaptiveTesselator>(
-		new tove::AdaptiveFlattener<tove::DefaultCurveFlattener>(
-			tove::DefaultCurveFlattener(2 * quality, 6)));
+			new tove::AdaptiveFlattener<tove::DefaultCurveFlattener>(
+					tove::DefaultCurveFlattener(2 * quality, 6)));
 }
 
 float VGMeshRenderer::get_quality() {

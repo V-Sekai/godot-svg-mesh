@@ -5,8 +5,8 @@
 #ifndef VG_PATH_H
 #define VG_PATH_H
 
-#include "utils.h"
 #include "scene/2d/mesh_instance_2d.h"
+#include "utils.h"
 #include "vector_graphics_paint.h"
 #include "vector_graphics_renderer.h"
 
@@ -27,7 +27,7 @@ class VGPath : public Node2D {
 
 	static void set_inherited_dirty(Node *p_node);
 	static void compose_graphics(const tove::GraphicsRef &p_tove_graphics,
-		const Transform2D &p_transform, const Node *p_node);
+			const Transform2D &p_transform, const Node *p_node);
 	static void _transform_changed(Node *p_node);
 
 	bool inherits_renderer() const;
@@ -63,7 +63,7 @@ public:
 	VGPath *get_root_path();
 	Ref<VGRenderer> get_inherited_renderer() const;
 
- 	Ref<VGRenderer> get_renderer();
+	Ref<VGRenderer> get_renderer();
 	void set_renderer(const Ref<VGRenderer> &p_renderer);
 
 	Ref<VGPaint> get_fill_color() const;
@@ -85,7 +85,7 @@ public:
 	int get_num_subpaths() const;
 	tove::SubpathRef get_subpath(int p_subpath) const;
 	tove::PathRef get_tove_path() const;
-    tove::GraphicsRef get_subtree_graphics() const;
+	tove::GraphicsRef get_subtree_graphics() const;
 
 	void set_dirty(bool p_children = false);
 	void set_tove_path(tove::PathRef p_path);

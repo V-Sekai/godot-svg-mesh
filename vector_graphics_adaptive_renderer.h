@@ -10,18 +10,18 @@
 class VGMeshRenderer : public VGAbstractMeshRenderer {
 	GDCLASS(VGMeshRenderer, VGRenderer);
 
-    float quality;
+	float quality;
 
 protected:
-    void create_tesselator();
+	void create_tesselator();
 
 	static void _bind_methods();
 
 public:
-    VGMeshRenderer();
+	VGMeshRenderer();
 
-    float get_quality();
-    void set_quality(float p_quality);
+	float get_quality();
+	void set_quality(float p_quality);
 };
 
 #endif // VG_ADAPTIVE_RENDERER_H

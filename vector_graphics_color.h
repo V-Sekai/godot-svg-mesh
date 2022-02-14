@@ -10,20 +10,21 @@
 class VGColor : public VGPaint {
 	GDCLASS(VGColor, VGPaint);
 
-    Color color;
+	Color color;
 
 protected:
 	static void _bind_methods();
 
 public:
-    VGColor() {
-    }
+	VGColor() {
+	}
 
-    VGColor(const Color &p_color) : color(p_color) {
-    }
+	VGColor(const Color &p_color) :
+			color(p_color) {
+	}
 
-    void set_color(const Color &p_color);
-    Color get_color() const;
+	void set_color(const Color &p_color);
+	Color get_color() const;
 };
 
 #endif // VG_COLOR_H

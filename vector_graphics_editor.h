@@ -15,7 +15,7 @@ class CanvasItemEditor;
 
 class VGTool : public Reference {
 protected:
-	CanvasItemEditor * const canvas_item_editor;
+	CanvasItemEditor *const canvas_item_editor;
 
 	Vector2 global_to_local(CanvasItem *p_node, const Vector2 p_where) const;
 
@@ -23,26 +23,26 @@ public:
 	VGTool();
 
 	virtual bool forward_gui_input(const Ref<InputEvent> &p_event) = 0;
-	virtual void forward_canvas_draw_over_viewport(Control *p_overlay) { }
+	virtual void forward_canvas_draw_over_viewport(Control *p_overlay) {}
 };
 
 class VGEditor : public HBoxContainer {
 
 	GDCLASS(VGEditor, HBoxContainer);
 
-    VGPath *node_vg;
+	VGPath *node_vg;
 	Ref<VGTool> tool;
 
 	Ref<ArrayMesh> overlay;
 	Transform2D overlay_full_xform;
 	Transform2D overlay_draw_xform;
 
-	Vector<ToolButton*> tool_buttons;
+	Vector<ToolButton *> tool_buttons;
 
 	enum {
 		TOOL_TRANSFORM = 0,
 		TOOL_CURVE,
-		//TOOL_ELLIPSE
+		// TOOL_ELLIPSE
 	};
 
 	ToolButton *button_bake;

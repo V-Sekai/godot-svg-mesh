@@ -39,5 +39,5 @@ void VGGradient::set_color_ramp(const Ref<Gradient> &p_color_ramp) {
 }
 
 Ref<Gradient> VGGradient::get_color_ramp() const {
-    return color_ramp;
+	return color_ramp;
 }

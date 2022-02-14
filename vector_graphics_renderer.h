@@ -14,22 +14,22 @@ class VGRenderer : public Resource {
 	GDCLASS(VGRenderer, Resource);
 
 protected:
-    static void clear_mesh(Ref<ArrayMesh> &p_mesh);
+	static void clear_mesh(Ref<ArrayMesh> &p_mesh);
 
 public:
-    virtual bool prefer_sprite() const {
-        return false;
-    }
+	virtual bool prefer_sprite() const {
+		return false;
+	}
 
-    virtual Rect2 render_mesh(Ref<ArrayMesh> &p_mesh, Ref<Material> &r_material, Ref<Texture> &r_texture, VGPath *p_path, bool p_hq, bool p_spatial) {
-        return Rect2();
-    }
+	virtual Rect2 render_mesh(Ref<ArrayMesh> &p_mesh, Ref<Material> &r_material, Ref<Texture> &r_texture, VGPath *p_path, bool p_hq, bool p_spatial) {
+		return Rect2();
+	}
 
-    virtual Ref<ImageTexture> render_texture(VGPath *p_path, bool p_hq) {
-        return Ref<ImageTexture>();
-    }
+	virtual Ref<ImageTexture> render_texture(VGPath *p_path, bool p_hq) {
+		return Ref<ImageTexture>();
+	}
 
-    virtual bool is_dirty_on_transform_change() const = 0;
+	virtual bool is_dirty_on_transform_change() const = 0;
 };
 
 #endif // VG_RENDERER_H

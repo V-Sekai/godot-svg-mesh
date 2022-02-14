@@ -1,7 +1,9 @@
 # Getting Started
+
 Some info to get you started.
 
 ## Installation
+
 To install TÖVE, grab TÖVE's [`binaries`](https://github.com/poke1024/tove2d/releases/download/1.0/tove.zip) package and unzip it inside your LÖVE project (as a folder called `tove`). You should then be able to load TÖVE using `tove = require "tove"`.
 
 TÖVE's folder contains four files:
@@ -14,6 +16,7 @@ TÖVE's folder contains four files:
 Since you're running only on one platform, you'd only need one of the binary files, but they are all included for convenience.
 
 ## Drawing a Triangle
+
 Let's draw a triangle.
 
 First import TÖVE as described above. Then create a `Graphics` instance, which is the main API for drawing in TÖVE:
@@ -23,7 +26,7 @@ local tove = require "tove"
 local myDrawing = tove.newGraphics()
 ```
 
- `Graphics` provides various functions of drawing and works similar to a canvas. Here comes our triangle:
+`Graphics` provides various functions of drawing and works similar to a canvas. Here comes our triangle:
 
 ```
 myDrawing:moveTo(100, 100)
@@ -57,11 +60,12 @@ myDrawing:fill()
 
 ![](images/tutorial/purple-triangle.jpg)
 
-Note: `setFillColor`  can take RGBA values, but you can also specify HTML colors , e.g. `setFillColor(#80AA20)`.
+Note: `setFillColor` can take RGBA values, but you can also specify HTML colors , e.g. `setFillColor(#80AA20)`.
 
 At this point, you might wonder what TÖVE is about. All this can be done with LÖVE as well. So on to the next section:
 
 ## Curves, lines and gradients
+
 While TÖVE supports straight lines, curves are its real matter. Let's bend one side of our triangle by replacing the first `lineTo` from above with a `curveTo`, which will draw a cubic bezier curve:
 
 ```
@@ -74,9 +78,9 @@ myDrawing:fill()
 
 ![](images/tutorial/curved-triangle.jpg)
 
-`curveTo` takes the positions of two control points (x1, y1, x2, y2) and one target point (x, y).  Together with the previous starting point this makes four points to define the cubic bezier curve.
+`curveTo` takes the positions of two control points (x1, y1, x2, y2) and one target point (x, y). Together with the previous starting point this makes four points to define the cubic bezier curve.
 
-This is a good place to note that you can also use `drawCircle(x, y, r)`  and `drawEllipse(x, y, rx, ry)` to draw circles and ellipses, and `drawRect(x, y, w, h, rx, ry)` to draw (rounded) rectangles.
+This is a good place to note that you can also use `drawCircle(x, y, r)` and `drawEllipse(x, y, rx, ry)` to draw circles and ellipses, and `drawRect(x, y, w, h, rx, ry)` to draw (rounded) rectangles.
 
 Let's continue with our triangle. Adding a bluish stroke of line width 10 is as simple as appending this code:
 
@@ -101,6 +105,7 @@ myDrawing:fill()
 ![](images/tutorial/triangle-gradient.jpg)
 
 ## Importing SVGs
+
 Yes, you can import SVGs, and it's as simple as this:
 
 ```
@@ -113,7 +118,7 @@ function love.draw()
 end
 ```
 
-The call to `newGraphics` takes the actual SVG data that was loaded via `love.filesystem.read`. The optional second parameter, `200`,  tells TÖVE to prescale the graphics to 200 pixels. If this is omitted, the SVG's natural scaling will be used, which assumes you know its exact scaling.
+The call to `newGraphics` takes the actual SVG data that was loaded via `love.filesystem.read`. The optional second parameter, `200`, tells TÖVE to prescale the graphics to 200 pixels. If this is omitted, the SVG's natural scaling will be used, which assumes you know its exact scaling.
 
 ![](images/tutorial/rabbit-svg.jpg)
 
