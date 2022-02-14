@@ -12,8 +12,8 @@
 #ifndef __TOVE_SHADER_LOOKUP
 #define __TOVE_SHADER_LOOKUP 1
 
-#include "../../thirdparty/robin-map/include/tsl/robin_set.h"
 #include <vector>
+#include <set>
 
 #include "curve_data.h"
 
@@ -38,7 +38,7 @@ enum {
 
 class LookupTable {
 public:
-	typedef tsl::robin_set<uint8_t> CurveSet;
+	typedef std::set<uint8_t> CurveSet;
 
 private:
 	ToveShaderGeometryData &_data;
@@ -48,7 +48,6 @@ private:
 
 public:
     LookupTable(int maxCurves, ToveShaderGeometryData &data, int ignore) :
-		active(4),
         _maxCurves(maxCurves),
         _data(data),
         _ignore(ignore) {

@@ -12,7 +12,8 @@
 #include "nsvg.h"
 #include "utils.h"
 
-#include "../thirdparty/robin-map/include/tsl/robin_map.h"
+#include <unordered_map>
+
 #include "../thirdparty/tinyxml2/tinyxml2.h"
 
 #if TOVE_DEBUG
@@ -101,13 +102,7 @@ class NanoSVGVisitor : public tinyxml2::XMLVisitor {
 	const XMLDocument *mCurrentDocument;
 	bool mSkipDefs;
 
-	typedef tsl::robin_map<
-		const char*,
-		const XMLElement*,
-		hash_cstr,
-		equal_cstr,
-		std::allocator<std::pair<const char*, const XMLElement*>>,
-		true /* store hash */> ElementsMap;
+	typedef std::unordered_map<const char*, const XMLElement*> ElementsMap;
 	std::unique_ptr<ElementsMap> mElementsById;
 
 	void gatherIds(const XMLElement *parent) {

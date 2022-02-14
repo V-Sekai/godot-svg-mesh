@@ -420,7 +420,6 @@ GeometryFeed::GeometryFeed(
 	lineColorData(lineColorData),
 	fillEventsLUT(maxCurves, geometryData, IGNORE_FILL),
 	strokeEventsLUT(maxCurves, strokeShaderData, IGNORE_LINE),
-	strokeCurves(4),
 	allocData(maxCurves, maxSubPaths,
 		enableFragmentShaderStrokes && path->hasStroke(), geometryData),
 	allocStrokeData(maxCurves, maxSubPaths, true, strokeShaderData),
