@@ -23,6 +23,9 @@
 static void editor_init_callback() {
 	EditorNode *editor = EditorNode::get_singleton();
 	editor->add_editor_plugin(memnew(VGEditorPlugin(editor)));
+	Ref<ResourceImporterSVGSpatial> svg_spatial_loader;
+	svg_spatial_loader.instance();
+	ResourceImporterScene::get_singleton()->add_importer(svg_spatial_loader);
 }
 #endif
 
@@ -36,10 +39,6 @@ void register_svg_mesh_types() {
 
 	ClassDB::register_virtual_class<VGRenderer>();
 	ClassDB::register_class<VGMeshRenderer>();
-
-	Ref<ResourceImporterSVGSpatial> svg_spatial_loader;
-	svg_spatial_loader.instance();
-	ResourceImporterScene::get_singleton()->add_importer(svg_spatial_loader);
 #ifdef TOOLS_ENABLED
 	EditorNode::add_init_callback(editor_init_callback);
 #endif
