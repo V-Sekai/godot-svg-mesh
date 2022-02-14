@@ -18,7 +18,7 @@ BEGIN_TOVE_NAMESPACE
 void CurveData::storeRoots(gpu_float_t *out) const {
 	for (int i = 0; i < 4; i++) {
 		float t = bounds.sroots[i];
-		store_gpu_float(out[i], t);
+		out[i] = t;
 	}
 }
 

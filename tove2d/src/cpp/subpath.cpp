@@ -992,23 +992,15 @@ bool Subpath::computeShaderCurveData(
 	extended.endpoints.p2[0] = pts[6];
 	extended.endpoints.p2[1] = pts[7];
 
-#if 0
-	printf("%d (%f, %f) (%f, %f) (%f, %f) (%f, %f)\n", target,
-		pts[0], pts[1],
-		pts[2], pts[3],
-		pts[4], pts[5],
-		pts[6], pts[7]);
-#endif
-
 	// write curve data.
 	for (int i = 0; i < 4; i++) {
-		store_gpu_float(curveTexturesData[i], bx[i]);
-		store_gpu_float(curveTexturesData[i + 4], by[i]);
+		curveTexturesData[i]  =  bx[i];
+		curveTexturesData[i + 4] = by[i];
 	}
 	curveTexturesData += 8;
 
 	for (int i = 0; i < 4; i++) {
-		store_gpu_float(curveTexturesData[i], curveData.bounds.bounds[i]);
+		curveTexturesData[i] = curveData.bounds.bounds[i];
 	}
 	curveTexturesData += 4;
 
