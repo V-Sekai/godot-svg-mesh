@@ -13,12 +13,12 @@
 #include "vector_graphics_adaptive_renderer.h"
 #include "vector_graphics_path.h"
 
-class ResourceImporterSVGSpatial : public ResourceImporterScene {
-	GDCLASS(ResourceImporterSVGSpatial, ResourceImporterScene);
+class EditorSceneImporterSVG : public EditorSceneImporter {
+	GDCLASS(EditorSceneImporterSVG, EditorSceneImporter);
 
 public:
-	ResourceImporterSVGSpatial();
-	~ResourceImporterSVGSpatial();
+	EditorSceneImporterSVG();
+	~EditorSceneImporterSVG();
 
 	static Point2 compute_center(const tove::PathRef &p_path) {
 		const float *bounds = p_path->getBounds();

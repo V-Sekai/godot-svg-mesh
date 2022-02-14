@@ -1,12 +1,12 @@
 #include "image_loader_svg_spatial.h"
 
-ResourceImporterSVGSpatial::ResourceImporterSVGSpatial() {
+EditorSceneImporterSVG::EditorSceneImporterSVG() {
 }
 
-ResourceImporterSVGSpatial::~ResourceImporterSVGSpatial() {
+EditorSceneImporterSVG::~EditorSceneImporterSVG() {
 }
 
-Node *ResourceImporterSVGSpatial::import_scene(const String &p_path, uint32_t p_flags, int p_bake_fps, uint32_t p_compress_flags, List<String> *r_missing_deps, Error *r_err) {
+Node *EditorSceneImporterSVG::import_scene(const String &p_path, uint32_t p_flags, int p_bake_fps, uint32_t p_compress_flags, List<String> *r_missing_deps, Error *r_err) {
 	Spatial *root = memnew(Spatial);
 	String units = "px";
 	float dpi = 96.0;
@@ -87,6 +87,6 @@ Node *ResourceImporterSVGSpatial::import_scene(const String &p_path, uint32_t p_
 	return root;
 }
 
-void ResourceImporterSVGSpatial::get_extensions(List<String> *r_extensions) const {
+void EditorSceneImporterSVG::get_extensions(List<String> *r_extensions) const {
 	r_extensions->push_back("svg");
 }
