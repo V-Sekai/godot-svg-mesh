@@ -17,15 +17,6 @@
 #include "../utils.h"
 
 BEGIN_TOVE_NAMESPACE
-
-#if TOVE_TARGET == TOVE_TARGET_LOVE2D
-inline ToveVertexIndex ToLoveVertexMapIndex(ToveVertexIndex i) {
-	// convert to indices for LÖVE's Mesh:setVertexMap(). this
-	// used to be (1 + i), but since we use the ByteData based
-	// version, it's now 0-based as well.
-	return i;
-}
-#else
 inline ToveVertexIndex ToLoveVertexMapIndex(ToveVertexIndex i) {
 	return i;
 }

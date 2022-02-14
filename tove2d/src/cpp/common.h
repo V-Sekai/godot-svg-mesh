@@ -15,14 +15,9 @@
 #define BEGIN_TOVE_NAMESPACE namespace tove {
 #define END_TOVE_NAMESPACE }
 
-#define TOVE_TARGET_LOVE2D 1
 #define TOVE_TARGET_GODOT 2
 
-#ifdef TOVE_GODOT
 #define TOVE_TARGET TOVE_TARGET_GODOT
-#else
-#define TOVE_TARGET TOVE_TARGET_LOVE2D
-#endif
 
 #define TOVE_GPUX_MESH_BAND 1
 #define TOVE_RT_CLIP_PATH 0
@@ -43,7 +38,7 @@ BEGIN_TOVE_NAMESPACE
 END_TOVE_NAMESPACE
 
 #include "thirdparty/misc/clipper.hpp"
-#include "../thirdparty/polypartition/src/polypartition.h"
+#include "thirdparty/misc/polypartition.h"
 
 #if _MSC_VER
 #define M_PI 3.1415926535897932384626433832795
