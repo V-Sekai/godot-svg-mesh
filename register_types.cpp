@@ -17,9 +17,6 @@
 
 #ifdef TOOLS_ENABLED
 #include "vector_graphics_editor_plugin.h"
-#endif
-
-#ifdef TOOLS_ENABLED
 static void editor_init_callback() {
 	EditorNode *editor = EditorNode::get_singleton();
 	editor->add_editor_plugin(memnew(VGEditorPlugin(editor)));
@@ -40,6 +37,7 @@ void register_svg_mesh_types() {
 	ClassDB::register_virtual_class<VGRenderer>();
 	ClassDB::register_class<VGMeshRenderer>();
 #ifdef TOOLS_ENABLED
+	ClassDB::register_class<ResourceImporterSVGSpatial>();
 	EditorNode::add_init_callback(editor_init_callback);
 #endif
 }
