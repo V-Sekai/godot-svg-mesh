@@ -26,7 +26,7 @@ static void editor_init_callback() {
 }
 #endif
 
-void register_vector_graphics_types() {
+void register_svg_mesh_types() {
 	ClassDB::register_class<VGPath>();
 	ClassDB::register_virtual_class<VGPaint>();
 	ClassDB::register_class<VGColor>();
@@ -45,5 +45,5 @@ void register_vector_graphics_types() {
 #endif
 }
 
-void unregister_vector_graphics_types() {
+void unregister_svg_mesh_types() {
 }
