@@ -33,6 +33,7 @@ Node *EditorSceneImporterSVG::import_scene(const String &p_path, uint32_t p_flag
 	Ref<SurfaceTool> st;
 	st.instance();
 	AABB bounds;
+	Spatial *root = memnew(Spatial);
 	for (int mesh_i = 0; mesh_i < n; mesh_i++) {
 		tove::PathRef tove_path = tove_graphics->getPath(mesh_i);
 		Point2 center = compute_center(tove_path);
@@ -66,15 +67,15 @@ Node *EditorSceneImporterSVG::import_scene(const String &p_path, uint32_t p_flag
 		if (!name.empty()) {
 			mesh_inst->set_name(name);
 		}
-		spatial->add_child(mesh_inst);
-		mesh_inst->set_owner(root_path);
+		root->add_child(mesh_inst);
+		mesh_inst->set_owner(root);
 	}
 	Vector3 translate = bounds.get_size();
 	translate.x = -translate.x;
 	translate.x += translate.x / 2.0f;
 	translate.y += translate.y;
-	spatial->translate(translate);
-	return root_path;
+	root->translate(translate);
+	return root;
 }
 
 void EditorSceneImporterSVG::get_extensions(List<String> *r_extensions) const {
