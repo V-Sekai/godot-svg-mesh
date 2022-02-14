@@ -39,7 +39,7 @@ void register_svg_mesh_types() {
 
 	Ref<ResourceImporterSVGSpatial> svg_spatial_loader;
 	svg_spatial_loader.instance();
-	ResourceFormatImporter::get_singleton()->add_importer(svg_spatial_loader);
+	ResourceImporterScene::get_singleton()->add_importer(svg_spatial_loader);
 #ifdef TOOLS_ENABLED
 	EditorNode::add_init_callback(editor_init_callback);
 #endif
