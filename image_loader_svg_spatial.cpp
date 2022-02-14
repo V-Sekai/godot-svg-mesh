@@ -12,7 +12,7 @@ Node *ResourceImporterSVGSpatial::import_scene(const String &p_path, uint32_t p_
 	float dpi = 96.0;
 	Vector<uint8_t> buf = FileAccess::get_file_as_array(p_path);
 	if (!buf.size()) {
-		return FAILED;
+		return nullptr;
 	}
 	String str;
 	str.parse_utf8((const char *)buf.ptr(), buf.size());
