@@ -86,3 +86,7 @@ Node *ResourceImporterSVGSpatial::import_scene(const String &p_path, uint32_t p_
 	memdelete(root_path);
 	return root;
 }
+
+void ResourceImporterSVGSpatial::get_extensions(List<String> *r_extensions) const {
+	r_extensions->push_back("svg");
+}
