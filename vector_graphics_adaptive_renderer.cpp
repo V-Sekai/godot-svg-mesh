@@ -13,7 +13,6 @@ void VGMeshRenderer::create_tesselator() {
 	tesselator = tove::tove_make_shared<tove::AdaptiveTesselator>(
 		new tove::AdaptiveFlattener<tove::DefaultCurveFlattener>(
 			tove::DefaultCurveFlattener(2 * quality, 6)));
-	//tove::TesselatorRef tess = tove::tove_make_shared<tove::RigidTesselator>(3, TOVE_HOLES_NONE);
 }
 
 float VGMeshRenderer::get_quality() {
