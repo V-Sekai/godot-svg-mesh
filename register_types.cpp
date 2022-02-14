@@ -16,6 +16,7 @@
 #include "core/reference.h"
 
 #ifdef TOOLS_ENABLED
+#include "editor/editor_node.h"
 static void editor_init_callback() {
 	Ref<EditorSceneImporterSVG> svg_spatial_loader;
 	svg_spatial_loader.instance();
