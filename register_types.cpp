@@ -6,7 +6,6 @@
 #include "image_loader_svg_node_2d.h"
 #include "image_loader_svg_spatial.h"
 #include "image_loader_svg_vgpath.h"
-#include "resource_format_loader_svg.h"
 #include "vector_graphics_adaptive_renderer.h"
 #include "vector_graphics_color.h"
 #include "vector_graphics_gradient.h"
@@ -15,7 +14,6 @@
 #include "vector_graphics_path.h"
 #include "vector_graphics_radial_gradient.h"
 #include "vector_graphics_renderer.h"
-#include "vector_graphics_texture_renderer.h"
 
 #include "core/reference.h"
 
@@ -40,7 +38,6 @@ void register_vector_graphics_types() {
   ClassDB::register_class<VGRadialGradient>();
 
   ClassDB::register_virtual_class<VGRenderer>();
-  ClassDB::register_class<VGSpriteRenderer>();
   ClassDB::register_class<VGMeshRenderer>();
 
   Ref<ResourceImporterSVGSpatial> svg_spatial_loader;
