@@ -18,7 +18,6 @@
 #include "vector_graphics_texture_renderer.h"
 
 #include "core/reference.h"
-#include "lottie_composition.h"
 
 #ifdef TOOLS_ENABLED
 #include "vector_graphics_editor_plugin.h"
@@ -51,9 +50,6 @@ void register_vector_graphics_types() {
   ClassDB::register_virtual_class<VGRenderer>();
   ClassDB::register_class<VGSpriteRenderer>();
   ClassDB::register_class<VGMeshRenderer>();
-  
-  ClassDB::register_class<LottieComposition>();
-  ClassDB::register_class<LottieFormatLoader>();
 
   Ref<ResourceImporterSVGSpatial> svg_spatial_loader;
   svg_spatial_loader.instance();
@@ -67,9 +63,6 @@ void register_vector_graphics_types() {
   svg_vg_path_loader.instance();
   ResourceFormatImporter::get_singleton()->add_importer(svg_vg_path_loader);
 
-  Ref<LottieFormatLoader> lottie_format_loader;
-  lottie_format_loader.instance();
-  ResourceFormatImporter::get_singleton()->add_importer(lottie_format_loader);
 #ifdef TOOLS_ENABLED
   EditorNode::add_init_callback(editor_init_callback);
 #endif
