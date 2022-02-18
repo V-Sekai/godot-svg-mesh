@@ -627,13 +627,8 @@ void VGPath::set_points(int p_subpath, Array p_points) {
 		p[2 * i + 0] = q.x;
 		p[2 * i + 1] = q.y;
 	}
-	try {
-		tove_subpath->setPoints(p, n, false);
-		set_dirty();
-	} catch (...) {
-		delete[] p;
-		throw;
-	}
+	tove_subpath->setPoints(p, n, false);
+	set_dirty();
 	delete[] p;
 }
 
