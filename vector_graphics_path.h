@@ -53,7 +53,7 @@ protected:
 	static void _bind_methods();
 
 public:
-	virtual Rect2 _edit_get_rect() const override;
+	virtual Rect2 _edit_get_rect() const;
 	virtual bool _edit_is_selected_on_click(const Point2 &p_point, double p_tolerance) const;
 	virtual void _edit_set_position(const Point2 &p_position);
 	virtual void _edit_set_scale(const Size2 &p_scale);
