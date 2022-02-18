@@ -40,7 +40,7 @@ public:
 		load(m);
 	}
 
-	inline Matrix3x2 &operator=(const Matrix3x2& m) {
+	inline Matrix3x2 &operator=(const Matrix3x2 &m) {
 		std::memcpy(m_val, m.m_val, sizeof(m_val));
 		return *this;
 	}
@@ -84,14 +84,14 @@ struct CachedPaint {
 	char spread;
 	float xform[6];
 
-	uint32_t * const colors;
+	uint32_t *const colors;
 	const int rowBytes;
 	const int numColors;
 
 	inline CachedPaint(void *colors, int rowBytes, int numColors) :
-	 	colors(reinterpret_cast<uint32_t*>(colors)),
-		rowBytes(rowBytes),
-		numColors(numColors) {
+			colors(reinterpret_cast<uint32_t *>(colors)),
+			rowBytes(rowBytes),
+			numColors(numColors) {
 	}
 
 	void init(const NSVGpaint &paint, float opacity);
@@ -100,11 +100,11 @@ struct CachedPaint {
 const ToveRasterizeSettings *getDefaultRasterizeSettings();
 
 bool shapeStrokeBounds(float *bounds, const NSVGshape *shape,
-	float scale, const ToveRasterizeSettings *settings);
+		float scale, const ToveRasterizeSettings *settings);
 
 void rasterize(NSVGimage *image, float tx, float ty, float scale,
-	uint8_t *pixels, int width, int height, int stride,
-	const ToveRasterizeSettings *settings);
+		uint8_t *pixels, int width, int height, int stride,
+		const ToveRasterizeSettings *settings);
 
 class Transform {
 private:
@@ -115,13 +115,13 @@ private:
 public:
 	Transform();
 	Transform(
-		float a, float b, float c,
-		float d, float e, float f);
+			float a, float b, float c,
+			float d, float e, float f);
 	Transform(const Transform &t);
 
 	void multiply(const Transform &t);
 
-	void transformGradient(NSVGgradient* grad) const;
+	void transformGradient(NSVGgradient *grad) const;
 	void transformPoints(float *pts, const float *srcpts, int npts) const;
 
 	float getScale() const;
@@ -141,7 +141,7 @@ public:
 NSVGlineJoin nsvgLineJoin(ToveLineJoin join);
 ToveLineJoin toveLineJoin(NSVGlineJoin join);
 
-}
+} // namespace nsvg
 
 END_TOVE_NAMESPACE
 

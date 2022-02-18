@@ -33,7 +33,8 @@ public:
 		return *this;
 	}
 
-	Segment(const ClipperPoint &begin, const ClipperPoint &end) : _begin(begin), _end(end) {
+	Segment(const ClipperPoint &begin, const ClipperPoint &end) :
+			_begin(begin), _end(end) {
 		int dx = end.X - begin.X;
 		int dy = end.Y - begin.Y;
 		_length = std::sqrt(dx * dx + dy * dy);
@@ -64,7 +65,8 @@ private:
 	int _next;
 
 public:
-	Segments(const ClipperPath &points, float offset) : _next(0) {
+	Segments(const ClipperPath &points, float offset) :
+			_next(0) {
 		std::vector<Segment> segments;
 		float length = 0;
 		for (int i = 0; i < points.size(); i++) {
@@ -128,7 +130,7 @@ private:
 
 public:
 	Turtle(const ClipperPath &path, float offset, ClipperPaths &out) :
-		_segments(path, offset), _t(0), _down(true), _out(out) {
+			_segments(path, offset), _t(0), _down(true), _out(out) {
 		_current = _segments.pop();
 		_begin = _current.begin();
 	}

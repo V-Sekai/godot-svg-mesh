@@ -233,8 +233,8 @@ static uint16_t *reducedOverlapTriangles(
 			*data++ = outer;
 
 			/**data++ = outer;
-			*data++ = middle;
-			*data++ = outer + 2;*/
+			 *data++ = middle;
+			 *data++ = outer + 2;*/
 		}
 
 		for (int i = 0; i < numVertices - 1; i++) {
@@ -399,7 +399,7 @@ void Submesh::triangulateFixedResolutionFill(
 		std::list<ToveTPPLPoly> triangles;
 		ToveTPPLPoly &p = *i;
 
-		//if (partition.Triangulate_MONO(&p, &triangles) == 0) {
+		// if (partition.Triangulate_MONO(&p, &triangles) == 0) {
 		if (partition.Triangulate_EC(&p, &triangles) == 0) {
 			triangulationFailed(polys);
 			continue;

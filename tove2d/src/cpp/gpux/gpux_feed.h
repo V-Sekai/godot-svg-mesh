@@ -26,26 +26,26 @@ private:
 
 public:
 	inline GPUXFeed(const PathRef &path, bool enableFragmentShaderStrokes) :
-		lineColor(path, data.color.line, 1),
-		fillColor(path, data.color.fill, 1),
-		geometry(path, data.geometry, data.color.line, enableFragmentShaderStrokes) {
+			lineColor(path, data.color.line, 1),
+			fillColor(path, data.color.fill, 1),
+			geometry(path, data.geometry, data.color.line, enableFragmentShaderStrokes) {
 	}
 
 	virtual ToveChangeFlags beginUpdate() {
 		return lineColor.beginUpdate() |
-			fillColor.beginUpdate() |
-			geometry.beginUpdate();
+			   fillColor.beginUpdate() |
+			   geometry.beginUpdate();
 	}
 
-    virtual ToveChangeFlags endUpdate() {
+	virtual ToveChangeFlags endUpdate() {
 		return lineColor.endUpdate() |
-			fillColor.endUpdate() |
-			geometry.endUpdate();
-    }
+			   fillColor.endUpdate() |
+			   geometry.endUpdate();
+	}
 
-    virtual ToveShaderData *getData() {
-    	return &data;
-    }
+	virtual ToveShaderData *getData() {
+		return &data;
+	}
 };
 
 END_TOVE_NAMESPACE

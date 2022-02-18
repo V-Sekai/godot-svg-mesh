@@ -16,13 +16,13 @@ struct NSVGcachedPaint;
 struct NSVGpaint;
 
 struct TOVEstencil {
-    unsigned char* data;
-    int32_t size;
-    int32_t stride;
+	unsigned char *data;
+	int32_t size;
+	int32_t stride;
 };
 
 struct TOVEdither {
-    void* data;
+	void *data;
 	uint32_t stride;
 };
 
@@ -33,41 +33,41 @@ struct TOVEcachedPaint {
 };
 
 typedef void (*TOVEscanlineFunction)(
-	NSVGrasterizer *rasterizer,
-	int x,
-	int y,
-	int n,
-	float tx,
-	float ty,
-	float scale,
-	NSVGcachedPaint* cache,
-	TOVEclip* clip);
+		NSVGrasterizer *rasterizer,
+		int x,
+		int y,
+		int n,
+		float tx,
+		float ty,
+		float scale,
+		NSVGcachedPaint *cache,
+		TOVEclip *clip);
 
-void tove_deleteRasterizer(NSVGrasterizer* r);
+void tove_deleteRasterizer(NSVGrasterizer *r);
 
 TOVEscanlineFunction tove__initPaint(
-	NSVGcachedPaint* cache,
-	const NSVGrasterizer* r,
-	NSVGpaint* paint,
-	float opacity,
-	bool &initCacheColors);
+		NSVGcachedPaint *cache,
+		const NSVGrasterizer *r,
+		NSVGpaint *paint,
+		float opacity,
+		bool &initCacheColors);
 
 bool tove__rasterize(
-	NSVGrasterizer* r,
-    NSVGimage* image,
-    int w,
-    int h,
-	float tx,
-    float ty,
-    float scale);
+		NSVGrasterizer *r,
+		NSVGimage *image,
+		int w,
+		int h,
+		float tx,
+		float ty,
+		float scale);
 
 void tove__drawColorScanline(
-	NSVGrasterizer* r,
-	int xmin,
-	int y,
-	int count,
-	float tx,
-	float ty,
-	float scale,
-	NSVGcachedPaint* cache,
-	TOVEclip* clip);
+		NSVGrasterizer *r,
+		int xmin,
+		int y,
+		int count,
+		float tx,
+		float ty,
+		float scale,
+		NSVGcachedPaint *cache,
+		TOVEclip *clip);

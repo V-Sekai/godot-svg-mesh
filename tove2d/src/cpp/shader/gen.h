@@ -12,8 +12,8 @@
 #ifndef __TOVE_SHADER_GEN
 #define __TOVE_SHADER_GEN 1
 
-#include <sstream>
 #include <map>
+#include <sstream>
 
 BEGIN_TOVE_NAMESPACE
 

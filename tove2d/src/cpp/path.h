@@ -12,10 +12,10 @@
 #ifndef __TOVE_PATH
 #define __TOVE_PATH 1
 
-#include "subpath.h"
-#include "paint.h"
-#include "observer.h"
 #include "mesh/flatten.h"
+#include "observer.h"
+#include "paint.h"
+#include "subpath.h"
 
 BEGIN_TOVE_NAMESPACE
 
@@ -108,7 +108,6 @@ public:
 	inline float getOpacity() const {
 		return nsvg.opacity;
 	}
-
 
 	inline bool hasOpaqueLine() const {
 		return nsvg.opacity >= 1.0f && lineColor && lineColor->isOpaque();

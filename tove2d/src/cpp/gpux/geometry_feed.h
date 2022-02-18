@@ -9,11 +9,11 @@
  * All rights reserved.
  */
 
-#include <vector>
 #include "../common.h"
 #include "../observer.h"
 #include "geometry_data.h"
 #include "lookup.h"
+#include <vector>
 
 BEGIN_TOVE_NAMESPACE
 
@@ -29,11 +29,11 @@ private:
 	const TovePaintData &lineColorData;
 	ToveShaderGeometryData strokeShaderData;
 
-    std::vector<Event> fillEvents;
-    std::vector<Event> strokeEvents;
-    LookupTable fillEventsLUT;
-    LookupTable strokeEventsLUT;
-    LookupTable::CurveSet strokeCurves;
+	std::vector<Event> fillEvents;
+	std::vector<Event> strokeEvents;
+	LookupTable fillEventsLUT;
+	LookupTable strokeEventsLUT;
+	LookupTable::CurveSet strokeCurves;
 	std::vector<ExCurveData> extended;
 
 	GeometryData allocData;
@@ -61,14 +61,14 @@ private:
 
 public:
 	GeometryFeed(
-		const PathRef &path,
-		ToveShaderGeometryData &data,
-		const TovePaintData &lineColorData,
-		bool enableFragmentShaderStrokes);
+			const PathRef &path,
+			ToveShaderGeometryData &data,
+			const TovePaintData &lineColorData,
+			bool enableFragmentShaderStrokes);
 	virtual ~GeometryFeed();
 
 	ToveChangeFlags beginUpdate();
-    ToveChangeFlags endUpdate();
+	ToveChangeFlags endUpdate();
 
 	virtual void observableChanged(Observable *observable, ToveChangeFlags what);
 };

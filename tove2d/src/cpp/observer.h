@@ -21,38 +21,38 @@ class Observable;
 
 class Observer {
 public:
-    virtual ~Observer() {
-    }
+	virtual ~Observer() {
+	}
 
 	virtual void observableChanged(
-        Observable *observable, ToveChangeFlags what) = 0;
+			Observable *observable, ToveChangeFlags what) = 0;
 };
 
 class Observable {
-	std::unordered_set<Observer*> observers;
+	std::unordered_set<Observer *> observers;
 
 protected:
-    inline bool hasObservers() const {
-        return observers.size() > 0;
-    }
+	inline bool hasObservers() const {
+		return observers.size() > 0;
+	}
 
 public:
-    virtual ~Observable() {
-        assert(!hasObservers());
-    }
+	virtual ~Observable() {
+		assert(!hasObservers());
+	}
 
 	inline void addObserver(Observer *observer) {
-        observers.insert(observer);        
-    }
+		observers.insert(observer);
+	}
 	inline void removeObserver(Observer *observer) {
-        observers.erase(observer);
-    }
+		observers.erase(observer);
+	}
 
 	void broadcastChange(ToveChangeFlags what) {
-        for (Observer *observer : observers) {
-            observer->observableChanged(this, what);
-        }        
-    }
+		for (Observer *observer : observers) {
+			observer->observableChanged(this, what);
+		}
+	}
 };
 
 END_TOVE_NAMESPACE

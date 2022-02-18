@@ -11,9 +11,9 @@
 
 #include "geometry_feed.h"
 #include "../common.h"
-#include "../utils.h"
-#include "../subpath.h"
 #include "../path.h"
+#include "../subpath.h"
+#include "../utils.h"
 #include <algorithm>
 
 BEGIN_TOVE_NAMESPACE
@@ -45,9 +45,9 @@ inline float *vertex(float *v, float x, float y, float tx, float ty) {
 #endif // TOVE_GPUX_MESH_BAND
 
 static void queryLUT(
-	ToveShaderGeometryData *data,
-	int dim, float y0, float y1,
-	CurveSet &result) {
+		ToveShaderGeometryData *data,
+		int dim, float y0, float y1,
+		CurveSet &result) {
 
 	const float *lut = data->lookupTable[dim];
 	const int n = data->lookupTableMeta->n[dim];
@@ -169,33 +169,33 @@ int GeometryFeed::buildLUT(int dim, const int ncurves) {
 	const int numLineEvents = se - strokeEvents.begin();
 
 	std::sort(fillEvents.begin(), fillEvents.begin() + numFillEvents,
-		[] (const Event &a, const Event &b) {
-			return a.y < b.y;
-		});
+			[](const Event &a, const Event &b) {
+				return a.y < b.y;
+			});
 
 	if (hasFragLine) {
 		std::sort(strokeEvents.begin(), strokeEvents.begin() + numLineEvents,
-			[] (const Event &a, const Event &b) {
-				return a.y < b.y;
-			});
+				[](const Event &a, const Event &b) {
+					return a.y < b.y;
+				});
 
 		strokeEventsLUT.build(dim, strokeEvents, numLineEvents, extended);
 
 		fillEventsLUT.build(dim, fillEvents, numFillEvents, extended, lineWidth,
-			[this, dim] (float y0, float y1, const CurveSet &active, uint8_t *list, int z) {
-				strokeCurves.clear();
-				queryLUT(&strokeShaderData, dim, y0, y1, strokeCurves);
+				[this, dim](float y0, float y1, const CurveSet &active, uint8_t *list, int z) {
+					strokeCurves.clear();
+					queryLUT(&strokeShaderData, dim, y0, y1, strokeCurves);
 
-				bool hasStrokeSentinel = false;
-				for (const auto curveIndex : strokeCurves) {
-					if (active.find(curveIndex) == active.end()) {
-						if (!hasStrokeSentinel) {
-							*list++ = SENTINEL_STROKES;
-							hasStrokeSentinel = true;
+					bool hasStrokeSentinel = false;
+					for (const auto curveIndex : strokeCurves) {
+						if (active.find(curveIndex) == active.end()) {
+							if (!hasStrokeSentinel) {
+								*list++ = SENTINEL_STROKES;
+								hasStrokeSentinel = true;
+							}
+							*list++ = curveIndex;
 						}
-						*list++ = curveIndex;
 					}
-				}
 
 #if 0
 				for (int i = 0; i < geometryData.numCurves; i++) {
@@ -228,8 +228,8 @@ int GeometryFeed::buildLUT(int dim, const int ncurves) {
 				}
 #endif
 
-				*list = SENTINEL_END;
-			});
+					*list = SENTINEL_END;
+				});
 	} else {
 		fillEventsLUT.build(dim, fillEvents, numFillEvents, extended);
 	}
@@ -408,22 +408,22 @@ void GeometryFeed::dumpCurveData() {
 }
 
 GeometryFeed::GeometryFeed(
-	const PathRef &path,
-	ToveShaderGeometryData &data,
-	const TovePaintData &lineColorData,
-	bool enableFragmentShaderStrokes) :
+		const PathRef &path,
+		ToveShaderGeometryData &data,
+		const TovePaintData &lineColorData,
+		bool enableFragmentShaderStrokes) :
 
-	path(path),
-	maxCurves(path->getNumCurves()),
-	maxSubPaths(path->getNumSubpaths()),
-	geometryData(data),
-	lineColorData(lineColorData),
-	fillEventsLUT(maxCurves, geometryData, IGNORE_FILL),
-	strokeEventsLUT(maxCurves, strokeShaderData, IGNORE_LINE),
-	allocData(maxCurves, maxSubPaths,
-		enableFragmentShaderStrokes && path->hasStroke(), geometryData),
-	allocStrokeData(maxCurves, maxSubPaths, true, strokeShaderData),
-	enableFragmentShaderStrokes(enableFragmentShaderStrokes) {
+		path(path),
+		maxCurves(path->getNumCurves()),
+		maxSubPaths(path->getNumSubpaths()),
+		geometryData(data),
+		lineColorData(lineColorData),
+		fillEventsLUT(maxCurves, geometryData, IGNORE_FILL),
+		strokeEventsLUT(maxCurves, strokeShaderData, IGNORE_LINE),
+		allocData(maxCurves, maxSubPaths,
+				enableFragmentShaderStrokes && path->hasStroke(), geometryData),
+		allocStrokeData(maxCurves, maxSubPaths, true, strokeShaderData),
+		enableFragmentShaderStrokes(enableFragmentShaderStrokes) {
 
 	if (maxCurves < 1) {
 		tove::report::warn("cannot render empty paths.");
@@ -443,10 +443,10 @@ GeometryFeed::GeometryFeed(
 }
 
 GeometryFeed::~GeometryFeed() {
-	path->removeObserver(this);	
+	path->removeObserver(this);
 }
 
- void GeometryFeed::observableChanged(Observable *observable, ToveChangeFlags what) {
+void GeometryFeed::observableChanged(Observable *observable, ToveChangeFlags what) {
 	changes |= what;
 }
 
@@ -458,12 +458,13 @@ ToveChangeFlags GeometryFeed::beginUpdate() {
 
 	if (changes & (CHANGED_LINE_ARGS | CHANGED_INITIAL)) {
 		if ((enableFragmentShaderStrokes && path->hasStroke()) !=
-			geometryData.fragmentShaderLine) {
+				geometryData.fragmentShaderLine) {
 			return CHANGED_RECREATE;
 		}
 
 		const float lineWidth = lineColorData.style > 0 ?
-			std::max(path->getLineWidth(), 1.0f) : 0.0f;
+										std::max(path->getLineWidth(), 1.0f) :
+										  0.0f;
 		geometryData.strokeWidth = lineWidth;
 
 		switch (path->getLineJoin()) {
@@ -501,11 +502,11 @@ ToveChangeFlags GeometryFeed::endUpdate() {
 
 	assert(geometryData.listsTexture != nullptr);
 	assert(geometryData.listsTextureRowBytes >=
-		geometryData.listsTextureSize[0] * 4);
+			geometryData.listsTextureSize[0] * 4);
 
 	assert(geometryData.curvesTexture != nullptr);
 	assert(geometryData.curvesTextureRowBytes >=
-		geometryData.curvesTextureSize[0] * 2);
+			geometryData.curvesTextureSize[0] * 2);
 	assert(geometryData.curvesTextureSize[1] == maxCurves);
 #endif
 
@@ -532,7 +533,7 @@ ToveChangeFlags GeometryFeed::endUpdate() {
 			for (int j = 0; j < n; j++) {
 				assert(curveIndex < maxCurves);
 				if (t->computeShaderCurveData(
-					&geometryData, j, curveIndex, extended[curveIndex])) {
+							&geometryData, j, curveIndex, extended[curveIndex])) {
 
 					extended[curveIndex].ignore = 0;
 				} else {
@@ -542,7 +543,7 @@ ToveChangeFlags GeometryFeed::endUpdate() {
 			}
 		} else {
 			assert(false); // not implemented yet
-			//curveIndex += t->getNumCurves();
+			// curveIndex += t->getNumCurves();
 		}
 	}
 	assert(curveIndex <= maxCurves);

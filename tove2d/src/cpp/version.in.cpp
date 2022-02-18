@@ -18,5 +18,4 @@ extern "C" {
 EXPORT const char *GetVersion() {
 	return tove_version;
 }
-
 }

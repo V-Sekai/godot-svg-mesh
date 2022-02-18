@@ -12,28 +12,28 @@
 #ifndef __TOVE_SHADER_LOOKUP
 #define __TOVE_SHADER_LOOKUP 1
 
-#include <vector>
 #include <set>
+#include <vector>
 
 #include "curve_data.h"
 
 BEGIN_TOVE_NAMESPACE
 
 enum EventType {
-    EVENT_ENTER,
-    EVENT_EXIT,
+	EVENT_ENTER,
+	EVENT_EXIT,
 	EVENT_MARK
 };
 
 struct Event {
-    float y;
-    EventType t : 8;
-    uint8_t curve;
+	float y;
+	EventType t : 8;
+	uint8_t curve;
 };
 
 enum {
-    SENTINEL_END = 0xff,
-    SENTINEL_STROKES = 0xfe
+	SENTINEL_END = 0xff,
+	SENTINEL_STROKES = 0xfe
 };
 
 class LookupTable {
@@ -42,16 +42,16 @@ public:
 
 private:
 	ToveShaderGeometryData &_data;
-    CurveSet active;
-    const int _maxCurves;
+	CurveSet active;
+	const int _maxCurves;
 	const int _ignore;
 
 public:
-    LookupTable(int maxCurves, ToveShaderGeometryData &data, int ignore) :
-        _maxCurves(maxCurves),
-        _data(data),
-        _ignore(ignore) {
-    }
+	LookupTable(int maxCurves, ToveShaderGeometryData &data, int ignore) :
+			_maxCurves(maxCurves),
+			_data(data),
+			_ignore(ignore) {
+	}
 
 #if TOVE_DEBUG
 	void dump(ToveShaderGeometryData *data, int dim) {
@@ -76,99 +76,99 @@ public:
 	}
 #endif
 
-    template<typename F>
-    void build(int dim, const std::vector<Event> &events,
-		int numEvents, const std::vector<ExCurveData> &extended,
-		float padding, const F &finish) {
+	template <typename F>
+	void build(int dim, const std::vector<Event> &events,
+			int numEvents, const std::vector<ExCurveData> &extended,
+			float padding, const F &finish) {
 
-        ToveShaderGeometryData &data = _data;
+		ToveShaderGeometryData &data = _data;
 
-        if (numEvents < 1) {
-            data.lookupTableMeta->n[dim] = 0;
-            return;
-        }
+		if (numEvents < 1) {
+			data.lookupTableMeta->n[dim] = 0;
+			return;
+		}
 
 		const int ignore = _ignore;
 
-        active.clear();
-        float *lookupTable = data.lookupTable[dim];
+		active.clear();
+		float *lookupTable = data.lookupTable[dim];
 
-        auto i = events.cbegin();
-        const auto end = events.cbegin() + numEvents;
+		auto i = events.cbegin();
+		const auto end = events.cbegin() + numEvents;
 
-        float *ylookup = lookupTable;
+		float *ylookup = lookupTable;
 
 		uint8_t *yptr = data.listsTexture;
 		int rowBytes = data.listsTextureRowBytes;
 
 		yptr += dim * rowBytes * (data.listsTextureSize[1] / 2);
 
-        int z = 0;
+		int z = 0;
 
-        if (data.fragmentShaderLine && padding > 0.0) {
-            const float y0 = i->y;
-            *ylookup++ = y0 - padding;
-            finish(y0 - padding, y0, active, yptr, z++);
-            yptr += rowBytes;
-        }
+		if (data.fragmentShaderLine && padding > 0.0) {
+			const float y0 = i->y;
+			*ylookup++ = y0 - padding;
+			finish(y0 - padding, y0, active, yptr, z++);
+			yptr += rowBytes;
+		}
 
-        while (i != end) {
-            auto j = i;
-            float y0 = i->y;
-            while (j != end && j->y == y0) {
-                switch (j->t) {
+		while (i != end) {
+			auto j = i;
+			float y0 = i->y;
+			while (j != end && j->y == y0) {
+				switch (j->t) {
 					case EVENT_ENTER:
-                    	active.insert(j->curve);
+						active.insert(j->curve);
 						break;
 					case EVENT_EXIT:
-                    	active.erase(j->curve);
+						active.erase(j->curve);
 						break;
 					case EVENT_MARK: // roots
 						break;
-                }
-                j++;
-            }
+				}
+				j++;
+			}
 
-            *ylookup++ = y0;
+			*ylookup++ = y0;
 
-            int k = 0;
-            assert(active.size() <= _maxCurves);
-            for (const auto curve : active) {
+			int k = 0;
+			assert(active.size() <= _maxCurves);
+			for (const auto curve : active) {
 				if ((extended[curve].ignore & ignore) == 0) {
 					yptr[k++] = curve;
 				}
-            }
+			}
 
-            float y1;
-            if (j != end) {
-                y1 = j->y;
-            } else {
-                y1 = y0;
+			float y1;
+			if (j != end) {
+				y1 = j->y;
+			} else {
+				y1 = y0;
 
-                if (data.fragmentShaderLine && padding > 0.0) {
-                    y1 += padding;
-                }
-            }
+				if (data.fragmentShaderLine && padding > 0.0) {
+					y1 += padding;
+				}
+			}
 
-            finish(y0, y1, active, &yptr[k], z++);
+			finish(y0, y1, active, &yptr[k], z++);
 
-            i = j;
+			i = j;
 			yptr += rowBytes;
-        }
+		}
 
-        *yptr = SENTINEL_END;
+		*yptr = SENTINEL_END;
 
-        data.lookupTableMeta->n[dim] = ylookup - lookupTable;
+		data.lookupTableMeta->n[dim] = ylookup - lookupTable;
 		assert(data.lookupTableMeta->n[dim] <= data.lookupTableSize);
-    }
+	}
 
-    inline void build(int dim, const std::vector<Event> &events,
-		int numEvents, const std::vector<ExCurveData> &extended) {
-        build(dim, events, numEvents, extended, 0.0,
-			[] (float y0, float y1, const CurveSet &active, uint8_t *list, int z) {
-            	*list = SENTINEL_END;
-        	});
-    }
+	inline void build(int dim, const std::vector<Event> &events,
+			int numEvents, const std::vector<ExCurveData> &extended) {
+		build(dim, events, numEvents, extended, 0.0,
+				[](float y0, float y1, const CurveSet &active, uint8_t *list, int z) {
+					*list = SENTINEL_END;
+				});
+	}
 };
 
 END_TOVE_NAMESPACE

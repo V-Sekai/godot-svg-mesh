@@ -1,5 +1,4 @@
-Nano SVG
-==========
+# Nano SVG
 
 ## Parser
 
@@ -15,7 +14,7 @@ The shapes in the SVG images are transformed by the viewBox and converted to spe
 That is, you should get the same looking data as your designed in your favorite app.
 
 NanoSVG can return the paths in few different units. For example if you want to render an image, you may choose
-to get the paths in pixels, or if you are feeding the data into a CNC-cutter, you may want to use millimeters. 
+to get the paths in pixels, or if you are feeding the data into a CNC-cutter, you may want to use millimeters.
 
 The units passed to NanoSVG should be one of: 'px', 'pt', 'pc' 'mm', 'cm', or 'in'.
 DPI (dots-per-inch) controls how the unit conversion is done.
@@ -30,10 +29,9 @@ The parser library is accompanied with really simpler SVG rasterizer. Currently 
 
 The intended usage for the rasterizer is to for example bake icons of different size into a texture. The rasterizer is not particular fast or accurate, but it's small and packed in one header file.
 
-
 ## Example Usage
 
-``` C
+```C
 // Load
 struct NSVGimage* image;
 image = nsvgParseFromFile("test.svg", "px", 96);
@@ -55,9 +53,9 @@ nsvgDelete(image);
 
 In order to use NanoSVG in your own project, just copy nanosvg.h to your project.
 In one C/C++ define `NANOSVG_IMPLEMENTATION` before including the library to expand the NanoSVG implementation in that file.
-NanoSVG depends on `stdio.h` ,`string.h` and `math.h`, they should be included where the implementation is expanded before including NanoSVG. 
+NanoSVG depends on `stdio.h` ,`string.h` and `math.h`, they should be included where the implementation is expanded before including NanoSVG.
 
-``` C
+```C
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
@@ -67,7 +65,7 @@ NanoSVG depends on `stdio.h` ,`string.h` and `math.h`, they should be included w
 
 By default, NanoSVG parses only the most common colors. In order to get support for full list of [SVG color keywords](http://www.w3.org/TR/SVG11/types.html#ColorKeywords), define `NANOSVG_ALL_COLOR_KEYWORDS` before expanding the implementation.
 
-``` C
+```C
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
@@ -82,9 +80,9 @@ In order to compile the demo project, your will need to install [GLFW](http://ww
 
 NanoSVG demo project uses [premake4](http://industriousone.com/premake) to build platform specific projects, now is good time to install it if you don't have it already. To build the example, navigate into the root folder in your favorite terminal, then:
 
-- *OS X*: `premake4 xcode4`
-- *Windows*: `premake4 vs2010`
-- *Linux*: `premake4 gmake`
+- _OS X_: `premake4 xcode4`
+- _Windows_: `premake4 vs2010`
+- _Linux_: `premake4 gmake`
 
 See premake4 documentation for full list of supported build file types. The projects will be created in `build` folder. An example of building and running the example on OS X:
 

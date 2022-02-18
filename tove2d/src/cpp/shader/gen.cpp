@@ -9,8 +9,8 @@
  * All rights reserved.
  */
 
-#include "../common.h"
 #include "gen.h"
+#include "../common.h"
 
 BEGIN_TOVE_NAMESPACE
 
@@ -37,9 +37,9 @@ ShaderWriter::ShaderWriter() {
 		out << "#pragma language glsl3\n#define GLSL3 1\n";
 	}
 #else
-	out << R"GLSL(
-shader_type canvas_item;
-render_mode skip_vertex_transform;
+	out << R "GLSL(
+			shader_type canvas_item;
+	render_mode skip_vertex_transform;
 )GLSL";
 #endif
 
@@ -58,7 +58,7 @@ render_mode skip_vertex_transform;
 #if TOVE_TARGET == TOVE_TARGET_LOVE2D
 	define("TEXEL", "Texel");
 #else
-	define("TEXEL", "texture");
+define("TEXEL", "texture");
 #endif
 }
 
@@ -72,19 +72,21 @@ void ShaderWriter::beginVertexShader() {
 
 void ShaderWriter::endVertexShader() {
 #if TOVE_TARGET == TOVE_TARGET_LOVE2D
-	out << R"GLSL(
-vec4 position(mat4 transform_projection, vec4 vertex_pos) {
-	return transform_projection * do_vertex(vertex_pos);
-}
+	out << R "GLSL(
+			vec4
+			position(mat4 transform_projection, vec4 vertex_pos) {
+		return transform_projection * do_vertex(vertex_pos);
+	}
 #endif // VERTEX
 )GLSL";
 #elif TOVE_TARGET == TOVE_TARGET_GODOT
-	out << R"GLSL(
-void vertex() {
-	vec4 v = vec4(VERTEX, 0.0, 1.0);
-	v = do_vertex(v);
-	VERTEX = (EXTRA_MATRIX * (WORLD_MATRIX * v)).xy;
-}
+	out << R "GLSL(
+			void
+			vertex() {
+		vec4 v = vec4(VERTEX, 0.0, 1.0);
+		v = do_vertex(v);
+		VERTEX = (EXTRA_MATRIX * (WORLD_MATRIX * v)).xy;
+	}
 )GLSL";
 #endif
 }
@@ -99,69 +101,70 @@ void ShaderWriter::beginFragmentShader() {
 
 void ShaderWriter::endFragmentShader() {
 #if TOVE_TARGET == TOVE_TARGET_LOVE2D
-	out << R"GLSL(
-vec4 effect(vec4 _1, Image _2, vec2 texture_coords, vec2 _4) {
-	return do_color(texture_coords);
-}
+	out << R "GLSL(
+			vec4
+			effect(vec4 _1, Image _2, vec2 texture_coords, vec2 _4) {
+		return do_color(texture_coords);
+	}
 #endif // PIXEL
 )GLSL";
 #endif
 }
 
 void ShaderWriter::computeLineColor(int lineStyle) {
-	out << "#define LINE_STYLE "<< lineStyle << "\n";
-	out << R"GLSL(
+	out << "#define LINE_STYLE " << lineStyle << "\n";
+	out << R "GLSL(
 #if LINE_STYLE == 1
-uniform vec4 linecolor;
+			uniform vec4 linecolor;
 #elif LINE_STYLE >= 2
-uniform sampler2D linecolors;
-uniform MATRIX linematrix;
-uniform vec2 linecscale;
+			uniform sampler2D linecolors;
+	uniform MATRIX linematrix;
+	uniform vec2 linecscale;
 #endif
 
 #if LINE_STYLE > 0
-vec4 computeLineColor(vec2 pos) {
+	vec4 computeLineColor(vec2 pos) {
 #if LINE_STYLE == 1
-	return linecolor;
+		return linecolor;
 #elif LINE_STYLE == 2
-	float y = (linematrix * vec3(pos, 1)).y;
-	y = linecscale.x + linecscale.y * y;
-	return TEXEL(linecolors, vec2(0.5, y));
+		float y = (linematrix * vec3(pos, 1)).y;
+		y = linecscale.x + linecscale.y * y;
+		return TEXEL(linecolors, vec2(0.5, y));
 #elif LINE_STYLE == 3
-	float y = length((linematrix * vec3(pos, 1)).xy);
-	y = linecscale.x + linecscale.y * y;
-	return TEXEL(linecolors, vec2(0.5, y));
+		float y = length((linematrix * vec3(pos, 1)).xy);
+		y = linecscale.x + linecscale.y * y;
+		return TEXEL(linecolors, vec2(0.5, y));
 #endif
-}
+	}
 #endif
 )GLSL";
 }
 
 void ShaderWriter::computeFillColor(int fillStyle) {
-	out << "#define FILL_STYLE "<< fillStyle << "\n";
-	out << R"GLSL(
+	out << "#define FILL_STYLE " << fillStyle << "\n";
+	out << R "GLSL(
 #if FILL_STYLE == 1
-uniform vec4 fillcolor;
+			uniform vec4 fillcolor;
 #elif FILL_STYLE >= 2
-uniform sampler2D fillcolors;
-uniform MATRIX fillmatrix;
-uniform vec2 fillcscale;
+			uniform sampler2D fillcolors;
+	uniform MATRIX fillmatrix;
+	uniform vec2 fillcscale;
 #endif
 
 #if FILL_STYLE > 0
-vec4 computeFillColor(vec2 pos) {
+	vec4 computeFillColor(vec2 pos) {
 #if FILL_STYLE == 1
-	return fillcolor;
+		return fillcolor;
 #elif FILL_STYLE == 2
-	float y = (fillmatrix * vec3(pos, 1)).y;
-	y = fillcscale.x + fillcscale.y * y;
-	return TEXEL(fillcolors, vec2(0.5, y));
+		float y = (fillmatrix * vec3(pos, 1)).y;
+		y = fillcscale.x + fillcscale.y * y;
+		return TEXEL(fillcolors, vec2(0.5, y));
 #elif FILL_STYLE == 3
-	float y = length((fillmatrix * vec3(pos, 1)).xy);
-	y = fillcscale.x + fillcscale.y * y;
-	return TEXEL(fillcolors, vec2(0.5, y));
+		float y = length((fillmatrix * vec3(pos, 1)).xy);
+		y = fillcscale.x + fillcscale.y * y;
+		return TEXEL(fillcolors, vec2(0.5, y));
 #endif
-}
+	}
 #endif
 )GLSL";
 }
@@ -171,13 +174,13 @@ const char *ShaderWriter::getSourcePtr() {
 
 	for (auto i : defines) {
 		size_t pos = 0;
-	    while ((pos = source.find(i.first, pos)) != std::string::npos) {
-	         source.replace(pos, i.first.length(), i.second);
-	         pos += i.second.length();
-	    }
+		while ((pos = source.find(i.first, pos)) != std::string::npos) {
+			source.replace(pos, i.first.length(), i.second);
+			pos += i.second.length();
+		}
 	}
 
-	//fprintf(stderr, "%s", source.c_str());
+	// fprintf(stderr, "%s", source.c_str());
 
 	sSource = source;
 	return sSource.c_str();
@@ -194,22 +197,22 @@ const char *GetPaintShaderCode(int numPaints) {
 
 	w.define("NUM_PAINTS", numPaints);
 
-	w << R"GLSL(
-varying vec2 gradient_pos;
-flat varying vec3 gradient_scale;
-flat varying vec2 texture_pos;
+	w << R "GLSL(
+			varying vec2 gradient_pos;
+	flat varying vec3 gradient_scale;
+	flat varying vec2 texture_pos;
 )GLSL";
 
 	w.beginVertexShader();
 
 #if TOVE_TARGET == TOVE_TARGET_LOVE2D
-	w << "attribute float VertexPaint;\n";
+w << "attribute float VertexPaint;\n";
 #elif TOVE_TARGET == TOVE_TARGET_GODOT
-	w.define("VertexPaint", "UV.x");
+w.define("VertexPaint", "UV.x");
 #endif
 
-	w << R"GLSL(
-uniform MATRIX matrix[NUM_PAINTS];
+w << R "GLSL(
+		uniform MATRIX matrix[NUM_PAINTS];
 uniform float arguments[NUM_PAINTS];
 uniform float cstep;
 
@@ -229,10 +232,10 @@ vec4 do_vertex(vec4 vertex_pos) {
 
 	w.endVertexShader();
 
-	w.beginFragmentShader();
+w.beginFragmentShader();
 
-	w << R"GLSL(
-uniform sampler2D colors;
+w << R "GLSL(
+		uniform sampler2D colors;
 
 vec4 do_color(vec2 _1) {
 	// encourage texture prefetch via texture_pos; for solid colors and
@@ -250,90 +253,91 @@ vec4 do_color(vec2 _1) {
 
 	w.endFragmentShader();
 
-	return w.getSourcePtr();
+return w.getSourcePtr();
 }
 
 const char *GetImplicitFillShaderCode(
-	const ToveShaderData *data, bool fragLine, bool meshBand, bool debug) {
-	
+		const ToveShaderData *data, bool fragLine, bool meshBand, bool debug) {
+
 	tove::ShaderWriter w;
 
-	w << R"GLSL(
-varying vec4 raw_vertex_pos;
+	w << R "GLSL(
+			varying vec4 raw_vertex_pos;
 )GLSL";
 
 	w.beginVertexShader();
-	if (!meshBand) {
-		w << R"GLSL(
-uniform vec4 bounds;
+if (!meshBand) {
+	w << R "GLSL(
+			uniform vec4 bounds;
 
-vec4 do_vertex(vec4 vertex_pos) {
-	raw_vertex_pos = vec4(mix(bounds.xy, bounds.zw, vertex_pos.xy), vertex_pos.zw);
-	return raw_vertex_pos;
-}
+	vec4 do_vertex(vec4 vertex_pos) {
+		raw_vertex_pos = vec4(mix(bounds.xy, bounds.zw, vertex_pos.xy), vertex_pos.zw);
+		return raw_vertex_pos;
+	}
 )GLSL";
-	} else {
-		w << R"GLSL(
-vec4 do_vertex(vec4 vertex_pos) {
-	raw_vertex_pos = vertex_pos;
-	return vertex_pos;
-}
+} else {
+	w << R "GLSL(
+			vec4
+			do_vertex(vec4 vertex_pos) {
+		raw_vertex_pos = vertex_pos;
+		return vertex_pos;
+	}
 )GLSL";
-	}
-	w.endVertexShader();
+}
+w.endVertexShader();
 
-	w.beginFragmentShader();
+w.beginFragmentShader();
 
-	if (!meshBand) {
-		// encourage shader caching by trying to reduce code changing states.
-		const int lutN = tove::nextpow2(data->geometry.lookupTableSize);
+if (!meshBand) {
+	// encourage shader caching by trying to reduce code changing states.
+	const int lutN = tove::nextpow2(data->geometry.lookupTableSize);
 
-		w << "#define LUT_SIZE "<< lutN << "\n";
-		w << "#define LUT_BANDS 1\n";
-	} else {
-		w << "#define MESH_BANDS 1\n";
-	}
+	w << "#define LUT_SIZE " << lutN << "\n";
+	w << "#define LUT_BANDS 1\n";
+} else {
+	w << "#define MESH_BANDS 1\n";
+}
 
-	if (debug) {
-		w << "#define GPUX_DEBUG 1\n";
-	}
+if (debug) {
+	w << "#define GPUX_DEBUG 1\n";
+}
 
-	w << "#define FILL_RULE "<< data->geometry.fillRule << "\n";
-	w << "#define CURVE_DATA_SIZE "<<
-		data->geometry.curvesTextureSize[0] << "\n";
+w << "#define FILL_RULE " << data->geometry.fillRule << "\n";
+w << "#define CURVE_DATA_SIZE " << data->geometry.curvesTextureSize[0] << "\n";
 
-	w.computeLineColor(fragLine ? data->color.line.style : 0);
-	w.computeFillColor(data->color.fill.style);
+w.computeLineColor(fragLine ? data->color.line.style : 0);
+w.computeFillColor(data->color.fill.style);
 
-	#include "../../glsl/fill.frag.inc"
+#include "../../glsl/fill.frag.inc"
 
-	w.endFragmentShader();
+w.endFragmentShader();
 
-	return w.getSourcePtr();
+return w.getSourcePtr();
 }
 
 const char *GetImplicitLineShaderCode(const ToveShaderData *data) {
 	tove::ShaderWriter w;
 
-	w << R"GLSL(
-varying vec2 raw_vertex_pos;
+	w << R "GLSL(
+			varying vec2 raw_vertex_pos;
 )GLSL";
 
 	w << "#define CURVE_DATA_SIZE "<<
 		data->geometry.curvesTextureSize[0] << "\n";
 
-	w.beginVertexShader();
-	#include "../../glsl/line.vert.inc"
-	w.endVertexShader();
+w.beginVertexShader();
+#include "../../glsl/line.vert.inc"
+w.endVertexShader();
 
-	w.beginFragmentShader();
-	w.computeLineColor(data->color.line.style);
-	w << R"GLSL(
-vec4 do_color(vec2 _1) {
+w.beginFragmentShader();
+w.computeLineColor(data->color.line.style);
+w << R "GLSL(
+		vec4
+		do_color(vec2 _1) {
 	return computeLineColor(raw_vertex_pos);
 }
 )GLSL";
 	w.endFragmentShader();
 
-	return w.getSourcePtr();
+return w.getSourcePtr();
 }

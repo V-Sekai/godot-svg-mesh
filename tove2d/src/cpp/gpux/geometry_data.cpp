@@ -18,17 +18,18 @@
 BEGIN_TOVE_NAMESPACE
 
 GeometryData::GeometryData(
-	int maxCurves,
-	int maxSubPaths,
-	bool fragmentShaderStrokes,
-	ToveShaderGeometryData &data) : data(data) {
+		int maxCurves,
+		int maxSubPaths,
+		bool fragmentShaderStrokes,
+		ToveShaderGeometryData &data) :
+		data(data) {
 
 	std::memset(&data, 0, sizeof(ToveShaderGeometryData));
 
-    data.maxCurves = maxCurves;
+	data.maxCurves = maxCurves;
 	data.numCurves = 0;
 	data.bounds = nullptr;
-    data.strokeWidth = 0;
+	data.strokeWidth = 0;
 	data.fragmentShaderLine = fragmentShaderStrokes;
 	data.opaqueLine = true;
 
@@ -38,8 +39,8 @@ GeometryData::GeometryData(
 
 	int baseLookupTableSize = maxCurves * 4; // number of (x, y) pairs
 
-    data.lookupTable[0] = nullptr;
-    data.lookupTable[1] = nullptr;
+	data.lookupTable[0] = nullptr;
+	data.lookupTable[1] = nullptr;
 	data.lookupTableMeta = nullptr;
 	if (fragmentShaderStrokes) {
 		data.lookupTableSize = baseLookupTableSize + 2; // 2 for padding
@@ -55,17 +56,17 @@ GeometryData::GeometryData(
 	// lists texture size: per axis, we can have up to 2 entries per
 	// curve.
 
-    data.listsTexture = nullptr;
+	data.listsTexture = nullptr;
 	if (fragmentShaderStrokes) {
-	    data.listsTextureSize[0] = div4(maxCurves + 2); // two markers
-	    data.listsTextureSize[1] = 2 * (maxCurves * 2 + 2);
+		data.listsTextureSize[0] = div4(maxCurves + 2); // two markers
+		data.listsTextureSize[1] = 2 * (maxCurves * 2 + 2);
 	} else {
 		data.listsTextureSize[0] = div4(maxCurves + 1); // one marker
-	    data.listsTextureSize[1] = 2 * (maxCurves * 2);
+		data.listsTextureSize[1] = 2 * (maxCurves * 2);
 	}
-    data.listsTextureFormat = "rgba8";
+	data.listsTextureFormat = "rgba8";
 
-    data.curvesTexture = nullptr;
+	data.curvesTexture = nullptr;
 #if 1
 	// for some reason, using a texture width of 12 for the "curves"
 	// texture has problems in texture lookup in the shader on some
@@ -78,11 +79,11 @@ GeometryData::GeometryData(
 		data.curvesTextureSize[0] = div4(12);
 	}
 #endif
-    data.curvesTextureSize[1] = maxCurves;
+	data.curvesTextureSize[1] = maxCurves;
 	if (sizeof(gpu_float_t) == sizeof(float)) {
-	    data.curvesTextureFormat = "rgba32f";
+		data.curvesTextureFormat = "rgba32f";
 	} else if (sizeof(gpu_float_t) == sizeof(uint16_t)) {
-	    data.curvesTextureFormat = "rgba16f";
+		data.curvesTextureFormat = "rgba16f";
 	} else {
 		std::cerr << "illegal gpu_float_t typedef" << std::endl;
 		assert(false);
@@ -109,21 +110,19 @@ GeometryData::~GeometryData() {
 }
 
 GeometryNoLinkData::GeometryNoLinkData(
-	int maxCurves, int maxSubPaths,
-	bool fragmentShaderStrokes, ToveShaderGeometryData &data) :
-	GeometryData(maxCurves, maxSubPaths, fragmentShaderStrokes, data) {
+		int maxCurves, int maxSubPaths,
+		bool fragmentShaderStrokes, ToveShaderGeometryData &data) :
+		GeometryData(maxCurves, maxSubPaths, fragmentShaderStrokes, data) {
 
 	// do not use this variant for data linked to tove's lua lib.
 
 	data.bounds = new ToveBounds;
 
 	data.listsTextureRowBytes = data.listsTextureSize[0] * sizeof(uint8_t) * 4;
-    data.listsTexture = new uint8_t[
-		data.listsTextureRowBytes * data.listsTextureSize[1]];
+	data.listsTexture = new uint8_t[data.listsTextureRowBytes * data.listsTextureSize[1]];
 
-    data.curvesTextureRowBytes = data.curvesTextureSize[0] * sizeof(gpu_float_t) * 4;
-    data.curvesTexture = new gpu_float_t[
-		data.curvesTextureRowBytes * data.curvesTextureSize[1] / sizeof(gpu_float_t)];
+	data.curvesTextureRowBytes = data.curvesTextureSize[0] * sizeof(gpu_float_t) * 4;
+	data.curvesTexture = new gpu_float_t[data.curvesTextureRowBytes * data.curvesTextureSize[1] / sizeof(gpu_float_t)];
 
 	data.lookupTable[0] = new float[data.lookupTableSize];
 	data.lookupTable[1] = new float[data.lookupTableSize];
@@ -133,8 +132,8 @@ GeometryNoLinkData::GeometryNoLinkData(
 GeometryNoLinkData::~GeometryNoLinkData() {
 	delete data.bounds;
 
-    delete[] data.listsTexture;
-    delete[] data.curvesTexture;
+	delete[] data.listsTexture;
+	delete[] data.curvesTexture;
 
 	delete[] data.lookupTable[0];
 	delete[] data.lookupTable[1];

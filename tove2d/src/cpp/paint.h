@@ -13,8 +13,8 @@
 #define __TOVE_PAINT 1
 
 #include "common.h"
-#include "observer.h"
 #include "nsvg.h"
+#include "observer.h"
 
 BEGIN_TOVE_NAMESPACE
 
@@ -30,7 +30,7 @@ public:
 	virtual PaintRef clone() const = 0;
 	virtual void cloneTo(PaintRef &target, const nsvg::Transform &transform) = 0;
 	virtual TovePaintType getType() const = 0;
-	virtual void transform(const nsvg::Transform &transform) { }
+	virtual void transform(const nsvg::Transform &transform) {}
 
 	virtual bool isGradient() const = 0;
 	virtual bool isOpaque() const = 0;
@@ -214,12 +214,14 @@ class LinearGradient final : public AbstractGradient {
 public:
 	LinearGradient(float x1, float y1, float x2, float y2);
 
-	inline LinearGradient(int nstops) : AbstractGradient(nstops) {
+	inline LinearGradient(int nstops) :
+			AbstractGradient(nstops) {
 	}
 
 	inline LinearGradient(const NSVGgradient *gradient);
 
-	inline LinearGradient(const LinearGradient &gradient) : AbstractGradient(gradient) {
+	inline LinearGradient(const LinearGradient &gradient) :
+			AbstractGradient(gradient) {
 	}
 
 	virtual void getGradientParameters(ToveGradientParameters &p);
@@ -249,13 +251,16 @@ class RadialGradient final : public AbstractGradient {
 public:
 	RadialGradient(float cx, float cy, float fx, float fy, float r);
 
-	inline RadialGradient(int nstops) : AbstractGradient(nstops) {
+	inline RadialGradient(int nstops) :
+			AbstractGradient(nstops) {
 	}
 
-	inline RadialGradient(const NSVGgradient *gradient) : AbstractGradient(gradient) {
+	inline RadialGradient(const NSVGgradient *gradient) :
+			AbstractGradient(gradient) {
 	}
 
-	inline RadialGradient(const RadialGradient &gradient) : AbstractGradient(gradient) {
+	inline RadialGradient(const RadialGradient &gradient) :
+			AbstractGradient(gradient) {
 	}
 
 	virtual void getGradientParameters(ToveGradientParameters &p);

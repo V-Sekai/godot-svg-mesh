@@ -12,8 +12,8 @@
 #ifndef __TOVE_MESH
 #define __TOVE_MESH 1
 
-#include "triangles.h"
 #include "paint.h"
+#include "triangles.h"
 #include "utils.h"
 #include <map>
 
@@ -30,7 +30,7 @@ protected:
 	void *mVertices;
 	int32_t mVertexCount;
 	const uint16_t mStride;
-	std::map<SubmeshId, Submesh*> mSubmeshes;
+	std::map<SubmeshId, Submesh *> mSubmeshes;
 	mutable std::vector<ToveVertexIndex> mCoalescedTriangles;
 
 	void reserve(int32_t n);
@@ -44,8 +44,8 @@ public:
 	int32_t getIndexCount() const;
 
 	void copyIndexData(
-		ToveVertexIndex *indices,
-		int32_t indexCount) const;
+			ToveVertexIndex *indices,
+			int32_t indexCount) const;
 
 	inline void clip(int n) {
 		mVertexCount = std::min(mVertexCount, n);
@@ -63,9 +63,9 @@ public:
 	void clearTriangles();
 
 	virtual void setLineColor(
-		const PathRef &path, int vertexIndex, int vertexCount);
+			const PathRef &path, int vertexIndex, int vertexCount);
 	virtual void setFillColor(
-		const PathRef &path, int vertexIndex, int vertexCount);
+			const PathRef &path, int vertexIndex, int vertexCount);
 
 	inline int getVertexCount() const {
 		return mVertexCount;
@@ -83,10 +83,11 @@ public:
 class Submesh {
 private:
 	TriangleCache mTriangles;
-	AbstractMesh * const mMesh;
+	AbstractMesh *const mMesh;
 
 public:
-	inline Submesh(AbstractMesh *mesh) : mMesh(mesh) {
+	inline Submesh(AbstractMesh *mesh) :
+			mMesh(mesh) {
 	}
 
 	inline ToveTrianglesMode getIndexMode() const {
@@ -98,8 +99,8 @@ public:
 	}
 
 	inline void copyIndexData(
-		ToveVertexIndex *indices,
-		int32_t indexCount) const {
+			ToveVertexIndex *indices,
+			int32_t indexCount) const {
 
 		mTriangles.copyIndexData(indices, indexCount);
 	}
@@ -113,30 +114,30 @@ public:
 
 	// used by adaptive flattener.
 	void addClipperPaths(
-		const ClipperPaths &paths,
-		float scale,
-		ToveHoles holes);
+			const ClipperPaths &paths,
+			float scale,
+			ToveHoles holes);
 
 	// used by fixed flattener.
 	void triangulateFixedResolutionFill(
-		const int vertexIndex0,
-		const PathRef &path,
-		const RigidFlattener &flattener,
-		ToveHoles holes);
+			const int vertexIndex0,
+			const PathRef &path,
+			const RigidFlattener &flattener,
+			ToveHoles holes);
 	void triangulateFixedResolutionLine(
-		const int pathVertex,
-		const bool miter,
-		const bool reduceOverlap,
-		const int verticesPerSegment,
-		const PathRef &path,
-		const RigidFlattener &flattener);
+			const int pathVertex,
+			const bool miter,
+			const bool reduceOverlap,
+			const int verticesPerSegment,
+			const PathRef &path,
+			const RigidFlattener &flattener);
 
 	inline bool findCachedTriangulation(
-		bool &trianglesChanged) {
-		
+			bool &trianglesChanged) {
+
 		return mTriangles.findCachedTriangulation(
-			vertices(0, mMesh->getVertexCount()),
-			trianglesChanged);
+				vertices(0, mMesh->getVertexCount()),
+				trianglesChanged);
 	}
 };
 
@@ -148,29 +149,29 @@ public:
 class ColorMesh : public AbstractMesh {
 protected:
 	void setColor(int vertexIndex, int vertexCount,
-		const MeshPaint &paint);
+			const MeshPaint &paint);
 
 public:
 	ColorMesh();
 
 	virtual void setLineColor(
-		const PathRef &path, int vertexIndex, int vertexCount);
+			const PathRef &path, int vertexIndex, int vertexCount);
 	virtual void setFillColor(
-		const PathRef &path, int vertexIndex, int vertexCount);
+			const PathRef &path, int vertexIndex, int vertexCount);
 };
 
 class PaintMesh : public AbstractMesh {
 protected:
 	void setPaintIndex(
-		int paintIndex, int vertexIndex, int vertexCount);
+			int paintIndex, int vertexIndex, int vertexCount);
 
 public:
 	PaintMesh();
 
 	virtual void setLineColor(
-		const PathRef &path, int vertexIndex, int vertexCount);
+			const PathRef &path, int vertexIndex, int vertexCount);
 	virtual void setFillColor(
-		const PathRef &path, int vertexIndex, int vertexCount);
+			const PathRef &path, int vertexIndex, int vertexCount);
 };
 
 END_TOVE_NAMESPACE

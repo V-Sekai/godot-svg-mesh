@@ -36,12 +36,12 @@ struct CurveBounds {
 	void update(const float *curve, float *bx, float *by);
 };
 
-template<typename T>
+template <typename T>
 inline void bezierpc(T P0, T P1, T P2, T P3, T *Z) {
-	Z[0] = -P0 + 3 * P1  + -3 * P2 + P3;
-    Z[1] = 3 * P0 - 6 * P1 + 3 * P2;
-    Z[2] = -3 * P0 + 3 * P1;
-    Z[3] = P0;
+	Z[0] = -P0 + 3 * P1 + -3 * P2 + P3;
+	Z[1] = 3 * P0 - 6 * P1 + 3 * P2;
+	Z[2] = -3 * P0 + 3 * P1;
+	Z[3] = P0;
 }
 
 class CurveData {

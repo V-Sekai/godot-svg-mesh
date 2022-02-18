@@ -20,50 +20,50 @@ struct vec2 {
 	float x;
 	float y;
 
-	inline vec2(float x, float y) : x(x), y(y) { };
+	inline vec2(float x, float y) :
+			x(x), y(y){};
 };
 
 class Vertices {
 private:
-    void *vertices;
-    const uint16_t stride;
+	void *vertices;
+	const uint16_t stride;
 
 public:
 	inline Vertices(void *vertices, uint16_t stride, size_t i0 = 0) :
-        vertices(reinterpret_cast<uint8_t*>(vertices) + (i0 * stride)),
-        stride(stride) {
+			vertices(reinterpret_cast<uint8_t *>(vertices) + (i0 * stride)),
+			stride(stride) {
 	}
 
 	inline Vertices(const Vertices &v) :
-        vertices(v.vertices),
-        stride(v.stride) {
+			vertices(v.vertices),
+			stride(v.stride) {
 	}
 
 	inline vec2 &operator[](size_t i) const {
-		return *reinterpret_cast<vec2*>(
-            reinterpret_cast<uint8_t*>(vertices) + (i * stride)
-        );
+		return *reinterpret_cast<vec2 *>(
+				reinterpret_cast<uint8_t *>(vertices) + (i * stride));
 	}
 
-	inline vec2& operator*() const {
-		return *reinterpret_cast<vec2*>(vertices);
+	inline vec2 &operator*() const {
+		return *reinterpret_cast<vec2 *>(vertices);
 	}
 
 	inline Vertices operator+(size_t i) const {
 		return Vertices(
-			reinterpret_cast<uint8_t*>(vertices) + stride * i, stride);
+				reinterpret_cast<uint8_t *>(vertices) + stride * i, stride);
 	}
 
-	inline vec2* operator->() const {
-		return reinterpret_cast<vec2*>(vertices);
+	inline vec2 *operator->() const {
+		return reinterpret_cast<vec2 *>(vertices);
 	}
 
-    inline uint8_t *attr() const {
-        return reinterpret_cast<uint8_t*>(vertices) + sizeof(vec2);
-    }
+	inline uint8_t *attr() const {
+		return reinterpret_cast<uint8_t *>(vertices) + sizeof(vec2);
+	}
 
-	inline Vertices& operator++() { // prefix
-		vertices = reinterpret_cast<uint8_t*>(vertices) + stride;
+	inline Vertices &operator++() { // prefix
+		vertices = reinterpret_cast<uint8_t *>(vertices) + stride;
 		return *this;
 	}
 
@@ -75,23 +75,23 @@ public:
 };
 
 inline float cross(
-    float Ax, float Ay, float Bx, float By, float Cx, float Cy) {
-    float BAx = Ax - Bx;
-    float BAy = Ay - By;
-    float BCx = Cx - Bx;
-    float BCy = Cy - By;
-    return (BAx * BCy - BAy * BCx);
+		float Ax, float Ay, float Bx, float By, float Cx, float Cy) {
+	float BAx = Ax - Bx;
+	float BAy = Ay - By;
+	float BCx = Cx - Bx;
+	float BCy = Cy - By;
+	return (BAx * BCy - BAy * BCx);
 }
 
 inline bool unequal(
-    float x1, float y1, float x2, float y2) {
+		float x1, float y1, float x2, float y2) {
 	float dx = x1 - x2;
 	float dy = y1 - y2;
 	return dx * dx + dy * dy > 1e-5;
 }
 
 inline int find_unequal_backward(
-	const Vertices &vertices, int start, int n) {
+		const Vertices &vertices, int start, int n) {
 	start = start % n;
 	const float x = vertices[start].x;
 	const float y = vertices[start].y;
@@ -106,7 +106,7 @@ inline int find_unequal_backward(
 }
 
 inline int find_unequal_forward(
-	const Vertices &vertices, int start, int n) {
+		const Vertices &vertices, int start, int n) {
 	start = start % n;
 	const float x = vertices[start].x;
 	const float y = vertices[start].y;
@@ -121,7 +121,7 @@ inline int find_unequal_forward(
 }
 
 inline int find_unequal_forward(
-	const Vertices &vertices, const ToveTPPLPoly &poly, int start, int n) {
+		const Vertices &vertices, const ToveTPPLPoly &poly, int start, int n) {
 	start = start % n;
 	const auto &s = vertices[poly[start].id];
 	const float x = s.x;
@@ -137,7 +137,7 @@ inline int find_unequal_forward(
 }
 
 inline int find_unequal_forward(
-	const Vertices &vertices, const uint16_t *indices, int start, int n) {
+		const Vertices &vertices, const uint16_t *indices, int start, int n) {
 	start = start % n;
 	const auto &s = vertices[indices[start]];
 	const float x = s.x;
@@ -154,39 +154,44 @@ inline int find_unequal_forward(
 
 #if TOVE_RT_CLIP_PATH
 inline void clip_line(
-	const vec2 &a,
-	vec2 &b,
-	const vec2 &c,
-	const vec2 &d) {
+		const vec2 &a,
+		vec2 &b,
+		const vec2 &c,
+		const vec2 &d) {
 
 	// adapted from:
 	// https://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect
 
-	float p0_x = a.x; float p0_y = a.y;
-	float p1_x = b.x; float p1_y = b.y;
-	float p2_x = c.x; float p2_y = c.y;
-	float p3_x = d.x; float p3_y = d.y;
+	float p0_x = a.x;
+	float p0_y = a.y;
+	float p1_x = b.x;
+	float p1_y = b.y;
+	float p2_x = c.x;
+	float p2_y = c.y;
+	float p3_x = d.x;
+	float p3_y = d.y;
 
-    float s1_x, s1_y, s2_x, s2_y;
-    s1_x = p1_x - p0_x; s1_y = p1_y - p0_y;
-    s2_x = p3_x - p2_x; s2_y = p3_y - p2_y;
+	float s1_x, s1_y, s2_x, s2_y;
+	s1_x = p1_x - p0_x;
+	s1_y = p1_y - p0_y;
+	s2_x = p3_x - p2_x;
+	s2_y = p3_y - p2_y;
 
-    float s = (-s1_y * (p0_x - p2_x) + s1_x * (p0_y - p2_y)) / (-s2_x * s1_y + s1_x * s2_y);
-	float t = ( s2_x * (p0_y - p2_y) - s2_y * (p0_x - p2_x)) / (-s2_x * s1_y + s1_x * s2_y);
+	float s = (-s1_y * (p0_x - p2_x) + s1_x * (p0_y - p2_y)) / (-s2_x * s1_y + s1_x * s2_y);
+	float t = (s2_x * (p0_y - p2_y) - s2_y * (p0_x - p2_x)) / (-s2_x * s1_y + s1_x * s2_y);
 
 	b.x = p0_x + (t * s1_x);
 	b.y = p0_y + (t * s1_y);
 }
 
-
 inline float ray_circle(
-	float x,
-	float y,
-	float rx,
-	float ry,
-	float cx,
-	float cy,
-	float r) {
+		float x,
+		float y,
+		float rx,
+		float ry,
+		float cx,
+		float cy,
+		float r) {
 
 	const float fx = x - cx;
 	const float fy = y - cy;

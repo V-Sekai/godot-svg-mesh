@@ -11,7 +11,7 @@ typedef enum {
 } ToveReportLevel;
 
 typedef void (*ToveReportFunction)(
-	const char *s, ToveReportLevel level);
+		const char *s, ToveReportLevel level);
 
 typedef uint32_t ToveChangeFlags;
 
@@ -246,11 +246,11 @@ typedef struct {
 	int16_t lookupTableSize;
 	ToveLookupTableMeta *lookupTableMeta;
 
-// #if TOVE_GPUX_MESH_BAND
+	// #if TOVE_GPUX_MESH_BAND
 	float *bandsVertices[3];
 	int16_t numBandsVertices[3];
 	int16_t maxBandsVertices;
-// #endif
+	// #endif
 
 	uint8_t *listsTexture;
 	int listsTextureRowBytes;

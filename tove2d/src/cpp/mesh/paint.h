@@ -24,7 +24,8 @@ private:
 	float cacheColors[256];
 
 public:
-	inline MeshPaint() : cache(cacheColors, sizeof(uint32_t), 256) {
+	inline MeshPaint() :
+			cache(cacheColors, sizeof(uint32_t), 256) {
 	}
 
 	inline void initialize(const NSVGpaint &paint, float opacity, float scale) {

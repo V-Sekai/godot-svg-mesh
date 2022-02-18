@@ -34,13 +34,13 @@ namespace nsvg {
 
 thread_local NSVGparser *_parser = nullptr;
 thread_local NSVGrasterizer *rasterizer = nullptr;
-thread_local ToveRasterizeSettings defaultSettings = {-1.0f, -1.0f};
+thread_local ToveRasterizeSettings defaultSettings = { -1.0f, -1.0f };
 
 // scoping the locale should no longer be necessary.
 #define NSVG_SCOPE_LOCALE 0
 
 class NanoSVGEnvironment {
-	const char* previousLocale;
+	const char *previousLocale;
 
 public:
 	inline NanoSVGEnvironment() {
@@ -53,15 +53,15 @@ public:
 		// everything up. setting the locale here fixes this.
 
 #if NSVG_SCOPE_LOCALE
-	    previousLocale = setlocale(LC_NUMERIC, nullptr);
-	    setlocale(LC_NUMERIC, "en_US.UTF-8");
+		previousLocale = setlocale(LC_NUMERIC, nullptr);
+		setlocale(LC_NUMERIC, "en_US.UTF-8");
 #endif
 	}
 
 	inline ~NanoSVGEnvironment() {
 #if NSVG_SCOPE_LOCALE
 		if (previousLocale) {
-		    setlocale(LC_NUMERIC, previousLocale);
+			setlocale(LC_NUMERIC, previousLocale);
 		}
 #endif
 	}
@@ -69,8 +69,8 @@ public:
 
 namespace bridge {
 
-typedef void (*StartElementCallback)(void* ud, const char* el, const char** attr);
-typedef void (*EndElementCallback)(void* ud, const char* el);
+typedef void (*StartElementCallback)(void *ud, const char *el, const char **attr);
+typedef void (*EndElementCallback)(void *ud, const char *el);
 
 struct hash_cstr {
 	// a simple, fast FNV-1a hash for C-style strings
@@ -102,7 +102,7 @@ class NanoSVGVisitor : public tinyxml2::XMLVisitor {
 	const XMLDocument *mCurrentDocument;
 	bool mSkipDefs;
 
-	typedef std::unordered_map<const char*, const XMLElement*> ElementsMap;
+	typedef std::unordered_map<const char *, const XMLElement *> ElementsMap;
 	std::unique_ptr<ElementsMap> mElementsById;
 
 	void gatherIds(const XMLElement *parent) {
@@ -135,19 +135,18 @@ class NanoSVGVisitor : public tinyxml2::XMLVisitor {
 
 public:
 	NanoSVGVisitor(
-		StartElementCallback startElement,
-		EndElementCallback endElement,
-		void *userdata) :
+			StartElementCallback startElement,
+			EndElementCallback endElement,
+			void *userdata) :
 
-		mStartElement(startElement),
-		mEndElement(endElement),
-		mUserData(userdata),
-		mSkipDefs(false) {
-
+			mStartElement(startElement),
+			mEndElement(endElement),
+			mUserData(userdata),
+			mSkipDefs(false) {
 	}
 
-    virtual bool VisitEnter(const XMLDocument &doc) {
-    	mCurrentDocument = doc.ToDocument();
+	virtual bool VisitEnter(const XMLDocument &doc) {
+		mCurrentDocument = doc.ToDocument();
 
 		// always handle <defs> tags first
 		mSkipDefs = false;
@@ -158,23 +157,23 @@ public:
 		}
 		mSkipDefs = true;
 
-        return true;
-    }
+		return true;
+	}
 
-    virtual bool VisitExit(const XMLDocument &doc) {
-    	mCurrentDocument = nullptr;
-        return true;
-    }
+	virtual bool VisitExit(const XMLDocument &doc) {
+		mCurrentDocument = nullptr;
+		return true;
+	}
 
-    virtual bool VisitEnter(const XMLElement &element, const XMLAttribute *firstAttribute) {
-    	if (mSkipDefs && strcmp(element.Name(), "defs") == 0 &&
-			element.Parent() == mCurrentDocument->RootElement()) {
-			
+	virtual bool VisitEnter(const XMLElement &element, const XMLAttribute *firstAttribute) {
+		if (mSkipDefs && strcmp(element.Name(), "defs") == 0 &&
+				element.Parent() == mCurrentDocument->RootElement()) {
+
 			// already handled in l VisitEnter(const XMLDocument &doc)
 			return true;
 		}
-    	if (strcmp(element.Name(), "use") == 0) {
-    		const char *href = element.Attribute("href");
+		if (strcmp(element.Name(), "use") == 0) {
+			const char *href = element.Attribute("href");
 			if (!href) {
 				href = element.Attribute("xlink:href");
 			}
@@ -190,7 +189,7 @@ public:
 					}
 				}
 			}
-    	} else {
+		} else {
 			const char *attr[NSVG_XML_MAX_ATTRIBS];
 			int numAttr = 0;
 
@@ -203,26 +202,26 @@ public:
 			}
 
 			attr[numAttr++] = 0;
-			attr[numAttr++] = 0;	
+			attr[numAttr++] = 0;
 
-	    	mStartElement(mUserData, element.Name(), attr);
-    	}
+			mStartElement(mUserData, element.Name(), attr);
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    virtual bool VisitExit(const XMLElement& element) {
-    	mEndElement(mUserData, element.Name());
-        return true;
-    }
+	virtual bool VisitExit(const XMLElement &element) {
+		mEndElement(mUserData, element.Name());
+		return true;
+	}
 };
 
 int parseSVG(
-	char* input,
-	void (*startelCb)(void* ud, const char* el, const char** attr),
-	void (*endelCb)(void* ud, const char* el),
-	void (*contentCb)(void* ud, const char* s),
-	void* ud) {
+		char *input,
+		void (*startelCb)(void *ud, const char *el, const char **attr),
+		void (*endelCb)(void *ud, const char *el),
+		void (*contentCb)(void *ud, const char *s),
+		void *ud) {
 
 	tinyxml2::XMLDocument doc;
 	doc.Parse(input);
@@ -230,13 +229,13 @@ int parseSVG(
 	return doc.Accept(&visitor) ? 1 : 0;
 }
 
-} // bridge
+} // namespace bridge
 
 NSVGimage *parseSVG(const char *svg, const char *units, float dpi) {
 	const NanoSVGEnvironment env;
 	// we know that our own bridge::parseSVG won't destroy the svg input
 	// text, so it's safe to const_cast here.
-	return nsvgParseEx(const_cast<char*>(svg), units, dpi, bridge::parseSVG);
+	return nsvgParseEx(const_cast<char *>(svg), units, dpi, bridge::parseSVG);
 }
 
 static NSVGrasterizer *ensureRasterizer() {
@@ -262,7 +261,7 @@ const ToveRasterizeSettings *getDefaultRasterizeSettings() {
 }
 
 static NSVGrasterizer *getRasterizer(
-	const ToveRasterizeSettings *settings) {
+		const ToveRasterizeSettings *settings) {
 
 	rasterizer = ensureRasterizer();
 	if (!rasterizer) {
@@ -299,10 +298,10 @@ static NSVGparser *getNSVGparser() {
 
 uint32_t makeColor(float r, float g, float b, float a) {
 	return nsvg__RGBA(
-		clamp(r, 0, 1) * 255.0,
-		clamp(g, 0, 1) * 255.0,
-		clamp(b, 0, 1) * 255.0,
-		clamp(a, 0, 1) * 255.0);
+			clamp(r, 0, 1) * 255.0,
+			clamp(g, 0, 1) * 255.0,
+			clamp(b, 0, 1) * 255.0,
+			clamp(a, 0, 1) * 255.0);
 }
 
 uint32_t applyOpacity(uint32_t color, float opacity) {
@@ -319,9 +318,12 @@ void curveBounds(float *bounds, float *curve) {
 
 void Matrix3x2::setIdentity() {
 	double *t = m_val;
-	t[0] = 1.0f; t[1] = 0.0f;
-	t[2] = 0.0f; t[3] = 1.0f;
-	t[4] = 0.0f; t[5] = 0.0f;
+	t[0] = 1.0f;
+	t[1] = 0.0f;
+	t[2] = 0.0f;
+	t[3] = 1.0f;
+	t[4] = 0.0f;
+	t[5] = 0.0f;
 }
 
 Matrix3x2 Matrix3x2::inverse() const {
@@ -354,12 +356,12 @@ NSVGimage *parsePath(const char *d) {
 
 	NSVGparser *parser = getNSVGparser();
 
-	const char *attr[3] = {"d", d, nullptr};
+	const char *attr[3] = { "d", d, nullptr };
 	nsvg__parsePath(parser, attr);
 
 	NSVGimage *image = parser->image;
 
-	parser->image = static_cast<NSVGimage*>(malloc(sizeof(NSVGimage)));
+	parser->image = static_cast<NSVGimage *>(malloc(sizeof(NSVGimage)));
 	if (!parser->image) {
 		TOVE_BAD_ALLOC();
 		return nullptr;
@@ -378,7 +380,7 @@ float *pathArcTo(float *cpx, float *cpy, float *args, int &npts) {
 
 void CachedPaint::init(const NSVGpaint &paint, float opacity) {
 	NSVGcachedPaint cache;
-	nsvg__initPaint(&cache, const_cast<NSVGpaint*>(&paint), opacity, 0, nullptr);
+	nsvg__initPaint(&cache, const_cast<NSVGpaint *>(&paint), opacity, 0, nullptr);
 
 	type = cache.type;
 	spread = cache.spread;
@@ -387,24 +389,24 @@ void CachedPaint::init(const NSVGpaint &paint, float opacity) {
 	}
 
 	const int n = numColors;
-	uint8_t *storage = reinterpret_cast<uint8_t*>(colors);
+	uint8_t *storage = reinterpret_cast<uint8_t *>(colors);
 	const int row = rowBytes;
 
 	for (int i = 0; i < n; i++) {
-		*reinterpret_cast<uint32_t*>(storage) = cache.colors[i];
+		*reinterpret_cast<uint32_t *>(storage) = cache.colors[i];
 		storage += row;
 	}
 }
 
 bool shapeStrokeBounds(float *bounds, const NSVGshape *shape,
-	float scale, const ToveRasterizeSettings *quality) {
+		float scale, const ToveRasterizeSettings *quality) {
 
 	// computing the shape stroke bounds is not trivial as miters
 	// might take varying amounts of space.
 
 	NSVGrasterizer *rasterizer = getRasterizer(quality);
 	nsvg__flattenShapeStroke(
-		rasterizer, const_cast<NSVGshape*>(shape), scale);
+			rasterizer, const_cast<NSVGshape *>(shape), scale);
 
 	const int n = rasterizer->nedges;
 	if (n < 1) {
@@ -415,7 +417,7 @@ bool shapeStrokeBounds(float *bounds, const NSVGshape *shape,
 		float bx0 = edges->x0, by0 = edges->y0;
 		float bx1 = bx0, by1 = by0;
 
- 		for (int i = 0; i < n; i++) {
+		for (int i = 0; i < n; i++) {
 			const float x0 = edges->x0;
 			const float y0 = edges->y0;
 			const float x1 = edges->x1;
@@ -444,8 +446,8 @@ bool shapeStrokeBounds(float *bounds, const NSVGshape *shape,
 }
 
 void rasterize(NSVGimage *image, float tx, float ty, float scale,
-	uint8_t* pixels, int width, int height, int stride,
-	const ToveRasterizeSettings *quality) {
+		uint8_t *pixels, int width, int height, int stride,
+		const ToveRasterizeSettings *quality) {
 
 	NSVGrasterizer *rasterizer = getRasterizer(quality);
 
@@ -461,8 +463,8 @@ Transform::Transform() {
 }
 
 Transform::Transform(
-	float a, float b, float c,
-	float d, float e, float f) {
+		float a, float b, float c,
+		float d, float e, float f) {
 
 	identity = false;
 	scaleLineWidth = false;
@@ -484,17 +486,17 @@ Transform::Transform(const Transform &t) {
 }
 
 void Transform::multiply(const Transform &t) {
-	nsvg__xformMultiply(matrix, const_cast<float*>(&t.matrix[0]));
+	nsvg__xformMultiply(matrix, const_cast<float *>(&t.matrix[0]));
 	identity = identity && t.identity;
 }
 
-void Transform::transformGradient(NSVGgradient* grad) const {
+void Transform::transformGradient(NSVGgradient *grad) const {
 #if TOVE_DEBUG
 	std::cout << "transformGradient [original]" << std::endl;
 	std::cout << tove::debug::xform<float>(grad->xform);
 #endif
 
-	nsvg__xformMultiply(grad->xform, const_cast<float*>(&matrix[0]));
+	nsvg__xformMultiply(grad->xform, const_cast<float *>(&matrix[0]));
 
 #if TOVE_DEBUG
 	std::cout << "transformGradient [transformed]" << std::endl;
