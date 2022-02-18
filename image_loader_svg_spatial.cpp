@@ -30,52 +30,49 @@ Node *EditorSceneImporterSVG::import_scene(const String &p_path, uint32_t p_flag
 	renderer->set_quality(0.4);
 	VGPath *root_path = memnew(VGPath(tove::tove_make_shared<tove::Path>()));
 	root_path->set_renderer(renderer);
-	Ref<SurfaceTool> st;
-	st.instantiate();
 	AABB bounds;
 	Node3D *root = memnew(Node3D);
-	for (int mesh_i = 0; mesh_i < n; mesh_i++) {
-		tove::PathRef tove_path = tove_graphics->getPath(mesh_i);
+	Ref<SurfaceTool> st;
+	st.instantiate();
+	for (int i = 0; i < n; i++) {
+		tove::PathRef tove_path = tove_graphics->getPath(i);
 		Point2 center = compute_center(tove_path);
 		tove_path->set(tove_path, tove::nsvg::Transform(1, 0, -center.x, 0, 1, -center.y));
 		VGPath *path = memnew(VGPath(tove_path));
 		path->set_position(center);
 		root_path->add_child(path, true);
-		path->set_owner(root_path);
+		path->set_owner(root);
 		Ref<ArrayMesh> mesh;
 		mesh.instantiate();
 		Ref<Texture> texture;
 		Ref<Material> renderer_material;
 		_ALLOW_DISCARD_ renderer->render_mesh(mesh, renderer_material, texture, path, true, true);
-		Transform3D xform;
-		MeshInstance3D *mesh_inst = memnew(MeshInstance3D);
-		mesh_inst->translate(Vector3(center.x * 0.001f, -center.y * 0.001f, 0.0f));
-		if (renderer_material.is_null()) {
-			Ref<StandardMaterial3D> mat;
-			mat.instantiate();
-			mat->set_texture(StandardMaterial3D::TEXTURE_ALBEDO, texture);
-			mat->set_flag(StandardMaterial3D::FLAG_ALBEDO_FROM_VERTEX_COLOR, true);
-			mat->set_depth_draw_mode(StandardMaterial3D::DEPTH_DRAW_ALWAYS);
-			mat->set_flag(StandardMaterial3D::FLAG_DISABLE_DEPTH_TEST, true);
-			mat->set_cull_mode(StandardMaterial3D::CULL_DISABLED);
-			mesh->surface_set_material(0, mat);
-		} else {
+		if (renderer_material.is_valid()) {
 			mesh->surface_set_material(0, renderer_material);
 		}
-		mesh_inst->set_mesh(mesh);
-		bounds = bounds.merge(mesh_inst->get_aabb());
-		String name = tove_path->getName();
-		if (!name.is_empty()) {
-			mesh_inst->set_name(name);
-		}
-		root->add_child(mesh_inst, true);
-		mesh_inst->set_owner(root);
+		Transform3D xform;
+		xform.origin = Vector3(center.x * 0.001f, center.y * -0.001f, 0.0f);
+		st->append_from(mesh, 0, xform);
 	}
+	Ref<ArrayMesh> combined_mesh = st->commit();
+	memdelete(root_path);
+	Ref<StandardMaterial3D> standard_material;
+	standard_material.instantiate();
+	standard_material->set_flag(StandardMaterial3D::FLAG_ALBEDO_FROM_VERTEX_COLOR, true);
+	standard_material->set_depth_draw_mode(StandardMaterial3D::DEPTH_DRAW_ALWAYS);
+	standard_material->set_flag(StandardMaterial3D::FLAG_DISABLE_DEPTH_TEST, true);
+	standard_material->set_cull_mode(StandardMaterial3D::CULL_DISABLED);
+	combined_mesh->surface_set_material(0, standard_material);
+	MeshInstance3D *mesh_inst = memnew(MeshInstance3D);
+	mesh_inst->set_mesh(combined_mesh);
+	mesh_inst->set_name(String("Path"));
+	root->add_child(mesh_inst, true);
+	mesh_inst->set_owner(root);
 	Vector3 translate = bounds.get_size();
 	translate.x = -translate.x;
 	translate.x += translate.x / 2.0f;
 	translate.y += translate.y;
-	root->translate(translate);
+	mesh_inst->translate(translate);
 	return root;
 }
 
