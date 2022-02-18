@@ -23,19 +23,19 @@ protected:
 
 public:
 	GeometryData(
-			int maxCurves,
-			int maxSubPaths,
-			bool fragmentShaderStrokes,
-			ToveShaderGeometryData &data);
+		int maxCurves,
+		int maxSubPaths,
+		bool fragmentShaderStrokes,
+		ToveShaderGeometryData &data);
 	~GeometryData();
 };
 
 struct GeometryNoLinkData : public GeometryData {
 	GeometryNoLinkData(
-			int maxCurves,
-			int maxSubPaths,
-			bool fragmentShaderStrokes,
-			ToveShaderGeometryData &data);
+		int maxCurves,
+		int maxSubPaths,
+		bool fragmentShaderStrokes,
+		ToveShaderGeometryData &data);
 	~GeometryNoLinkData();
 };
 

@@ -23,32 +23,31 @@ protected:
 
 public:
 	ToveMeshUpdateFlags graphicsToMesh(
-			Graphics *graphics,
-			ToveMeshUpdateFlags update,
-			const MeshRef &fill,
-			const MeshRef &line);
+		Graphics *graphics,
+		ToveMeshUpdateFlags update,
+		const MeshRef &fill,
+		const MeshRef &line);
 
 	virtual void beginTesselate(
-			Graphics *graphics,
-			float scale);
+		Graphics *graphics,
+		float scale);
 
 	void endTesselate();
 
 	virtual ToveMeshUpdateFlags pathToMesh(
-			ToveMeshUpdateFlags update,
-			const PathRef &path,
-			const MeshRef &fill,
-			const MeshRef &line,
-			int &fillIndex,
-			int &lineIndex) = 0;
+		ToveMeshUpdateFlags update,
+		const PathRef &path,
+		const MeshRef &fill,
+		const MeshRef &line,
+		int &fillIndex,
+		int &lineIndex) = 0;
 
 	virtual ClipperLib::Paths toClipPath(
-			const std::vector<PathRef> &paths) const = 0;
+		const std::vector<PathRef> &paths) const = 0;
 
 	virtual bool hasFixedSize() const = 0;
 
-	inline AbstractTesselator() :
-			graphics(nullptr) {
+	inline AbstractTesselator() : graphics(nullptr) {
 	}
 
 	virtual ~AbstractTesselator() {
@@ -58,33 +57,33 @@ public:
 class AdaptiveTesselator : public AbstractTesselator {
 private:
 	void renderStrokes(
-			const PathRef &path,
-			const ClipperLib::PolyNode *node,
-			ClipperPaths &holes,
-			Submesh *submesh);
+		const PathRef &path,
+		const ClipperLib::PolyNode *node,
+		ClipperPaths &holes,
+		Submesh *submesh);
 
 	AbstractAdaptiveFlattener *flattener;
 
 public:
 	AdaptiveTesselator(
-			AbstractAdaptiveFlattener *flattener);
+		AbstractAdaptiveFlattener *flattener);
 
 	virtual ~AdaptiveTesselator();
 
 	virtual void beginTesselate(
-			Graphics *graphics,
-			float scale);
+		Graphics *graphics,
+		float scale);
 
 	virtual ToveMeshUpdateFlags pathToMesh(
-			ToveMeshUpdateFlags update,
-			const PathRef &path,
-			const MeshRef &fill,
-			const MeshRef &line,
-			int &fillIndex,
-			int &lineIndex);
+		ToveMeshUpdateFlags update,
+		const PathRef &path,
+		const MeshRef &fill,
+		const MeshRef &line,
+		int &fillIndex,
+		int &lineIndex);
 
 	virtual ClipperLib::Paths toClipPath(
-			const std::vector<PathRef> &paths) const;
+		const std::vector<PathRef> &paths) const;
 
 	virtual bool hasFixedSize() const;
 };
@@ -96,19 +95,19 @@ private:
 
 public:
 	RigidTesselator(
-			int subdivisions,
-			ToveHoles holes);
+		int subdivisions,
+		ToveHoles holes);
 
 	virtual ToveMeshUpdateFlags pathToMesh(
-			ToveMeshUpdateFlags update,
-			const PathRef &path,
-			const MeshRef &fill,
-			const MeshRef &line,
-			int &fillIndex,
-			int &lineIndex);
+		ToveMeshUpdateFlags update,
+		const PathRef &path,
+		const MeshRef &fill,
+		const MeshRef &line,
+		int &fillIndex,
+		int &lineIndex);
 
 	virtual ClipperLib::Paths toClipPath(
-			const std::vector<PathRef> &paths) const;
+		const std::vector<PathRef> &paths) const;
 
 	virtual bool hasFixedSize() const;
 };

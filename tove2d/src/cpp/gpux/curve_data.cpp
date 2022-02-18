@@ -9,8 +9,8 @@
  * All rights reserved.
  */
 
-#include "curve_data.h"
 #include "../common.h"
+#include "curve_data.h"
 #include <algorithm>
 
 BEGIN_TOVE_NAMESPACE
@@ -55,7 +55,7 @@ void CurveBounds::update(const float *curve, float *bx, float *by) {
 				}
 			}
 		} else {
-			double b2ac = b * b - 4.0 * c * a;
+			double b2ac = b*b - 4.0*c*a;
 			if (b2ac > 0.0) {
 				double t = (-b + sqrt(b2ac)) / (2.0 * a);
 				if (t > 0.0 && t < 1.0) {
@@ -76,9 +76,9 @@ void CurveBounds::update(const float *curve, float *bx, float *by) {
 			float t3 = t2 * t;
 
 			r.positions[2 * j + 0] =
-					bx[0] * t3 + bx[1] * t2 + bx[2] * t + bx[3];
+				bx[0] * t3 + bx[1] * t2 + bx[2] * t + bx[3];
 			r.positions[2 * j + 1] =
-					by[0] * t3 + by[1] * t2 + by[2] * t + by[3];
+				by[0] * t3 + by[1] * t2 + by[2] * t + by[3];
 
 			const float v = r.positions[2 * j + i];
 			bounds[0 + i] = std::min(bounds[0 + i], v);

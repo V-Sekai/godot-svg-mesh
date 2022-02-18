@@ -8,25 +8,25 @@
  * All rights reserved.
  */
 
-void tove_deleteRasterizer(NSVGrasterizer *r) {
+void tove_deleteRasterizer(NSVGrasterizer* r) {
 
 	if (r->stencil.data) free(r->stencil.data);
 	if (r->dither.data) free(r->dither.data);
 }
 
 void tove__scanlineBit(
-		NSVGrasterizer *r,
-		int x,
-		int y,
-		int count,
-		float tx,
-		float ty,
-		float scale,
-		NSVGcachedPaint *cache,
-		TOVEclip *clip) {
+	NSVGrasterizer* r,
+	int x,
+	int y,
+	int count,
+	float tx,
+	float ty,
+	float scale,
+	NSVGcachedPaint* cache,
+	TOVEclip *clip) {
 
-	unsigned char *const row = &r->bitmap[y * r->stride];
-	unsigned char *const cover = r->scanline;
+	unsigned char* const row = &r->bitmap[y * r->stride];
+	unsigned char* const cover = r->scanline;
 
 	const int x1 = x + count;
 	for (; x < x1; x++) {
@@ -35,17 +35,18 @@ void tove__scanlineBit(
 }
 
 inline void maskClip(
-		NSVGrasterizer *r,
-		TOVEclip *clip,
-		int xmin,
-		int y,
-		int count) {
+	NSVGrasterizer* r,
+	TOVEclip* clip,
+	int xmin,
+	int y,
+	int count) {
 
-	unsigned char *const cover = r->scanline;
+	unsigned char* const cover = r->scanline;
 	const int xmax = xmin + count - 1;
 
 	for (int i = 0; i < clip->count; i++) {
-		unsigned char *stencil = &r->stencil.data[r->stencil.size * clip->index[i] + y * r->stencil.stride];
+		unsigned char* stencil = &r->stencil.data[
+			r->stencil.size * clip->index[i] + y * r->stencil.stride];
 
 		for (int j = xmin; j <= xmax; j++) {
 			if (((stencil[j / 8] >> (j % 8)) & 1) == 0) {
@@ -56,18 +57,18 @@ inline void maskClip(
 }
 
 void tove__drawColorScanline(
-		NSVGrasterizer *r,
-		int xmin,
-		int y,
-		int count,
-		float tx,
-		float ty,
-		float scale,
-		NSVGcachedPaint *cache,
-		TOVEclip *clip) {
+	NSVGrasterizer* r,
+	int xmin,
+	int y,
+	int count,
+	float tx,
+	float ty,
+	float scale,
+	NSVGcachedPaint* cache,
+	TOVEclip* clip) {
 
-	unsigned char *dst = &r->bitmap[y * r->stride] + xmin * 4;
-	unsigned char *cover = &r->scanline[xmin];
+	unsigned char* dst = &r->bitmap[y * r->stride] + xmin*4;
+	unsigned char* cover = &r->scanline[xmin];
 	maskClip(r, clip, xmin, y, count);
 
 	int i, cr, cg, cb, ca;
@@ -77,7 +78,7 @@ void tove__drawColorScanline(
 	ca = (cache->colors[0] >> 24) & 0xff;
 
 	for (i = 0; i < count; i++) {
-		int r, g, b;
+		int r,g,b;
 		int a = nsvg__div255((int)cover[0] * ca);
 		int ia = 255 - a;
 		// Premultiply
@@ -102,44 +103,41 @@ void tove__drawColorScanline(
 }
 
 class LinearGradient {
-	const float *const t;
+	const float* const t;
 
 public:
-	inline LinearGradient(const NSVGcachedPaint *cache) :
-			t(cache->xform) {
+	inline LinearGradient(const NSVGcachedPaint* cache) : t(cache->xform) {
 	}
 
 	inline float operator()(float fx, float fy) const {
-		return fx * t[1] + fy * t[3] + t[5];
+		return fx*t[1] + fy*t[3] + t[5];
 	}
 };
 
 class RadialGradient {
-	const float *const t;
+	const float* const t;
 
 public:
-	inline RadialGradient(const NSVGcachedPaint *cache) :
-			t(cache->xform) {
+	inline RadialGradient(const NSVGcachedPaint* cache) : t(cache->xform) {
 	}
 
 	inline float operator()(float fx, float fy) const {
-		const float gx = fx * t[0] + fy * t[2] + t[4];
-		const float gy = fx * t[1] + fy * t[3] + t[5];
-		return sqrtf(gx * gx + gy * gy);
+		const float gx = fx*t[0] + fy*t[2] + t[4];
+		const float gy = fx*t[1] + fy*t[3] + t[5];
+		return sqrtf(gx*gx + gy*gy);
 	}
 };
 
 class FastGradientColors {
-	const NSVGcachedPaint *const cache;
+	const NSVGcachedPaint * const cache;
 
 public:
 	inline FastGradientColors(
-			NSVGrasterizer *r,
-			NSVGcachedPaint *cache,
-			int x,
-			int y,
-			int count) :
-			cache(cache) {
+		NSVGrasterizer* r,
+		NSVGcachedPaint *cache,
+		int x,
+		int y,
+		int count) : cache(cache) {
 	}
 
 	inline bool good() {
@@ -147,32 +145,32 @@ public:
 	}
 
 	inline uint32_t operator()(int x, float gy) const {
-		return cache->colors[(int)nsvg__clampf(gy * 255.0f, 0, 255.0f)];
+		return cache->colors[(int)nsvg__clampf(gy*255.0f, 0, 255.0f)];
 	}
 };
 
 class BestGradientColors {
 	typedef float dither_error_t;
-
+	
 	static constexpr int diffusion_matrix_width = 5;
 	static constexpr int diffusion_matrix_height = 3;
 	static constexpr int dither_components = 4;
 
 	dither_error_t *diffusion[diffusion_matrix_height];
 
-	const NSVGgradient *const gradient;
+	const NSVGgradient * const gradient;
 	const NSVGgradientStop *stop;
 	const NSVGgradientStop *const stopN;
 
 	inline void rotate(
-			const NSVGrasterizer *r,
-			NSVGcachedPaint *cache,
-			const int x,
-			const int y,
-			const int count) {
+		const NSVGrasterizer* r,
+		NSVGcachedPaint* cache,
+		const int x,
+		const int y,
+		const int count) {
 
 		dither_error_t **rows = diffusion;
-		dither_error_t *const data = static_cast<dither_error_t *>(r->dither.data);
+		dither_error_t * const data = static_cast<dither_error_t*>(r->dither.data);
 
 		const unsigned int stride = r->dither.stride;
 
@@ -195,7 +193,7 @@ class BestGradientColors {
 
 		// new rows.
 		for (int i = 0; i < roll; i++) {
-			dither_error_t *const row = rows[diffusion_matrix_height - 1 - i];
+			dither_error_t * const row = rows[diffusion_matrix_height - 1 - i];
 			for (int j = span0; j < span1; j++) {
 				row[j] = 0.0f;
 			}
@@ -203,13 +201,13 @@ class BestGradientColors {
 
 		// old rows that already have content.
 		for (int i = 0; i < diffusion_matrix_height - roll; i++) {
-			dither_error_t *const row = rows[i];
+			dither_error_t * const row = rows[i];
 
 			const int previousLeftSpan = cache->tove.ditherSpan[0];
 			for (int j = span0; j < previousLeftSpan; j++) {
 				row[j] = 0.0f;
 			}
-
+			
 			for (int j = cache->tove.ditherSpan[1]; j < span1; j++) {
 				row[j] = 0.0f;
 			}
@@ -217,33 +215,34 @@ class BestGradientColors {
 
 		cache->tove.ditherSpan[0] = span0;
 		cache->tove.ditherSpan[1] = span1;
+
 	}
 
 public:
 	inline BestGradientColors(
-			NSVGrasterizer *r,
-			NSVGcachedPaint *cache,
-			int x,
-			int y,
-			int count) :
+		NSVGrasterizer* r,
+		NSVGcachedPaint *cache,
+		int x,
+		int y,
+		int count) :
 
-			gradient(cache->tove.paint->gradient),
-			stop(gradient->stops),
-			stopN(gradient->stops + gradient->nstops) {
+		gradient(cache->tove.paint->gradient),
+		stop(gradient->stops),
+		stopN(gradient->stops + gradient->nstops) {
 
 		rotate(r, cache, x, y, count);
 	}
 
-	static inline bool enabled(const NSVGrasterizer *r) {
+	static inline bool enabled(const NSVGrasterizer* r) {
 		return r->quality > 0;
 	}
 
-	static inline bool allocate(NSVGrasterizer *r, int w) {
+	static inline bool allocate(NSVGrasterizer* r, int w) {
 		if (enabled(r)) {
 			TOVEdither &dither = r->dither;
 			dither.stride = (w + diffusion_matrix_width - 1) * dither_components;
-			dither.data = (dither_error_t *)realloc(dither.data,
-					dither.stride * diffusion_matrix_height * sizeof(dither_error_t));
+			dither.data = (dither_error_t*)realloc(dither.data,
+				dither.stride * diffusion_matrix_height * sizeof(dither_error_t));
 			return dither.data != nullptr;
 		} else {
 			return true;
@@ -251,9 +250,9 @@ public:
 	}
 
 	static void init(
-			NSVGcachedPaint *cache,
-			NSVGpaint *paint,
-			float opacity) {
+		NSVGcachedPaint* cache,
+		NSVGpaint* paint,
+		float opacity) {
 
 		cache->tove.paint = paint;
 		cache->tove.ditherY = -diffusion_matrix_height;
@@ -280,18 +279,18 @@ public:
 			stop--;
 		}
 
-		dither_error_t *const r0 = diffusion[0];
-		dither_error_t *const r1 = diffusion[1];
-		dither_error_t *const r2 = diffusion[2];
+		dither_error_t * const r0 = diffusion[0];
+		dither_error_t * const r1 = diffusion[1];
+		dither_error_t * const r2 = diffusion[2];
 
 		const unsigned int c0 = stop->tove.color;
-		const int cr0 = (c0)&0xff;
+		const int cr0 = (c0) & 0xff;
 		const int cg0 = (c0 >> 8) & 0xff;
 		const int cb0 = (c0 >> 16) & 0xff;
 		const int ca0 = (c0 >> 24) & 0xff;
 
 		const unsigned int c1 = (stop + 1)->tove.color;
-		const int cr1 = (c1)&0xff;
+		const int cr1 = (c1) & 0xff;
 		const int cg1 = (c1 >> 8) & 0xff;
 		const int cb1 = (c1 >> 16) & 0xff;
 		const int ca1 = (c1 >> 24) & 0xff;
@@ -314,7 +313,7 @@ public:
 		// future feature:
 		// apply restricted paletted on (cr, cg, cb) here.
 
-		const float errors[] = { f_cr - cr, f_cg - cg, f_cb - cb, f_ca - ca };
+		const float errors[] = {f_cr - cr, f_cg - cg, f_cb - cb, f_ca - ca};
 
 		// Distribute errors using sierra dithering.
 		// #pragma clang loop vectorize(enable)
@@ -340,22 +339,22 @@ public:
 	}
 };
 
-template <typename Gradient, typename Colors>
+template<typename Gradient, typename Colors>
 void drawGradientScanline(
-		NSVGrasterizer *r,
-		int x,
-		int y,
-		int count,
-		float tx,
-		float ty,
-		float scale,
-		NSVGcachedPaint *cache,
-		TOVEclip *clip) {
+	NSVGrasterizer* r,
+	int x,
+	int y,
+	int count,
+	float tx,
+	float ty,
+	float scale,
+	NSVGcachedPaint* cache,
+	TOVEclip* clip) {
 
 	using tove::nsvg__div255;
 
-	unsigned char *dst = &r->bitmap[y * r->stride] + x * 4;
-	unsigned char *cover = &r->scanline[x];
+	unsigned char* dst = &r->bitmap[y * r->stride] + x*4;
+	unsigned char* cover = &r->scanline[x];
 	maskClip(r, clip, x, y, count);
 
 	// TODO: spread modes.
@@ -371,9 +370,9 @@ void drawGradientScanline(
 	dx = 1.0f / scale;
 
 	for (i = 0; i < count; i++) {
-		int r, g, b, a, ia;
+		int r,g,b,a,ia;
 		c = colors(x, gradient(fx, fy));
-		cr = (c)&0xff;
+		cr = (c) & 0xff;
 		cg = (c >> 8) & 0xff;
 		cb = (c >> 16) & 0xff;
 		ca = (c >> 24) & 0xff;
@@ -405,11 +404,11 @@ void drawGradientScanline(
 }
 
 TOVEscanlineFunction tove__initPaint(
-		NSVGcachedPaint *cache,
-		const NSVGrasterizer *r,
-		NSVGpaint *paint,
-		float opacity,
-		bool &initCacheColors) {
+	NSVGcachedPaint* cache,
+	const NSVGrasterizer* r,
+	NSVGpaint* paint,
+	float opacity,
+	bool &initCacheColors) {
 
 	if (r && BestGradientColors::enabled(r)) {
 		switch (cache->type) {
@@ -436,18 +435,19 @@ TOVEscanlineFunction tove__initPaint(
 }
 
 bool tove__rasterize(
-		NSVGrasterizer *r,
-		NSVGimage *image,
-		int w,
-		int h,
-		float tx,
-		float ty,
-		float scale) {
+	NSVGrasterizer* r,
+    NSVGimage* image,
+    int w,
+    int h,
+	float tx,
+    float ty,
+    float scale)
+{
 	if (!BestGradientColors::allocate(r, w)) {
 		return false;
 	}
 
-	TOVEclipPath *clipPath;
+	TOVEclipPath* clipPath;
 	int clipPathCount = 0;
 
 	clipPath = image->clipPaths;
@@ -462,8 +462,8 @@ bool tove__rasterize(
 
 	r->stencil.stride = w / 8 + (w % 8 != 0 ? 1 : 0);
 	r->stencil.size = h * r->stencil.stride;
-	r->stencil.data = (unsigned char *)realloc(
-			r->stencil.data, r->stencil.size * clipPathCount);
+	r->stencil.data = (unsigned char*)realloc(
+		r->stencil.data, r->stencil.size * clipPathCount);
 	if (r->stencil.data == NULL) {
 		return false;
 	}
@@ -472,8 +472,8 @@ bool tove__rasterize(
 	clipPath = image->clipPaths;
 	while (clipPath != NULL) {
 		nsvg__rasterizeShapes(r, clipPath->shapes, tx, ty, scale,
-				&r->stencil.data[r->stencil.size * clipPath->index],
-				w, h, r->stencil.stride, tove__scanlineBit);
+			&r->stencil.data[r->stencil.size * clipPath->index],
+			w, h, r->stencil.stride, tove__scanlineBit);
 		clipPath = clipPath->next;
 	}
 

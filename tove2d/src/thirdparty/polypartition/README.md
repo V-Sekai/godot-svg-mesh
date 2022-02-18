@@ -18,6 +18,7 @@ Example:
 
 ![http://polypartition.googlecode.com/svn/trunk/images/tri_ec.png](https://raw.githubusercontent.com/ivanfratric/polypartition/master/images/tri_ec.png)
 
+
 #### Optimal triangulation in terms of edge length using dynamic programming algorithm
 
 Method: `TPPLPartition::Triangulate_OPT`
@@ -31,6 +32,7 @@ Quality of solution: Optimal in terms of minimal edge length
 Example:
 
 ![https://raw.githubusercontent.com/ivanfratric/polypartition/master/images/tri_opt.png](https://raw.githubusercontent.com/ivanfratric/polypartition/master/images/tri_opt.png)
+
 
 #### Triangulation by partition into monotone polygons
 
@@ -46,6 +48,7 @@ Example:
 
 ![https://raw.githubusercontent.com/ivanfratric/polypartition/master/images/tri_mono.png](https://raw.githubusercontent.com/ivanfratric/polypartition/master/images/tri_mono.png)
 
+
 #### Convex partition using Hertel-Mehlhorn algorithm
 
 Method: `TPPLPartition::ConvexPartition_HM`
@@ -60,6 +63,7 @@ Example:
 
 ![https://raw.githubusercontent.com/ivanfratric/polypartition/master/images/conv_hm.png](https://raw.githubusercontent.com/ivanfratric/polypartition/master/images/conv_hm.png)
 
+
 #### Optimal convex partition using dynamic programming algorithm by Keil and Snoeyink
 
 Method: `TPPLPartition::ConvexPartition_OPT`
@@ -73,3 +77,5 @@ Quality of solution: Optimal. A minimum number of convex polygons is produced
 Example:
 
 ![https://raw.githubusercontent.com/ivanfratric/polypartition/master/images/conv_opt.png](https://raw.githubusercontent.com/ivanfratric/polypartition/master/images/conv_opt.png)
+
+

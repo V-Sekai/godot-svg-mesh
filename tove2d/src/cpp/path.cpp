@@ -9,8 +9,8 @@
  * All rights reserved.
  */
 
-#include "path.h"
 #include "common.h"
+#include "path.h"
 #include "graphics.h"
 #include "intersect.h"
 #include "nsvg.h"
@@ -93,7 +93,7 @@ void Path::_setLineColor(const PaintRef &color) {
 
 bool Path::areColorsSolid() const {
 	return nsvg.stroke.type <= NSVG_PAINT_COLOR &&
-		   nsvg.fill.type <= NSVG_PAINT_COLOR;
+		nsvg.fill.type <= NSVG_PAINT_COLOR;
 }
 
 void Path::set(const NSVGshape *shape) {
@@ -133,9 +133,9 @@ void Path::set(const NSVGshape *shape) {
 		clipIndices.resize(shape->clip.count);
 		nsvg.clip.index = clipIndices.data();
 		std::memcpy(
-				nsvg.clip.index,
-				shape->clip.index,
-				shape->clip.count * sizeof(TOVEclipPathIndex));
+			nsvg.clip.index,
+			shape->clip.index,
+			shape->clip.count * sizeof(TOVEclipPathIndex));
 	}
 #endif
 
@@ -143,8 +143,8 @@ void Path::set(const NSVGshape *shape) {
 }
 
 Path::Path() :
-		changes(CHANGED_BOUNDS | CHANGED_EXACT_BOUNDS),
-		pathIndex(-1) {
+	changes(CHANGED_BOUNDS | CHANGED_EXACT_BOUNDS),
+	pathIndex(-1) {
 
 	memset(&nsvg, 0, sizeof(nsvg));
 
@@ -168,15 +168,14 @@ Path::Path() :
 }
 
 Path::Path(const NSVGshape *shape) :
-		changes(0),
-		pathIndex(-1) {
+	changes(0),
+	pathIndex(-1) {
 
 	set(shape);
 	newSubpath = true;
 }
 
-Path::Path(const char *d) :
-		changes(0), pathIndex(-1) {
+Path::Path(const char *d) : changes(0), pathIndex(-1) {
 	NSVGimage *image = nsvg::parsePath(d);
 	set(image->shapes);
 	nsvgDelete(image);
@@ -185,8 +184,8 @@ Path::Path(const char *d) :
 }
 
 Path::Path(const Path *path) :
-		changes(CHANGED_BOUNDS | CHANGED_EXACT_BOUNDS),
-		pathIndex(-1) {
+	changes(CHANGED_BOUNDS | CHANGED_EXACT_BOUNDS),
+	pathIndex(-1) {
 
 	memset(&nsvg, 0, sizeof(nsvg));
 
@@ -409,8 +408,7 @@ void Path::set(const PathRef &path, const nsvg::Transform &transform) {
 	const int n = path->subpaths.size();
 
 	const float lineScale = transform.wantsScaleLineWidth() ?
-									transform.getScale() :
-									  1.0f;
+		transform.getScale() : 1.0f;
 
 	bool hasGeometryChanged = false;
 
@@ -508,7 +506,7 @@ void Path::setLineWidth(float width) {
 
 ToveLineJoin Path::getLineJoin() const {
 	return nsvg::toveLineJoin(
-			static_cast<NSVGlineJoin>(nsvg.strokeLineJoin));
+		static_cast<NSVGlineJoin>(nsvg.strokeLineJoin));
 }
 
 void Path::setLineJoin(ToveLineJoin join) {
@@ -566,11 +564,11 @@ void Path::animateLineDash(const PathRef &a, const PathRef &b, float t) {
 
 		if (n != nsvg.strokeDashCount) {
 			nsvg.strokeDashCount = n;
-			changed = true;
+			changed = true;		
 		}
 		for (int i = 0; i < n; i++) {
 			const float dash = a->nsvg.strokeDashArray[i] * s +
-							   b->nsvg.strokeDashArray[i] * t;
+				b->nsvg.strokeDashArray[i] * t;
 
 			if (dash != nsvg.strokeDashArray[i]) {
 				nsvg.strokeDashArray[i] = dash;
@@ -586,11 +584,13 @@ void Path::animateLineDash(const PathRef &a, const PathRef &b, float t) {
 
 		if (tove::report::warnings()) {
 			std::ostringstream message;
-			message << "cannot animate over line dash sizes " << a->nsvg.strokeDashCount << " <-> " << b->nsvg.strokeDashCount << " in path "
-					<< (pathIndex + 1) << ".";
+			message << "cannot animate over line dash sizes " <<
+				a->nsvg.strokeDashCount << " <-> " <<
+				b->nsvg.strokeDashCount << " in path "
+				<< (pathIndex + 1) << ".";
 			tove::report::warn(message.str().c_str());
 		}
-	}
+	}	
 }
 
 void Path::animate(const PathRef &a, const PathRef &b, float t) {
@@ -598,8 +598,10 @@ void Path::animate(const PathRef &a, const PathRef &b, float t) {
 	if (n != b->subpaths.size()) {
 		if (tove::report::warnings()) {
 			std::ostringstream message;
-			message << "cannot animate over sub path counts " << a->subpaths.size() << " <-> " << b->subpaths.size() << " in path "
-					<< (pathIndex + 1) << ".";
+			message << "cannot animate over sub path counts " <<
+				a->subpaths.size() << " <-> " <<
+				b->subpaths.size() << " in path "
+				<< (pathIndex + 1) << ".";
 			tove::report::warn(message.str().c_str());
 		}
 		return;
@@ -609,8 +611,10 @@ void Path::animate(const PathRef &a, const PathRef &b, float t) {
 		if (!subpaths[i]->animate(a->subpaths[i], b->subpaths[i], t)) {
 			if (tove::report::warnings()) {
 				std::ostringstream message;
-				message << "cannot animate over point sizes " << a->subpaths[i]->nsvg.npts << " <-> " << b->subpaths[i]->nsvg.npts << " in sub path "
-						<< (pathIndex + 1) << "/" << (i + 1) << ".";
+				message << "cannot animate over point sizes " <<
+					a->subpaths[i]->nsvg.npts << " <-> " <<
+					b->subpaths[i]->nsvg.npts << " in sub path "
+					<< (pathIndex + 1) << "/" << (i + 1) << ".";
 				tove::report::warn(message.str().c_str());
 			}
 		}
@@ -622,8 +626,8 @@ void Path::animate(const PathRef &a, const PathRef &b, float t) {
 		if (!fillColor->animate(a->fillColor, b->fillColor, t)) {
 			if (tove::report::warnings()) {
 				std::ostringstream message;
-				message << "cannot animate fill color "
-						<< " in path " << (pathIndex + 1) << ".";
+				message << "cannot animate fill color " <<
+					" in path " << (pathIndex + 1) << ".";
 				tove::report::warn(message.str().c_str());
 			}
 		}
@@ -637,8 +641,8 @@ void Path::animate(const PathRef &a, const PathRef &b, float t) {
 		if (!lineColor->animate(a->lineColor, b->lineColor, t)) {
 			if (tove::report::warnings()) {
 				std::ostringstream message;
-				message << "cannot animate line color "
-						<< " in path " << (pathIndex + 1) << ".";
+				message << "cannot animate line color " <<
+					" in path " << (pathIndex + 1) << ".";
 				tove::report::warn(message.str().c_str());
 			}
 		}

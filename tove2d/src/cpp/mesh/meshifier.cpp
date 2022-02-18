@@ -9,15 +9,15 @@
  * All rights reserved.
  */
 
-#include "meshifier.h"
 #include "../common.h"
+#include "meshifier.h"
 #include "mesh.h"
 
 BEGIN_TOVE_NAMESPACE
 
 void AbstractTesselator::beginTesselate(
-		Graphics *graphics,
-		float scale) {
+	Graphics *graphics,
+	float scale) {
 
 	this->graphics = graphics;
 }
@@ -27,10 +27,10 @@ void AbstractTesselator::endTesselate() {
 }
 
 ToveMeshUpdateFlags AbstractTesselator::graphicsToMesh(
-		Graphics *graphics,
-		ToveMeshUpdateFlags update, // UPDATE_MESH_EVERYTHING
-		const MeshRef &fill,
-		const MeshRef &line) {
+	Graphics *graphics,
+	ToveMeshUpdateFlags update, // UPDATE_MESH_EVERYTHING
+	const MeshRef &fill,
+	const MeshRef &line) {
 
 	const int n = graphics->getNumPaths();
 
@@ -41,7 +41,7 @@ ToveMeshUpdateFlags AbstractTesselator::graphicsToMesh(
 
 	const float *bounds = graphics->getBounds();
 	const float extent = std::max(
-			bounds[2] - bounds[0], bounds[3] - bounds[1]);
+		bounds[2] - bounds[0], bounds[3] - bounds[1]);
 
 	beginTesselate(graphics, 1.0f / extent);
 
@@ -51,10 +51,10 @@ ToveMeshUpdateFlags AbstractTesselator::graphicsToMesh(
 
 	for (int i = 0; i < n; i++) {
 		updated |= pathToMesh(
-				update,
-				graphics->getPath(i),
-				fill, line,
-				fillIndex, lineIndex);
+			update,
+			graphics->getPath(i),
+			fill, line,
+			fillIndex, lineIndex);
 	}
 
 	if (&fill != &line) {
@@ -67,37 +67,38 @@ ToveMeshUpdateFlags AbstractTesselator::graphicsToMesh(
 	return updated;
 }
 
+
 static void clip(
-		const Graphics *graphics,
-		const PathRef &path,
-		ClipperPaths &subject) {
+	const Graphics *graphics,
+	const PathRef &path,
+	ClipperPaths &subject) {
 
 #ifdef NSVG_CLIP_PATHS
 	const std::vector<TOVEclipPathIndex> &clipIndices =
-			path->getClipIndices();
+		path->getClipIndices();
 
 	if (!clipIndices.empty()) {
 		for (TOVEclipPathIndex i : clipIndices) {
 			ClipperLib::Clipper c;
 			c.AddPaths(
-					subject,
-					ClipperLib::ptSubject,
-					true);
+				subject,
+				ClipperLib::ptSubject,
+				true);
 			c.AddPaths(
-					graphics->getClipAtIndex(i)->computed,
-					ClipperLib::ptClip,
-					true);
+				graphics->getClipAtIndex(i)->computed,
+				ClipperLib::ptClip,
+				true);
 			c.Execute(
-					ClipperLib::ctIntersection,
-					subject);
+				ClipperLib::ctIntersection,
+				subject);
 		}
 	}
 #endif
 }
 
 AdaptiveTesselator::AdaptiveTesselator(
-		AbstractAdaptiveFlattener *flattener) :
-		flattener(flattener) {
+	AbstractAdaptiveFlattener *flattener) :
+	flattener(flattener) {
 }
 
 AdaptiveTesselator::~AdaptiveTesselator() {
@@ -105,8 +106,8 @@ AdaptiveTesselator::~AdaptiveTesselator() {
 }
 
 void AdaptiveTesselator::beginTesselate(
-		Graphics *graphics,
-		float scale) {
+	Graphics *graphics,
+	float scale) {
 
 	AbstractTesselator::beginTesselate(graphics, scale);
 
@@ -120,10 +121,10 @@ bool AdaptiveTesselator::hasFixedSize() const {
 }
 
 void AdaptiveTesselator::renderStrokes(
-		const PathRef &path,
-		const ClipperLib::PolyNode *node,
-		ClipperPaths &holes,
-		Submesh *submesh) {
+	const PathRef &path,
+	const ClipperLib::PolyNode *node,
+	ClipperPaths &holes,
+	Submesh *submesh) {
 
 	const NSVGshape *shape = path->getNSVG();
 
@@ -142,19 +143,19 @@ void AdaptiveTesselator::renderStrokes(
 			paths.insert(paths.end(), holes.begin(), holes.end());
 			clip(graphics, path, paths);
 			submesh->addClipperPaths(
-					paths, flattener->getClipperScale(), TOVE_HOLES_CW);
+				paths, flattener->getClipperScale(), TOVE_HOLES_CW);
 		}
 		holes.clear();
 	}
 }
 
 ToveMeshUpdateFlags AdaptiveTesselator::pathToMesh(
-		ToveMeshUpdateFlags update,
-		const PathRef &path,
-		const MeshRef &fill,
-		const MeshRef &line,
-		int &fillIndex,
-		int &lineIndex) {
+	ToveMeshUpdateFlags update,
+	const PathRef &path,
+	const MeshRef &fill,
+	const MeshRef &line,
+	int &fillIndex,
+	int &lineIndex) {
 
 	assert(fillIndex == fill->getVertexCount());
 	assert(lineIndex == line->getVertexCount());
@@ -166,7 +167,7 @@ ToveMeshUpdateFlags AdaptiveTesselator::pathToMesh(
 	}
 
 	if (shape->fill.type == NSVG_PAINT_NONE &&
-			shape->stroke.type == NSVG_PAINT_NONE) {
+		shape->stroke.type == NSVG_PAINT_NONE) {
 		return UPDATE_MESH_EVERYTHING;
 	}
 
@@ -177,14 +178,14 @@ ToveMeshUpdateFlags AdaptiveTesselator::pathToMesh(
 	if (!t.fill.empty() && shape->fill.type != NSVG_PAINT_NONE) {
 		clip(graphics, path, t.fill);
 		const int index0 = fill->getVertexCount();
-		// ClipperLib always gives us TOVE_HOLES_CW.
-		fill->submesh(path, 0)->addClipperPaths(
-				t.fill, flattener->getClipperScale(), TOVE_HOLES_CW);
+ 		// ClipperLib always gives us TOVE_HOLES_CW.
+ 		fill->submesh(path, 0)->addClipperPaths(
+			t.fill, flattener->getClipperScale(), TOVE_HOLES_CW);
 		fill->setFillColor(path, index0, fill->getVertexCount() - index0);
 	}
 
 	if (t.stroke.ChildCount() > 0 &&
-			shape->stroke.type != NSVG_PAINT_NONE && shape->strokeWidth > 0.0) {
+		shape->stroke.type != NSVG_PAINT_NONE && shape->strokeWidth > 0.0) {
 		const int index0 = line->getVertexCount();
 		ClipperPaths holes;
 		renderStrokes(path, &t.stroke, holes, line->submesh(path, 1));
@@ -198,7 +199,7 @@ ToveMeshUpdateFlags AdaptiveTesselator::pathToMesh(
 }
 
 ClipperLib::Paths AdaptiveTesselator::toClipPath(
-		const std::vector<PathRef> &paths) const {
+	const std::vector<PathRef> &paths) const {
 
 	ClipperLib::Paths flattened;
 
@@ -206,35 +207,35 @@ ClipperLib::Paths AdaptiveTesselator::toClipPath(
 		Tesselation t;
 		flattener->flatten(path, t);
 		ClipperLib::SimplifyPolygons(
-				t.fill, path->getClipperFillType());
+			t.fill, path->getClipperFillType());
 
 		if (paths.size() == 1) {
 			return t.fill;
 		}
 
 		flattened.insert(
-				flattened.end(),
-				std::make_move_iterator(t.fill.begin()),
-				std::make_move_iterator(t.fill.end()));
+			flattened.end(),
+			std::make_move_iterator(t.fill.begin()),
+			std::make_move_iterator(t.fill.end()));
 	}
 	return flattened;
 }
 
 RigidTesselator::RigidTesselator(
-		int subdivisions,
-		ToveHoles holes) :
+	int subdivisions,
+	ToveHoles holes) :
 
-		flattener(subdivisions, 0.0),
-		holes(holes) {
+	flattener(subdivisions, 0.0),
+	holes(holes) {
 }
 
 ToveMeshUpdateFlags RigidTesselator::pathToMesh(
-		ToveMeshUpdateFlags _update,
-		const PathRef &path,
-		const MeshRef &fill,
-		const MeshRef &line,
-		int &fillIndex,
-		int &lineIndex) {
+	ToveMeshUpdateFlags _update,
+	const PathRef &path,
+	const MeshRef &fill,
+	const MeshRef &line,
+	int &fillIndex,
+	int &lineIndex) {
 
 	NSVGshape *shape = path->getNSVG();
 
@@ -243,7 +244,7 @@ ToveMeshUpdateFlags RigidTesselator::pathToMesh(
 	}
 
 	if (shape->fill.type == NSVG_PAINT_NONE &&
-			shape->stroke.type == NSVG_PAINT_NONE) {
+		shape->stroke.type == NSVG_PAINT_NONE) {
 		return _update;
 	}
 
@@ -264,7 +265,7 @@ ToveMeshUpdateFlags RigidTesselator::pathToMesh(
 
 	const float miterLimit = path->getMiterLimit();
 	const bool miter = path->getLineJoin() == TOVE_LINEJOIN_MITER &&
-					   miterLimit > 0.0f;
+		miterLimit > 0.0f;
 	const bool reduceOverlap = false;
 
 	const int verticesPerSegment = 4 + (miter ? 1 : 0) + (reduceOverlap ? 1 : 0);
@@ -281,7 +282,7 @@ ToveMeshUpdateFlags RigidTesselator::pathToMesh(
 
 		for (int i = 0; i < n; i++) {
 			const int k = flattener.flatten(
-					path->getSubpath(i), fill, fillIndex0 + index);
+				path->getSubpath(i), fill, fillIndex0 + index);
 
 			if (k == 0) {
 				continue;
@@ -298,7 +299,7 @@ ToveMeshUpdateFlags RigidTesselator::pathToMesh(
 				auto out = line->vertices(subpathLineVertex, k * verticesPerSegment);
 
 				const auto vertices = fill->vertices(
-						fillIndex0 + index, k);
+					fillIndex0 + index, k);
 
 				int previous = find_unequal_backward(vertices, k, k);
 				int next = find_unequal_forward(vertices, 0, k);
@@ -343,7 +344,7 @@ ToveMeshUpdateFlags RigidTesselator::pathToMesh(
 
 					const float ox = -dy21 * lineOffset;
 					const float oy = dx21 * lineOffset;
-
+	
 					if (miter) {
 						float dx10 = x1 - x0;
 						float dy10 = y1 - y0;
@@ -388,8 +389,8 @@ ToveMeshUpdateFlags RigidTesselator::pathToMesh(
 #if TOVE_RT_CLIP_PATH
 				if (reduceOverlap) {
 					unoverlap(
-							line->vertices(subpathLineVertex, k * verticesPerSegment),
-							k, verticesPerSegment, miter);
+						line->vertices(subpathLineVertex, k * verticesPerSegment),
+						k, verticesPerSegment, miter);
 				}
 #endif
 			}
@@ -398,7 +399,7 @@ ToveMeshUpdateFlags RigidTesselator::pathToMesh(
 		}
 
 		if ((update & UPDATE_MESH_TRIANGLES) == 0 &&
-				(update & UPDATE_MESH_AUTO_TRIANGLES)) {
+			(update & UPDATE_MESH_AUTO_TRIANGLES)) {
 			if (!fillSubmesh->findCachedTriangulation(trianglesChanged)) {
 				update |= UPDATE_MESH_TRIANGLES;
 			}
@@ -413,7 +414,7 @@ ToveMeshUpdateFlags RigidTesselator::pathToMesh(
 	if (shape->fill.type != NSVG_PAINT_NONE) {
 		if (update & UPDATE_MESH_TRIANGLES) {
 			fillSubmesh->triangulateFixedResolutionFill(
-					fillIndex0, path, flattener, holes);
+				fillIndex0, path, flattener, holes);
 		}
 		if (update & (UPDATE_MESH_COLORS | UPDATE_MESH_VERTICES)) {
 			fill->setFillColor(path, fillIndex0, index);
@@ -425,7 +426,7 @@ ToveMeshUpdateFlags RigidTesselator::pathToMesh(
 
 		if (update & UPDATE_MESH_TRIANGLES) {
 			lineSubmesh->triangulateFixedResolutionLine(
-					v0, miter, reduceOverlap, verticesPerSegment, path, flattener);
+				v0, miter, reduceOverlap, verticesPerSegment, path, flattener);
 		}
 		if (update & (UPDATE_MESH_COLORS | UPDATE_MESH_VERTICES)) {
 			line->setLineColor(path, v0, index * verticesPerSegment);
@@ -443,7 +444,7 @@ ToveMeshUpdateFlags RigidTesselator::pathToMesh(
 }
 
 ClipperLib::Paths RigidTesselator::toClipPath(
-		const std::vector<PathRef> &paths) const {
+	const std::vector<PathRef> &paths) const {
 
 	return ClipperPaths();
 }

@@ -26,7 +26,7 @@ inline float lerp(float a, float b, float t) {
 }
 
 inline int div4(int n) {
-	return (n / 4) + (n % 4 ? 1 : 0);
+    return (n / 4) + (n % 4 ? 1 : 0);
 }
 
 inline int ncurves(int npts) {
@@ -35,19 +35,18 @@ inline int ncurves(int npts) {
 	return n;
 }
 
-template <typename T>
+template<typename T>
 inline double dot4(const T *v, double x, double y, double z, double w) {
 	return v[0] * x + v[1] * y + v[2] * z + v[3] * w;
 }
 
-template <typename T>
+template<typename T>
 inline double dot3(const T *v, double x, double y, double z) {
 	return v[0] * x + v[1] * y + v[2] * z;
 }
 
-template <typename T>
-int sgn(T val) {
-	return (T(0) < val) - (val < T(0));
+template<typename T> int sgn(T val) {
+    return (T(0) < val) - (val < T(0));
 }
 
 inline float wrapAngle(float phi) {

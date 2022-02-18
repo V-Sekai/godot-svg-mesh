@@ -12,8 +12,8 @@
 #ifndef __TOVE_SHADER_COLOR
 #define __TOVE_SHADER_COLOR 1
 
-#include "../gen.h"
 #include <functional>
+#include "../gen.h"
 
 BEGIN_TOVE_NAMESPACE
 
@@ -35,11 +35,11 @@ protected:
 		} else {
 			NSVGgradient *g = paint->getNSVGgradient();
 			assert(g);
-			if (g->nstops < 1) {
-				return PAINT_NONE;
-			} else {
-				return style;
-			}
+	    	if (g->nstops < 1) {
+	    		return PAINT_NONE;
+	    	} else {
+	    		return style;
+	    	}
 		}
 	}
 
@@ -50,13 +50,13 @@ protected:
 		} else {
 			NSVGgradient *g = paint->getNSVGgradient();
 			assert(g && g->nstops >= 1);
-			if (SPECIAL_CASE_2 && g->nstops == 2 &&
-					g->stops[0].offset == 0.0 &&
-					g->stops[1].offset == 1.0) {
-				return 2;
-			} else {
-				return 256;
-			}
+	    	if (SPECIAL_CASE_2 && g->nstops == 2 &&
+				g->stops[0].offset == 0.0 &&
+				g->stops[1].offset == 1.0) {
+	    		return 2;
+	    	} else {
+	    		return 256;
+	    	}
 		}
 	}
 
@@ -110,12 +110,12 @@ protected:
 				uint8_t *texture = gradient.colorsTexture;
 				if (texture) {
 					const uint32_t color = nsvg::makeColor(
-							paintData.rgba.r,
-							paintData.rgba.g,
-							paintData.rgba.b,
-							paintData.rgba.a);
+						paintData.rgba.r,
+						paintData.rgba.g,
+						paintData.rgba.b,
+						paintData.rgba.a);
 
-					*(uint32_t *)texture = color;
+					*(uint32_t*)texture = color;
 				}
 			}
 
@@ -130,23 +130,22 @@ protected:
 		assert(g);
 
 		if (SPECIAL_CASE_2 && gradient.numColors <= 2 &&
-				gradient.colorsTextureHeight == gradient.numColors) {
-
+			gradient.colorsTextureHeight == gradient.numColors) {
+			
 			assert(g->nstops == gradient.numColors);
 			for (int i = 0; i < gradient.numColors; i++) {
-				*(uint32_t *)texture = nsvg::applyOpacity(
-						g->stops[i].color, opacity);
+				*(uint32_t*)texture = nsvg::applyOpacity(
+					g->stops[i].color, opacity);
 				texture += textureRowBytes;
 			}
 		} else {
 			NSVGpaint nsvgPaint;
 			nsvgPaint.type = paint->getType() == PAINT_LINEAR_GRADIENT ?
-									 NSVG_PAINT_LINEAR_GRADIENT :
-									   NSVG_PAINT_RADIAL_GRADIENT;
+				NSVG_PAINT_LINEAR_GRADIENT : NSVG_PAINT_RADIAL_GRADIENT;
 			nsvgPaint.gradient = g;
 
 			assert(gradient.numColors == 256 &&
-					gradient.colorsTextureHeight == 256);
+				gradient.colorsTextureHeight == 256);
 
 			nsvg::CachedPaint cached(texture, textureRowBytes, 256);
 			cached.init(nsvgPaint, opacity);
@@ -164,7 +163,7 @@ protected:
 
 public:
 	AbstractPaintFeed(TovePaintData &data, float scale) :
-			paintData(data), scale(scale) {
+		paintData(data), scale(scale) {
 
 		paintData.style = PAINT_UNDEFINED;
 	}
@@ -182,8 +181,7 @@ protected:
 		switch (CHANGED_STYLE) {
 			case CHANGED_LINE_STYLE:
 				return path->getLineWidth() >= 0.0f ?
-							   path->getLineColor() :
-								 none;
+					path->getLineColor() : none;
 			case CHANGED_FILL_STYLE:
 				return path->getFillColor();
 			default:
@@ -194,14 +192,14 @@ protected:
 
 public:
 	PaintFeedBase(
-			const PathRef &path,
-			TovePaintData &data,
-			float scale,
-			ToveChangeFlags CHANGED_STYLE) :
+		const PathRef &path,
+		TovePaintData &data,
+		float scale,
+		ToveChangeFlags CHANGED_STYLE) :
 
-			AbstractPaintFeed(data, scale),
-			path(path),
-			CHANGED_STYLE(CHANGED_STYLE) {
+		AbstractPaintFeed(data, scale),
+		path(path),
+		CHANGED_STYLE(CHANGED_STYLE) {
 
 		path->addObserver(this);
 		changed = false;
@@ -209,7 +207,7 @@ public:
 		std::memset(&paintData, 0, sizeof(paintData));
 
 		const PaintRef &color = getColor();
-		const TovePaintType style = getStyle(color);
+        const TovePaintType style = getStyle(color);
 		paintData.style = style;
 		paintData.gradient.numColors = determineNumColors(color);
 	}
@@ -233,7 +231,7 @@ public:
 
 		paintData.gradient.matrix = data.matrix + i * size;
 		paintData.gradient.arguments = &data.arguments[i];
-		paintData.gradient.colorsTexture = data.colorsTexture + 4 * i;
+		paintData.gradient.colorsTexture = 	data.colorsTexture + 4 * i;
 		paintData.gradient.colorsTextureRowBytes = data.colorsTextureRowBytes;
 		paintData.gradient.colorsTextureHeight = data.colorsTextureHeight;
 
@@ -245,23 +243,23 @@ public:
 			changed = false;
 
 			const PaintRef &color = getColor();
-			const TovePaintType style = getStyle(color);
+	        const TovePaintType style = getStyle(color);
 
-			if (paintData.style != style ||
-					determineNumColors(color) != paintData.gradient.numColors) {
+	        if (paintData.style != style ||
+				determineNumColors(color) != paintData.gradient.numColors) {
 
-				return CHANGED_RECREATE;
+ 				return CHANGED_RECREATE;
 			}
 
 			return CHANGED_STYLE;
 		} else {
 			return 0;
 		}
-	}
+    }
 
 	inline ToveChangeFlags endUpdate() {
-		return update(getColor(), path->getOpacity()) ? CHANGED_STYLE : 0;
-	}
+    	return update(getColor(), path->getOpacity()) ? CHANGED_STYLE : 0;
+    }
 };
 
 class PaintFeed : public PaintFeedBase {
@@ -270,25 +268,25 @@ private:
 
 public:
 	PaintFeed(const PaintFeed &feed) :
-			PaintFeedBase(feed.path, _data, feed.scale, feed.CHANGED_STYLE) {
+		PaintFeedBase(feed.path, _data, feed.scale, feed.CHANGED_STYLE) {
 	}
 
 	PaintFeed(const PathRef &path, float scale, ToveChangeFlags changed) :
-			PaintFeedBase(path, _data, scale, changed) {
+		PaintFeedBase(path, _data, scale, changed) {
 	}
 };
 
 class LinePaintFeed : public PaintFeedBase {
 public:
 	LinePaintFeed(const PathRef &path, TovePaintData &data, float scale) :
-			PaintFeedBase(path, data, scale, CHANGED_LINE_STYLE) {
+		PaintFeedBase(path, data, scale, CHANGED_LINE_STYLE) {
 	}
 };
 
 class FillPaintFeed : public PaintFeedBase {
 public:
 	FillPaintFeed(const PathRef &path, TovePaintData &data, float scale) :
-			PaintFeedBase(path, data, scale, CHANGED_FILL_STYLE) {
+		PaintFeedBase(path, data, scale, CHANGED_FILL_STYLE) {
 	}
 };
 

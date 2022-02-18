@@ -31,9 +31,9 @@
 #include "interface.h"
 #include "warn.h"
 
-#include <assert.h>
-#include <limits>
 #include <memory>
+#include <limits>
+#include <assert.h>
 
 BEGIN_TOVE_NAMESPACE
 #define NANOSVG_CPLUSPLUS 1
@@ -42,8 +42,8 @@ BEGIN_TOVE_NAMESPACE
 #include "../thirdparty/nanosvg/src/nanosvgrast.h"
 END_TOVE_NAMESPACE
 
-#include "../thirdparty/polypartition/src/polypartition.h"
 #include "thirdparty/misc/clipper.hpp"
+#include "../thirdparty/polypartition/src/polypartition.h"
 
 #if _MSC_VER
 #define M_PI 3.1415926535897932384626433832795

@@ -513,7 +513,7 @@ void VGPath::set_renderer(const Ref<VGRenderer> &p_renderer) {
 	}
 	renderer = p_renderer;
 	if (renderer.is_valid()) {
-		renderer->connect("changed", callable_mp(this, &VGPath::_renderer_changed));
+		renderer->connect("changed", callable_mp( this, &VGPath::_renderer_changed));
 	}
 
 	set_inherited_dirty(this);

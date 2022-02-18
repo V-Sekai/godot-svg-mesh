@@ -18,6 +18,7 @@ VGGradient::VGGradient() {
 	set_color_ramp(g);
 }
 
+
 void VGGradient::set_color_ramp(const Ref<Gradient> &p_color_ramp) {
 	color_ramp = p_color_ramp;
 }

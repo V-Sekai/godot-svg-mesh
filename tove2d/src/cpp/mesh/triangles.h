@@ -12,9 +12,9 @@
 #ifndef __TOVE_MESH_TRIANGLES
 #define __TOVE_MESH_TRIANGLES 1
 
+#include "partition.h"
 #include "../interface.h"
 #include "../utils.h"
-#include "partition.h"
 
 BEGIN_TOVE_NAMESPACE
 
@@ -43,17 +43,17 @@ public:
 
 private:
 	void _add(
-			const std::list<ToveTPPLPoly> &triangles,
-			bool isFinalSize);
+		const std::list<ToveTPPLPoly> &triangles,
+		bool isFinalSize);
 
 	void _add(
-			const std::vector<ToveVertexIndex> &triangles,
-			const ToveVertexIndex i0,
-			bool isFinalSize);
+		const std::vector<ToveVertexIndex> &triangles,
+		const ToveVertexIndex i0,
+		bool isFinalSize);
 
 public:
 	inline TriangleStore(ToveTrianglesMode mode) :
-			mSize(0), mTriangles(nullptr), mMode(mode) {
+		mSize(0), mTriangles(nullptr), mMode(mode) {
 	}
 
 	inline ~TriangleStore() {
@@ -63,7 +63,7 @@ public:
 	}
 
 	inline TriangleStore(const std::list<ToveTPPLPoly> &triangles) :
-			mSize(0), mTriangles(nullptr), mMode(TRIANGLES_LIST) {
+		mSize(0), mTriangles(nullptr), mMode(TRIANGLES_LIST) {
 
 		_add(triangles, true);
 	}
@@ -91,27 +91,26 @@ public:
 	}
 
 	inline void copy(
-			ToveVertexIndex *indices,
-			int32_t indexCount) const {
+		ToveVertexIndex *indices,
+		int32_t indexCount) const {
 
 		const int32_t n = std::min(mSize, indexCount);
 		if (n > 0) {
 			std::memcpy(indices, mTriangles,
-					n * sizeof(ToveVertexIndex));
+				n * sizeof(ToveVertexIndex));
 		}
 	}
 };
 
 struct Triangulation {
-	inline Triangulation(ToveTrianglesMode mode) :
-			triangles(mode) {
+	inline Triangulation(ToveTrianglesMode mode) : triangles(mode) {
 	}
 
 	inline Triangulation(const std::list<ToveTPPLPoly> &convex) :
-			partition(convex),
-			triangles(TRIANGLES_LIST),
-			useCount(0),
-			keyframe(false) {
+		partition(convex),
+		triangles(TRIANGLES_LIST),
+		useCount(0),
+		keyframe(false) {
 	}
 
 	inline ToveTrianglesMode getMode() const {
@@ -126,7 +125,7 @@ struct Triangulation {
 
 class TriangleCache {
 private:
-	std::vector<Triangulation *> triangulations;
+	std::vector<Triangulation*> triangulations;
 	int current;
 	int cacheSize;
 
@@ -139,7 +138,7 @@ private:
 
 public:
 	inline TriangleCache(int cacheSize = 2) :
-			current(0), cacheSize(cacheSize) {
+		current(0), cacheSize(cacheSize) {
 		assert(cacheSize >= 2);
 	}
 
@@ -189,7 +188,7 @@ public:
 	}
 
 	inline void add(const std::vector<ToveVertexIndex> &triangles,
-			ToveVertexIndex i0) {
+		ToveVertexIndex i0) {
 		if (triangulations.empty()) {
 			triangulations.push_back(new Triangulation(TRIANGLES_LIST));
 		}
@@ -219,9 +218,9 @@ public:
 	}
 
 	inline void copyIndexData(
-			ToveVertexIndex *indices,
-			int32_t indexCount) const {
-
+		ToveVertexIndex *indices,
+		int32_t indexCount) const {
+		
 		if (current < (int32_t)triangulations.size()) {
 			auto &t = triangulations[current]->triangles;
 			t.copy(indices, indexCount);
@@ -229,7 +228,7 @@ public:
 	}
 
 	bool findCachedTriangulation(
-			const Vertices &vertices, bool &trianglesChanged);
+		const Vertices &vertices, bool &trianglesChanged);
 };
 
 END_TOVE_NAMESPACE

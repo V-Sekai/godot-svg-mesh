@@ -10,32 +10,32 @@
  */
 
 #include "../common.h"
-#include "../gpux/gpux_feed.h"
+#include "../references.h"
+#include "../path.h"
 #include "../graphics.h"
-#include "../mesh/flatten.h"
 #include "../mesh/mesh.h"
 #include "../mesh/meshifier.h"
-#include "../path.h"
-#include "../references.h"
+#include "../mesh/flatten.h"
 #include "../shader/feed/color_feed.h"
+#include "../gpux/gpux_feed.h"
 #include <sstream>
 
 #if TOVE_TARGET == TOVE_TARGET_LOVE2D
 
 using namespace tove;
 
-template <typename F>
+template<typename F>
 static ToveMeshResult exception_safe(const F &f) {
 	try {
-		return ToveMeshResult{ f() };
+		return ToveMeshResult{f()};
 	} catch (const std::bad_alloc &e) {
 		TOVE_BAD_ALLOC();
-		return ToveMeshResult{ 0 };
+		return ToveMeshResult{0};
 	} catch (const std::exception &e) {
 		tove::report::err(e.what());
-		return ToveMeshResult{ 0 };
+		return ToveMeshResult{0};
 	} catch (...) {
-		return ToveMeshResult{ 0 };
+		return ToveMeshResult{0};
 	}
 }
 
@@ -61,12 +61,14 @@ void SetReportLevel(ToveReportLevel l) {
 	tove::report::config.level = l;
 }
 
+
 void DefaultRasterizeSettings(ToveRasterizeSettings *settings) {
 	const ToveRasterizeSettings *def = nsvg::getDefaultRasterizeSettings();
 	if (def) {
 		*settings = *def;
 	}
 }
+
 
 TovePaintType PaintGetType(TovePaintRef paint) {
 	return deref(paint)->getType();
@@ -129,6 +131,7 @@ void GradientSetColorStop(TovePaintRef gradient, int i, float offset, float r, f
 void ReleasePaint(TovePaintRef paint) {
 	paints.release(paint);
 }
+
 
 TovePathRef NewPath(const char *d) {
 	if (d) {
@@ -289,11 +292,11 @@ bool PathIsInside(TovePathRef path, float x, float y) {
 }
 
 void PathSet(
-		TovePathRef path,
-		TovePathRef source,
-		bool scaleLineWidth,
-		float a, float b, float c,
-		float d, float e, float f) {
+	TovePathRef path,
+	TovePathRef source,
+	bool scaleLineWidth,
+	float a, float b, float c,
+	float d, float e, float f) {
 
 	nsvg::Transform transform(a, b, c, d, e, f);
 	transform.setWantsScaleLineWidth(scaleLineWidth);
@@ -315,6 +318,7 @@ const char *PathGetId(TovePathRef path) {
 void ReleasePath(TovePathRef path) {
 	paths.release(path);
 }
+
 
 ToveSubpathRef NewSubpath() {
 	return trajectories.make();
@@ -433,7 +437,7 @@ float SubpathGetCommandValue(ToveSubpathRef subpath, int command, int property) 
 }
 
 void SubpathSetCommandValue(ToveSubpathRef subpath,
-		int command, int property, float value) {
+	int command, int property, float value) {
 	deref(subpath)->setCommandValue(command, property, value);
 }
 
@@ -446,7 +450,7 @@ ToveVec2 SubpathGetNormal(ToveSubpathRef subpath, float t) {
 }
 
 ToveNearest SubpathNearest(ToveSubpathRef subpath,
-		float x, float y, float dmin, float dmax) {
+	float x, float y, float dmin, float dmax) {
 	return deref(subpath)->nearest(x, y, dmin, dmax);
 }
 
@@ -479,13 +483,14 @@ void SubpathMove(ToveSubpathRef subpath, int k, float x, float y, ToveHandle han
 }
 
 void SubpathSet(ToveSubpathRef subpath, ToveSubpathRef source,
-		float a, float b, float c, float d, float e, float f) {
+	float a, float b, float c, float d, float e, float f) {
 
 	nsvg::Transform transform(a, b, c, d, e, f);
 	deref(subpath)->set(deref(source), transform);
 }
 
-ToveGraphicsRef NewGraphics(const char *svg, const char *units, float dpi) {
+
+ToveGraphicsRef NewGraphics(const char *svg, const char* units, float dpi) {
 
 	return shapes.publish(Graphics::createFromSVG(svg, units, dpi));
 }
@@ -581,7 +586,7 @@ ToveBounds GraphicsGetBounds(ToveGraphicsRef shape, bool exact) {
 	if (exact) {
 		computed = deref(shape)->getExactBounds();
 	} else {
-		computed = deref(shape)->getBounds();
+		computed  = deref(shape)->getBounds();
 	}
 
 	ToveBounds bounds;
@@ -593,11 +598,11 @@ ToveBounds GraphicsGetBounds(ToveGraphicsRef shape, bool exact) {
 }
 
 void GraphicsSet(
-		ToveGraphicsRef graphics,
-		ToveGraphicsRef source,
-		bool scaleLineWidth,
-		float a, float b, float c,
-		float d, float e, float f) {
+	ToveGraphicsRef graphics,
+	ToveGraphicsRef source,
+	bool scaleLineWidth,
+	float a, float b, float c,
+	float d, float e, float f) {
 
 	nsvg::Transform transform(a, b, c, d, e, f);
 	transform.setWantsScaleLineWidth(scaleLineWidth);
@@ -621,24 +626,24 @@ void GraphicsSet(
 }*/
 
 void GraphicsRasterize(
-		ToveGraphicsRef shape, uint8_t *pixels, int width, int height, int stride,
-		float tx, float ty, float scale, const ToveRasterizeSettings *settings) {
+	ToveGraphicsRef shape, uint8_t *pixels, int width, int height, int stride,
+	float tx, float ty, float scale, const ToveRasterizeSettings *settings) {
 
 	deref(shape)->rasterize(
-			pixels, width, height, stride, tx, ty, scale, settings);
+		pixels, width, height, stride, tx, ty, scale, settings);
 }
 
 void GraphicsAnimate(
-		ToveGraphicsRef graphics,
-		ToveGraphicsRef a,
-		ToveGraphicsRef b,
-		float t) {
+	ToveGraphicsRef graphics,
+	ToveGraphicsRef a,
+	ToveGraphicsRef b,
+	float t) {
 	deref(graphics)->animate(deref(a), deref(b), t);
 }
 
 void GraphicsSetOrientation(
-		ToveGraphicsRef graphics,
-		ToveOrientation orientation) {
+	ToveGraphicsRef graphics,
+	ToveOrientation orientation) {
 	deref(graphics)->setOrientation(orientation);
 }
 
@@ -674,13 +679,14 @@ void ReleaseGraphics(ToveGraphicsRef graphics) {
 	shapes.release(graphics);
 }
 
+
 ToveFeedRef NewColorFeed(ToveGraphicsRef graphics, float scale) {
 	return shaderLinks.publish(tove_make_shared<ColorFeed>(deref(graphics), scale));
 }
 
 ToveFeedRef NewGeometryFeed(TovePathRef path, bool enableFragmentShaderStrokes) {
 	return shaderLinks.publish(tove_make_shared<GPUXFeed>(
-			deref(path), enableFragmentShaderStrokes));
+		deref(path), enableFragmentShaderStrokes));
 }
 
 ToveChangeFlags FeedBeginUpdate(ToveFeedRef link) {
@@ -706,6 +712,7 @@ void FeedBind(ToveFeedRef link, const ToveGradientData *data) {
 void ReleaseFeed(ToveFeedRef link) {
 	shaderLinks.release(link);
 }
+
 
 ToveMeshRef NewMesh() {
 	return meshes.publish(tove_make_shared<Mesh>());
@@ -737,8 +744,8 @@ int MeshGetIndexCount(ToveMeshRef mesh) {
 
 void MeshCopyIndexData(ToveMeshRef mesh, void *buffer, int32_t size) {
 	deref(mesh)->copyIndexData(
-			static_cast<ToveVertexIndex *>(buffer),
-			size / sizeof(ToveVertexIndex));
+		static_cast<ToveVertexIndex*>(buffer),
+		size / sizeof(ToveVertexIndex));
 }
 
 void MeshCache(ToveMeshRef mesh, bool keyframe) {
@@ -751,8 +758,8 @@ void ReleaseMesh(ToveMeshRef mesh) {
 
 ToveTesselatorRef NewAdaptiveTesselator(float resolution, int recursionLimit) {
 	return tesselators.publish(tove_make_shared<AdaptiveTesselator>(
-			new AdaptiveFlattener<DefaultCurveFlattener>(
-					DefaultCurveFlattener(resolution, recursionLimit))));
+		new AdaptiveFlattener<DefaultCurveFlattener>(
+			DefaultCurveFlattener(resolution, recursionLimit))));
 }
 
 ToveTesselatorRef NewRigidTesselator(int subdivisions, ToveHoles holes) {
@@ -760,19 +767,19 @@ ToveTesselatorRef NewRigidTesselator(int subdivisions, ToveHoles holes) {
 }
 
 ToveMeshUpdateFlags TesselatorTessGraphics(ToveTesselatorRef tess,
-		ToveGraphicsRef graphics, ToveMeshRef mesh, ToveMeshUpdateFlags flags) {
+	ToveGraphicsRef graphics, ToveMeshRef mesh, ToveMeshUpdateFlags flags) {
 
 	tove::MeshRef m = deref(mesh);
 	return deref(tess)->graphicsToMesh(deref(graphics).get(), flags, m, m);
 }
 
 ToveMeshUpdateFlags TesselatorTessPath(ToveTesselatorRef tess,
-		ToveGraphicsRef graphics, TovePathRef path,
-		ToveMeshRef fillMesh, ToveMeshRef lineMesh, ToveMeshUpdateFlags flags) {
+	ToveGraphicsRef graphics, TovePathRef path,
+	ToveMeshRef fillMesh, ToveMeshRef lineMesh, ToveMeshUpdateFlags flags) {
 
 	const float *bounds = deref(graphics)->getBounds();
 	const float extent = std::max(
-			bounds[2] - bounds[0], bounds[3] - bounds[1]);
+		bounds[2] - bounds[0], bounds[3] - bounds[1]);
 
 	int lineIndex = 0;
 	int fillIndex = 0;
@@ -780,8 +787,8 @@ ToveMeshUpdateFlags TesselatorTessPath(ToveTesselatorRef tess,
 	deref(tess)->beginTesselate(deref(graphics).get(), 1.0f / extent);
 
 	ToveMeshUpdateFlags result = deref(tess)->pathToMesh(
-			flags, deref(path),
-			deref(fillMesh), deref(lineMesh), fillIndex, lineIndex);
+		flags, deref(path),
+		deref(fillMesh), deref(lineMesh), fillIndex, lineIndex);
 
 	deref(tess)->endTesselate();
 
@@ -795,6 +802,7 @@ void TesselatorSetMaxSubdivisions(int subdivisions) {
 void ReleaseTesselator(ToveTesselatorRef tess) {
 	tesselators.release(tess);
 }
+
 
 } // extern "C"
 

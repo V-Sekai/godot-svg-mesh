@@ -78,8 +78,8 @@ public:
 				double u = 2 * sqrt(-Q);
 
 				return at(bx, by, u * cos(th / 3) - A_third) +
-					   at(bx, by, u * cos((th + 2 * M_PI) / 3) - A_third) +
-					   at(bx, by, u * cos((th + 4 * M_PI) / 3) - A_third);
+					at(bx, by, u * cos((th + 2 * M_PI) / 3) - A_third) +
+					at(bx, by, u * cos((th + 4 * M_PI) / 3) - A_third);
 			}
 		}
 	}
@@ -87,24 +87,24 @@ public:
 
 class Intersecter : public AbstractIntersecter {
 private:
-	std::vector<float> hits;
+    std::vector<float> hits;
 
 protected:
-	virtual int at(const coeff *bx, const coeff *by, double t) {
-		if (t >= 0.0 && t <= 1.0) {
-			double t2 = t * t;
+    virtual int at(const coeff *bx, const coeff *by, double t) {
+        if (t >= 0.0 && t <= 1.0) {
+            double t2 = t * t;
 			double t3 = t2 * t;
 
-			hits.push_back(dot4(bx, t3, t2, t, 1));
-			hits.push_back(dot4(by, t3, t2, t, 1));
-		}
+            hits.push_back(dot4(bx, t3, t2, t, 1));
+            hits.push_back(dot4(by, t3, t2, t, 1));
+        }
 
-		return 0;
-	}
+        return 0;
+    }
 
-	const std::vector<float> &get() const {
-		return hits;
-	};
+    const std::vector<float> &get() const {
+        return hits;
+    };
 };
 
 class RuntimeRay : public AbstractRay {
@@ -113,41 +113,40 @@ private:
 
 public:
 	inline RuntimeRay(float x1, float y1, float x2, float y2) :
-			A(y2 - y1),
-			B(x1 - x2),
-			C(x1 * (y1 - y2) + y1 * (x2 - x1)) {
+		A(y2 - y1),
+		B(x1 - x2),
+		C(x1 * (y1 - y2) + y1 * (x2 - x1)) {
 	}
 
 	virtual void computeP(double *P, const coeff *bx, const coeff *by) const {
-		P[0] = A * bx[0] + B * by[0]; // t^3
-		P[1] = A * bx[1] + B * by[1]; // t^2
-		P[2] = A * bx[2] + B * by[2]; // t
+		P[0] = A * bx[0] + B * by[0];     // t^3
+		P[1] = A * bx[1] + B * by[1];     // t^2
+		P[2] = A * bx[2] + B * by[2];     // t
 		P[3] = A * bx[3] + B * by[3] + C; // 1
 	}
 };
 
-template <int DX, int DY>
+template<int DX, int DY>
 class CompiledRay : public AbstractRay {
 private:
 	const float x1, y1;
 
 public:
-	inline CompiledRay(float x1, float y1) :
-			x1(x1), y1(y1) {
+	inline CompiledRay(float x1, float y1) : x1(x1), y1(y1) {
 	}
 
 	virtual void computeP(double *P, const coeff *bx, const coeff *by) const {
 		constexpr int A = DY;
 		constexpr int B = -DX;
 		const float C = x1 * (-DY) + y1 * DX;
-		P[0] = A * bx[0] + B * by[0]; // t^3
-		P[1] = A * bx[1] + B * by[1]; // t^2
-		P[2] = A * bx[2] + B * by[2]; // t
+		P[0] = A * bx[0] + B * by[0];     // t^3
+		P[1] = A * bx[1] + B * by[1];     // t^2
+		P[2] = A * bx[2] + B * by[2];     // t
 		P[3] = A * bx[3] + B * by[3] + C; // 1
 	}
 };
 
-template <int DX, int DY>
+template<int DX, int DY>
 class NonZeroCounter : public AbstractIntersecter {
 private:
 	const double x;
@@ -159,7 +158,7 @@ private:
 			double t3 = t2 * t;
 
 			if (DX * (x - dot4(bx, t3, t2, t, 1)) >= 0 &&
-					DY * (y - dot4(by, t3, t2, t, 1)) >= 0) {
+				DY * (y - dot4(by, t3, t2, t, 1)) >= 0) {
 				return sgn(dot3(by, 3 * t2, 2 * t, 1));
 			}
 		}
@@ -170,8 +169,7 @@ private:
 	const CompiledRay<DX, DY> ray;
 
 public:
-	inline NonZeroCounter(double x, double y) :
-			x(x), y(y), ray(x, y) {
+	inline NonZeroCounter(double x, double y) : x(x), y(y), ray(x, y) {
 	}
 
 	inline int operator()(const coeff *bx, const coeff *by) {
@@ -179,7 +177,7 @@ public:
 	}
 };
 
-template <int DX, int DY>
+template<int DX, int DY>
 class EvenOddCounter : public AbstractIntersecter {
 private:
 	const double x;
@@ -191,7 +189,7 @@ private:
 			double t3 = t2 * t;
 
 			if (DX * (x - dot4(bx, t3, t2, t, 1)) >= 0 &&
-					DY * (y - dot4(by, t3, t2, t, 1)) >= 0) {
+				DY * (y - dot4(by, t3, t2, t, 1)) >= 0) {
 				return 1;
 			}
 		}
@@ -202,8 +200,7 @@ private:
 	const CompiledRay<DX, DY> ray;
 
 public:
-	inline EvenOddCounter(double x, double y) :
-			x(x), y(y), ray(x, y) {
+	inline EvenOddCounter(double x, double y) : x(x), y(y), ray(x, y) {
 	}
 
 	inline int operator()(const coeff *bx, const coeff *by) {
@@ -215,8 +212,8 @@ class AbstractInsideTest {
 protected:
 	int counts[3];
 
-	template <template <int, int> class Counter>
-	void _add(const coeff *bx, const coeff *by, float x, float y) {
+	template<template <int, int> class Counter>
+    void _add(const coeff *bx, const coeff *by, float x, float y) {
 		Counter<1, 0> c1(x, y);
 		counts[0] += c1(bx, by);
 
@@ -228,11 +225,11 @@ protected:
 	}
 
 public:
-	inline AbstractInsideTest() {
-		for (int i = 0; i < 3; i++) {
-			counts[i] = 0;
-		}
-	}
+    inline AbstractInsideTest() {
+        for (int i = 0; i < 3; i++) {
+            counts[i] = 0;
+        }
+    }
 
 	virtual void add(const coeff *bx, const coeff *by, float x, float y) = 0;
 };

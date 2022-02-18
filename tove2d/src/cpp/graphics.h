@@ -44,8 +44,7 @@ private:
 	void link();
 
 public:
-	ClipSet(const std::vector<ClipRef> &c) :
-			clips(c) {
+	ClipSet(const std::vector<ClipRef> &c) : clips(c) {
 		link();
 	}
 	ClipSet(const ClipSet &source, const nsvg::Transform &t);
@@ -99,11 +98,11 @@ private:
 
 	void initialize(float width, float height);
 
-	template <typename Get>
+	template<typename Get>
 	void computeBounds(float *bounds, const Get &get) {
 		int k = 0;
 		const int n = paths.size();
-		for (int i = 0; i < n; i++) {
+	    for (int i = 0; i < n; i++) {
 			const PathRef &p = paths[i];
 			if (p->hasFill() || p->hasStroke()) {
 				const float *pathBounds = get(p);
@@ -118,7 +117,7 @@ private:
 					bounds[3] = std::max(bounds[3], pathBounds[3]);
 				}
 			}
-		}
+	    }
 		if (k == 0) {
 			bounds[0] = 0.0f;
 			bounds[1] = 0.0f;
@@ -131,7 +130,7 @@ public:
 	NSVGimage nsvg;
 
 	static GraphicsRef createFromSVG(
-			const char *svg, const char *units, float dpi);
+		const char *svg, const char *units, float dpi);
 
 	Graphics();
 	Graphics(const ClipSetRef &clipSet);
@@ -163,7 +162,7 @@ public:
 	}
 
 	inline void setLineWidth(float strokeWidth) {
-		this->strokeWidth = strokeWidth;
+ 		this->strokeWidth = strokeWidth;
 	}
 
 	ToveLineJoin getLineJoin() const;
@@ -241,10 +240,10 @@ public:
 #endif
 
 	void rasterize(
-			uint8_t *pixels,
-			int width, int height, int stride,
-			float tx, float ty, float scale,
-			const ToveRasterizeSettings *settings = nullptr);
+		uint8_t *pixels,
+		int width, int height, int stride,
+		float tx, float ty, float scale,
+		const ToveRasterizeSettings *settings = nullptr);
 };
 
 END_TOVE_NAMESPACE
