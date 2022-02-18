@@ -45,7 +45,10 @@ Node *EditorSceneImporterSVG::import_scene(const String &p_path, uint32_t p_flag
 		mesh.instantiate();
 		Ref<Texture> texture;
 		Ref<Material> renderer_material;
-		_ALLOW_DISCARD_ renderer->render_mesh(mesh, renderer_material, texture, path, true, true);
+		Rect2 area = renderer->render_mesh(mesh, renderer_material, texture, path, true, true);
+		if (area.is_equal_approx(Rect2())) {
+			continue;
+		}
 		if (renderer_material.is_valid()) {
 			mesh->surface_set_material(0, renderer_material);
 		}
