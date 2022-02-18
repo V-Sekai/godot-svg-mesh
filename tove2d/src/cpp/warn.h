@@ -45,7 +45,7 @@ namespace report {
 } // namespace report 
 
 #define TOVE_FATAL(s) tove::report::fatal(__FILE__, __LINE__, s)
-#define TOVE_BAD_ALLOC() { TOVE_FATAL("Out of memory"); throw std::bad_alloc(); }
+#define TOVE_BAD_ALLOC() { CRASH_NOW_MSG("Out of memory"); }
 
 END_TOVE_NAMESPACE
 
