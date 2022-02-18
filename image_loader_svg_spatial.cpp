@@ -34,8 +34,7 @@ Node *EditorSceneImporterSVG::import_scene(const String &p_path, uint32_t p_flag
 	st.instantiate();
 	AABB bounds;
 	Node3D *root = memnew(Node3D);
-	unsigned int mesh_i = n;
-	while (mesh_i--) {
+	for (int mesh_i = 0; mesh_i < n; mesh_i++) {
 		tove::PathRef tove_path = tove_graphics->getPath(mesh_i);
 		Point2 center = compute_center(tove_path);
 		tove_path->set(tove_path, tove::nsvg::Transform(1, 0, -center.x, 0, 1, -center.y));
