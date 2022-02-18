@@ -30,7 +30,6 @@ Node *EditorSceneImporterSVG::import_scene(const String &p_path, uint32_t p_flag
 	renderer->set_quality(0.4);
 	VGPath *root_path = memnew(VGPath(tove::tove_make_shared<tove::Path>()));
 	root_path->set_renderer(renderer);
-	AABB bounds;
 	Node3D *root = memnew(Node3D);
 	Ref<SurfaceTool> st;
 	st.instantiate();
@@ -68,11 +67,12 @@ Node *EditorSceneImporterSVG::import_scene(const String &p_path, uint32_t p_flag
 	mesh_inst->set_name(String("Path"));
 	root->add_child(mesh_inst, true);
 	mesh_inst->set_owner(root);
-	Vector3 translate = bounds.get_size();
-	translate.x = -translate.x;
-	translate.x += translate.x / 2.0f;
-	translate.y += translate.y;
-	mesh_inst->translate(translate);
+	Vector3 translate = combined_mesh->get_aabb().get_size();
+	translate.x = -translate.x / 2.0f;
+	translate.y = translate.y / 2.0f;
+	Transform3D xform;
+	xform.origin = translate;
+	mesh_inst->set_transform(xform);
 	return root;
 }
 
