@@ -156,7 +156,7 @@ void VGPath::import_svg(const String &p_path) {
 
 		path->set_name(String(name.c_str()));
 
-		add_child(path);
+		add_child(path, true);
 		path->set_owner(get_owner());
 	}
 }

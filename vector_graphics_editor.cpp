@@ -448,7 +448,7 @@ public:
 			if (mb->get_button_index() == MouseButton::LEFT) {
 				if (mb->is_pressed() && path == NULL) {
 					path = memnew(VGPath);
-					root->add_child(path);
+					root->add_child(path, true);
 					if (root->get_owner()) {
 						path->set_owner(root->get_owner());
 					}
@@ -1537,12 +1537,12 @@ VGEditor::VGEditor(EditorNode *p_editor) {
 	editor = p_editor;
 	undo_redo = editor->get_undo_redo();
 
-	add_child(memnew(VSeparator));
+	add_child(memnew(VSeparator), true);
 
 	const int n_tools = 3;
 	for (int i = 0; i < n_tools; i++) {
 		Button *button = memnew(Button);
-		add_child(button);
+		add_child(button, true);
 		button->connect("pressed", callable_mp(this, &VGEditor::_tool_selected), varray(i));
 		button->set_toggle_mode(true);
 		button->set_pressed(i == 0);
@@ -1551,15 +1551,15 @@ VGEditor::VGEditor(EditorNode *p_editor) {
 
 	VSeparator *sep = memnew(VSeparator);
 	sep->set_h_size_flags(SIZE_EXPAND_FILL);
-	add_child(sep);
+	add_child(sep, true);
 
 	button_bake = memnew(Button);
-	add_child(button_bake);
+	add_child(button_bake, true);
 	button_bake->connect("pressed", callable_mp(this, &VGEditor::_create_mesh_node));
 	button_bake->set_tooltip(TTR("Bake into mesh"));
 
 	create_resource = memnew(ConfirmationDialog);
-	add_child(create_resource);
+	add_child(create_resource, true);
 	create_resource->get_ok_button()->set_text(TTR("Create"));
 }
 #endif

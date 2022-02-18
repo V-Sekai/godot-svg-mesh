@@ -40,7 +40,7 @@ Node *EditorSceneImporterSVG::import_scene(const String &p_path, uint32_t p_flag
 		tove_path->set(tove_path, tove::nsvg::Transform(1, 0, -center.x, 0, 1, -center.y));
 		VGPath *path = memnew(VGPath(tove_path));
 		path->set_position(center);
-		root_path->add_child(path);
+		root_path->add_child(path, true);
 		path->set_owner(root_path);
 		Ref<ArrayMesh> mesh;
 		mesh.instantiate();
@@ -67,7 +67,7 @@ Node *EditorSceneImporterSVG::import_scene(const String &p_path, uint32_t p_flag
 		if (!name.is_empty()) {
 			mesh_inst->set_name(name);
 		}
-		root->add_child(mesh_inst);
+		root->add_child(mesh_inst, true);
 		mesh_inst->set_owner(root);
 	}
 	Vector3 translate = bounds.get_size();
