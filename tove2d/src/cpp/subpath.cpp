@@ -28,7 +28,7 @@ float *Subpath::addPoints(int n, bool allowClosedEdit) {
 	nsvg.pts = static_cast<float*>(
 		realloc(nsvg.pts, cpts * 2 * sizeof(float)));
 	if (!nsvg.pts) {
-		throw std::bad_alloc();
+		CRASH_NOW_MSG("Bad allocation.");
 	}
 	float *p = &nsvg.pts[nsvg.npts * 2];
 	nsvg.npts += n;
@@ -101,7 +101,7 @@ Subpath::Subpath(const NSVGpath *path) {
 	const size_t size = path->npts * 2 * sizeof(float);
 	nsvg.pts = static_cast<float*>(malloc(size));
 	if (!nsvg.pts) {
-		throw std::bad_alloc();
+		CRASH_NOW_MSG("Bad allocation.");
 	}
 	std::memcpy(nsvg.pts, path->pts, size);
 	for (int i = 0; i < 4; i++) {
@@ -117,7 +117,7 @@ Subpath::Subpath(const SubpathRef &t) {
 	const size_t size = nsvg.npts * 2 * sizeof(float);
 	nsvg.pts = static_cast<float*>(malloc(size));
 	if (!nsvg.pts) {
-		throw std::bad_alloc();
+		CRASH_NOW_MSG("Bad allocation.");
 	}
 	std::memcpy(nsvg.pts, t->nsvg.pts, size);
 	for (int i = 0; i < 4; i++) {
@@ -1099,7 +1099,7 @@ void Subpath::invert() {
 	const size_t size = n * 2 * sizeof(float);
 	float *pts = static_cast<float*>(malloc(size));
 	if (!pts) {
-		throw std::bad_alloc();
+		CRASH_NOW_MSG("Bad allocation.");
 	}
 	for (int i = 0; i < n; i++) {
 		const int j = n - 1 - i;

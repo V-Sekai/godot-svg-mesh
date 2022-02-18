@@ -219,7 +219,7 @@ void AbstractGradient::setNumColorStops(int numStops) {
 	const size_t size = getRecordSize(numStops);
 	nsvg = static_cast<NSVGgradient*>(realloc(nsvg, nextpow2(size)));
 	if (!nsvg) {
-		throw std::bad_alloc();
+		CRASH_NOW_MSG("Bad allocation.");
 	}
 	nsvg->nstops = numStops;
 }
