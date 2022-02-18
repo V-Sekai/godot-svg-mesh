@@ -12,6 +12,8 @@
 #ifndef __TOVE_WARN
 #define __TOVE_WARN 1
 
+#include "core/error/error_macros.h"
+
 #include "common.h"
 #include "interface.h"
 
