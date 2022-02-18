@@ -51,10 +51,16 @@ Node *EditorSceneImporterSVG::import_scene(const String &p_path, uint32_t p_flag
 		}
 		Transform3D xform;
 		xform.origin = Vector3(center.x * 0.001f, center.y * -0.001f, 0.0f);
+		if (mesh.is_null()) {
+			continue;
+		}
 		st->append_from(mesh, 0, xform);
 	}
-	Ref<ArrayMesh> combined_mesh = st->commit();
 	memdelete(root_path);
+	Ref<ArrayMesh> combined_mesh = st->commit();
+	if (combined_mesh.is_null()) {
+		return nullptr;
+	}
 	Ref<StandardMaterial3D> standard_material;
 	standard_material.instantiate();
 	standard_material->set_flag(StandardMaterial3D::FLAG_ALBEDO_FROM_VERTEX_COLOR, true);
