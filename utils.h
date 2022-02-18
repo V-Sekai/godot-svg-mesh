@@ -5,7 +5,7 @@
 #ifndef VG_UTILS_H
 #define VG_UTILS_H
 
-#include "core/class_db.h"
+#include "core/io/file_access.h"
 #include "scene/2d/mesh_instance_2d.h"
 #include <stdint.h>
 

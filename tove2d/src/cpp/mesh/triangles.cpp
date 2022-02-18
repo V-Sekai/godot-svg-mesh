@@ -32,12 +32,12 @@ ToveVertexIndex *TriangleStore::allocate(int n, bool isFinalSize) {
 }
 
 void TriangleStore::_add(
-    const std::list<TPPLPoly> &triangles,
+    const std::list<ToveTPPLPoly> &triangles,
     bool isFinalSize) {
 
     ToveVertexIndex *indices = allocate(triangles.size(), isFinalSize);
     for (auto i = triangles.begin(); i != triangles.end(); i++) {
-        const TPPLPoly &poly = *i;
+        const ToveTPPLPoly &poly = *i;
         for (int j = 0; j < 3; j++) {
             *indices++ = ToLoveVertexMapIndex(poly[j].id);
         }

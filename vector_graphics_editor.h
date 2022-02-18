@@ -8,12 +8,12 @@
 #ifdef TOOLS_ENABLED
 #include "editor/editor_node.h"
 #include "editor/editor_plugin.h"
-#include "scene/gui/tool_button.h"
+#include "scene/gui/button.h"
 #include "vector_graphics_path.h"
 
 class CanvasItemEditor;
 
-class VGTool : public Reference {
+class VGTool : public RefCounted {
 protected:
 	CanvasItemEditor *const canvas_item_editor;
 
@@ -37,7 +37,7 @@ class VGEditor : public HBoxContainer {
 	Transform2D overlay_full_xform;
 	Transform2D overlay_draw_xform;
 
-	Vector<ToolButton *> tool_buttons;
+	Vector<Button *> tool_buttons;
 
 	enum {
 		TOOL_TRANSFORM = 0,
@@ -45,7 +45,7 @@ class VGEditor : public HBoxContainer {
 		// TOOL_ELLIPSE
 	};
 
-	ToolButton *button_bake;
+	Button *button_bake;
 
 	CanvasItemEditor *canvas_item_editor;
 	EditorNode *editor;

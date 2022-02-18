@@ -13,14 +13,14 @@
 #include "vector_graphics_radial_gradient.h"
 #include "vector_graphics_renderer.h"
 
-#include "core/reference.h"
+#include "core/object/ref_counted.h"
 
 #ifdef TOOLS_ENABLED
 #include "editor/editor_node.h"
 static void editor_init_callback() {
 	Ref<EditorSceneImporterSVG> svg_spatial_loader;
-	svg_spatial_loader.instance();
-	ResourceImporterScene::get_singleton()->add_importer(svg_spatial_loader);
+	svg_spatial_loader.instantiate();
+	ResourceImporterScene::get_singleton()->add_importer(svg_spatial_loader, true);
 }
 #endif
 

@@ -5,7 +5,7 @@
 #ifndef VG_RENDERER_H
 #define VG_RENDERER_H
 
-#include "core/resource.h"
+#include "core/object/ref_counted.h"
 #include "scene/2d/mesh_instance_2d.h"
 
 class VGPath;

@@ -6,10 +6,8 @@
 
 void VGRenderer::clear_mesh(Ref<ArrayMesh> &p_mesh) {
 	if (p_mesh.is_valid()) {
-		while (p_mesh->get_surface_count() > 0) {
-			p_mesh->surface_remove(0);
-		}
+		p_mesh->clear_surfaces();
 	} else {
-		p_mesh.instance();
+		p_mesh.instantiate();
 	}
 }

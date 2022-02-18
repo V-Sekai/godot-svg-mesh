@@ -33,7 +33,7 @@ public:
 	inline Partition() {
 	}
 
-	Partition(const std::list<TPPLPoly> &convex);
+	Partition(const std::list<ToveTPPLPoly> &convex);
 
 	inline bool empty() const {
 		return parts.empty();

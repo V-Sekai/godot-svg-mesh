@@ -17,7 +17,7 @@ void VGRadialGradient::_bind_methods() {
 
 	ADD_PROPERTY(PropertyInfo(Variant::VECTOR2, "center"), "set_center", "get_center");
 	ADD_PROPERTY(PropertyInfo(Variant::VECTOR2, "focal"), "set_focal", "get_focal");
-	ADD_PROPERTY(PropertyInfo(Variant::REAL, "radius"), "set_radius", "get_radius");
+	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "radius"), "set_radius", "get_radius");
 }
 
 VGRadialGradient::VGRadialGradient() {
@@ -28,7 +28,6 @@ VGRadialGradient::VGRadialGradient() {
 
 void VGRadialGradient::set_center(const Vector2 &p_center) {
 	center = p_center;
-	_change_notify("color");
 }
 
 Vector2 VGRadialGradient::get_center() const {
@@ -37,7 +36,6 @@ Vector2 VGRadialGradient::get_center() const {
 
 void VGRadialGradient::set_focal(const Vector2 &p_focal) {
 	focal = p_focal;
-	_change_notify("color");
 }
 
 Vector2 VGRadialGradient::get_focal() const {
@@ -46,7 +44,6 @@ Vector2 VGRadialGradient::get_focal() const {
 
 void VGRadialGradient::set_radius(const float p_radius) {
 	radius = p_radius;
-	_change_notify("color");
 }
 
 float VGRadialGradient::get_radius() const {

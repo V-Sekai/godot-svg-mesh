@@ -18,11 +18,11 @@
 
 BEGIN_TOVE_NAMESPACE
 
-inline void triangulationFailed(const std::list<TPPLPoly> &polys) {
+inline void triangulationFailed(const std::list<ToveTPPLPoly> &polys) {
 	tove::report::warn("triangulation failed.");
 }
 
-static void applyHoles(ToveHoles mode, TPPLPoly &poly) {
+static void applyHoles(ToveHoles mode, ToveTPPLPoly &poly) {
 	switch (mode) {
 		case TOVE_HOLES_NONE:
 			if (poly.GetOrientation() == TPPL_CW) {
@@ -136,10 +136,10 @@ void Submesh::addClipperPaths(
 		float scale,
 		ToveHoles holes) {
 
-	std::list<TPPLPoly> polys;
+	std::list<ToveTPPLPoly> polys;
 	for (const ClipperPath &path : paths) {
 		const int n = path.size();
-		TPPLPoly poly;
+		ToveTPPLPoly poly;
 		poly.Init(n);
 		int index = mMesh->getVertexCount();
 		auto v = vertices(index, n);
@@ -163,8 +163,8 @@ void Submesh::addClipperPaths(
 		polys.push_back(poly);
 	}
 
-	TPPLPartition partition;
-	std::list<TPPLPoly> triangles;
+	ToveTPPLPartition partition;
+	std::list<ToveTPPLPoly> triangles;
 	if (partition.Triangulate_EC(&polys, &triangles) == 0) {
 		triangulationFailed(polys);
 		return;
@@ -335,7 +335,7 @@ void Submesh::triangulateFixedResolutionFill(
 
 	const int numSubpaths = path->getNumSubpaths();
 
-	std::list<TPPLPoly> polys;
+	std::list<ToveTPPLPoly> polys;
 	int vertexIndex = vertexIndex0;
 
 	for (int i = 0; i < numSubpaths; i++) {
@@ -346,8 +346,8 @@ void Submesh::triangulateFixedResolutionFill(
 
 		const auto vertex = vertices(vertexIndex, n);
 
-		polys.push_back(TPPLPoly());
-		TPPLPoly &poly = polys.back();
+		polys.push_back(ToveTPPLPoly());
+		ToveTPPLPoly &poly = polys.back();
 		poly.Init(n);
 
 		int written = 0;
@@ -386,9 +386,9 @@ void Submesh::triangulateFixedResolutionFill(
 		applyHoles(holes, poly);
 	}
 
-	TPPLPartition partition;
+	ToveTPPLPartition partition;
 
-	std::list<TPPLPoly> convex;
+	std::list<ToveTPPLPoly> convex;
 	if (partition.ConvexPartition_HM(&polys, &convex) == 0) {
 		tove::report::warn("triangulation (ConvexPartition_HM) failed.");
 		return;
@@ -396,8 +396,8 @@ void Submesh::triangulateFixedResolutionFill(
 
 	Triangulation *triangulation = new Triangulation(convex);
 	for (auto i = convex.begin(); i != convex.end(); i++) {
-		std::list<TPPLPoly> triangles;
-		TPPLPoly &p = *i;
+		std::list<ToveTPPLPoly> triangles;
+		ToveTPPLPoly &p = *i;
 
 		//if (partition.Triangulate_MONO(&p, &triangles) == 0) {
 		if (partition.Triangulate_EC(&p, &triangles) == 0) {

@@ -23,7 +23,6 @@ VGLinearGradient::VGLinearGradient() {
 
 void VGLinearGradient::set_p1(const Vector2 &p_p1) {
 	p1 = p_p1;
-	_change_notify("color");
 }
 
 Vector2 VGLinearGradient::get_p1() const {
@@ -32,7 +31,6 @@ Vector2 VGLinearGradient::get_p1() const {
 
 void VGLinearGradient::set_p2(const Vector2 &p_p2) {
 	p2 = p_p2;
-	_change_notify("color");
 }
 
 Vector2 VGLinearGradient::get_p2() const {

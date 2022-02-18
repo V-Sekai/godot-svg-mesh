@@ -13,7 +13,6 @@ void VGColor::_bind_methods() {
 
 void VGColor::set_color(const Color &p_color) {
 	color = p_color;
-	_change_notify("color");
 }
 
 Color VGColor::get_color() const {

@@ -6,7 +6,7 @@ EditorSceneImporterSVG::EditorSceneImporterSVG() {
 EditorSceneImporterSVG::~EditorSceneImporterSVG() {
 }
 
-Node *EditorSceneImporterSVG::import_scene(const String &p_path, uint32_t p_flags, int p_bake_fps, uint32_t p_compress_flags, List<String> *r_missing_deps, Error *r_err) {
+Node *EditorSceneImporterSVG::import_scene(const String &p_path, uint32_t p_flags, const Map<StringName, Variant> &p_options, int p_bake_fps, List<String> *r_missing_deps, Error *r_err) {
 	String units = "px";
 	float dpi = 96.0;
 	Vector<uint8_t> buf = FileAccess::get_file_as_array(p_path);
@@ -26,14 +26,14 @@ Node *EditorSceneImporterSVG::import_scene(const String &p_path, uint32_t p_flag
 	}
 	int32_t n = tove_graphics->getNumPaths();
 	Ref<VGMeshRenderer> renderer;
-	renderer.instance();
+	renderer.instantiate();
 	renderer->set_quality(0.4);
 	VGPath *root_path = memnew(VGPath(tove::tove_make_shared<tove::Path>()));
 	root_path->set_renderer(renderer);
 	Ref<SurfaceTool> st;
-	st.instance();
+	st.instantiate();
 	AABB bounds;
-	Spatial *root = memnew(Spatial);
+	Node3D *root = memnew(Node3D);
 	for (int mesh_i = 0; mesh_i < n; mesh_i++) {
 		tove::PathRef tove_path = tove_graphics->getPath(mesh_i);
 		Point2 center = compute_center(tove_path);
@@ -43,20 +43,20 @@ Node *EditorSceneImporterSVG::import_scene(const String &p_path, uint32_t p_flag
 		root_path->add_child(path);
 		path->set_owner(root_path);
 		Ref<ArrayMesh> mesh;
-		mesh.instance();
+		mesh.instantiate();
 		Ref<Texture> texture;
 		Ref<Material> renderer_material;
 		renderer->render_mesh(mesh, renderer_material, texture, path, true, true);
-		Transform xform;
+		Transform3D xform;
 		real_t gap = mesh_i * CMP_POINT_IN_PLANE_EPSILON * 16.0f;
-		MeshInstance *mesh_inst = memnew(MeshInstance);
+		MeshInstance3D *mesh_inst = memnew(MeshInstance3D);
 		mesh_inst->translate(Vector3(center.x * 0.001f, -center.y * 0.001f, gap));
 		if (renderer_material.is_null()) {
-			Ref<SpatialMaterial> mat;
-			mat.instance();
-			mat->set_texture(SpatialMaterial::TEXTURE_ALBEDO, texture);
-			mat->set_flag(SpatialMaterial::FLAG_ALBEDO_FROM_VERTEX_COLOR, true);
-			mat->set_cull_mode(SpatialMaterial::CULL_DISABLED);
+			Ref<StandardMaterial3D> mat;
+			mat.instantiate();
+			mat->set_texture(StandardMaterial3D::TEXTURE_ALBEDO, texture);
+			mat->set_flag(StandardMaterial3D::FLAG_ALBEDO_FROM_VERTEX_COLOR, true);
+			mat->set_cull_mode(StandardMaterial3D::CULL_DISABLED);
 			mesh->surface_set_material(0, mat);
 		} else {
 			mesh->surface_set_material(0, renderer_material);
@@ -64,7 +64,7 @@ Node *EditorSceneImporterSVG::import_scene(const String &p_path, uint32_t p_flag
 		mesh_inst->set_mesh(mesh);
 		bounds = bounds.merge(mesh_inst->get_aabb());
 		String name = tove_path->getName();
-		if (!name.empty()) {
+		if (!name.is_empty()) {
 			mesh_inst->set_name(name);
 		}
 		root->add_child(mesh_inst);

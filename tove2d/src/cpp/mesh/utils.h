@@ -121,7 +121,7 @@ inline int find_unequal_forward(
 }
 
 inline int find_unequal_forward(
-	const Vertices &vertices, const TPPLPoly &poly, int start, int n) {
+	const Vertices &vertices, const ToveTPPLPoly &poly, int start, int n) {
 	start = start % n;
 	const auto &s = vertices[poly[start].id];
 	const float x = s.x;

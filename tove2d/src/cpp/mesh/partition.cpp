@@ -13,11 +13,11 @@
 
 BEGIN_TOVE_NAMESPACE
 
-Partition::Partition(const std::list<TPPLPoly> &convex) {
+Partition::Partition(const std::list<ToveTPPLPoly> &convex) {
     parts.reserve(convex.size());
 
     for (auto i = convex.begin(); i != convex.end(); i++) {
-        const TPPLPoly &poly = *i;
+        const ToveTPPLPoly &poly = *i;
         const int n = poly.GetNumPoints();
 
         Part part;

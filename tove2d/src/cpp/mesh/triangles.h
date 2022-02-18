@@ -43,7 +43,7 @@ public:
 
 private:
 	void _add(
-		const std::list<TPPLPoly> &triangles,
+		const std::list<ToveTPPLPoly> &triangles,
 		bool isFinalSize);
 
 	void _add(
@@ -62,13 +62,13 @@ public:
 		}
 	}
 
-	inline TriangleStore(const std::list<TPPLPoly> &triangles) :
+	inline TriangleStore(const std::list<ToveTPPLPoly> &triangles) :
 		mSize(0), mTriangles(nullptr), mMode(TRIANGLES_LIST) {
 
 		_add(triangles, true);
 	}
 
-	inline void add(const std::list<TPPLPoly> &triangles) {
+	inline void add(const std::list<ToveTPPLPoly> &triangles) {
 		assert(mMode == TRIANGLES_LIST);
 		_add(triangles, false);
 	}
@@ -106,7 +106,7 @@ struct Triangulation {
 	inline Triangulation(ToveTrianglesMode mode) : triangles(mode) {
 	}
 
-	inline Triangulation(const std::list<TPPLPoly> &convex) :
+	inline Triangulation(const std::list<ToveTPPLPoly> &convex) :
 		partition(convex),
 		triangles(TRIANGLES_LIST),
 		useCount(0),
@@ -180,7 +180,7 @@ public:
 		return currentTriangulation()->triangles.allocate(n);
 	}
 
-	inline void add(const std::list<TPPLPoly> &triangles) {
+	inline void add(const std::list<ToveTPPLPoly> &triangles) {
 		if (triangulations.empty()) {
 			triangulations.push_back(new Triangulation(TRIANGLES_LIST));
 		}

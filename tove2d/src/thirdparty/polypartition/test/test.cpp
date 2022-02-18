@@ -31,7 +31,7 @@ using namespace std;
 #include "image.h"
 #include "imageio.h"
 
-void ReadPoly(FILE *fp, TPPLPoly *poly) {
+void ReadPoly(FILE *fp, ToveTPPLPoly *poly) {
 	int i,numpoints,hole;
 	float x,y;
 
@@ -48,7 +48,7 @@ void ReadPoly(FILE *fp, TPPLPoly *poly) {
 	}
 }
 
-void ReadPoly(const char *filename, TPPLPoly *poly) {
+void ReadPoly(const char *filename, ToveTPPLPoly *poly) {
 	FILE *fp = fopen(filename,"r");
 	if(!fp) {
 		printf("Error reading file %s\n", filename);
@@ -58,9 +58,9 @@ void ReadPoly(const char *filename, TPPLPoly *poly) {
 	fclose(fp);	
 }
 
-void ReadPolyList(FILE *fp, list<TPPLPoly> *polys) {
+void ReadPolyList(FILE *fp, list<ToveTPPLPoly> *polys) {
 	int i,numpolys;
-	TPPLPoly poly;
+	ToveTPPLPoly poly;
 
 	polys->clear();
 	fscanf(fp,"%d\n",&numpolys);
@@ -70,7 +70,7 @@ void ReadPolyList(FILE *fp, list<TPPLPoly> *polys) {
 	}
 }
 
-void ReadPolyList(const char *filename, list<TPPLPoly> *polys) {
+void ReadPolyList(const char *filename, list<ToveTPPLPoly> *polys) {
 	FILE *fp = fopen(filename,"r");
 	if(!fp) {
 		printf("Error reading file %s\n", filename);
@@ -81,7 +81,7 @@ void ReadPolyList(const char *filename, list<TPPLPoly> *polys) {
 }
 
 
-void WritePoly(FILE *fp, TPPLPoly *poly) {
+void WritePoly(FILE *fp, ToveTPPLPoly *poly) {
 	int i,numpoints;
 	numpoints = poly->GetNumPoints();
 
@@ -98,7 +98,7 @@ void WritePoly(FILE *fp, TPPLPoly *poly) {
 	}
 }
 
-void WritePoly(const char *filename, TPPLPoly *poly) {
+void WritePoly(const char *filename, ToveTPPLPoly *poly) {
 	FILE *fp = fopen(filename,"w");
 	if(!fp) {
 		printf("Error writing file %s\n", filename);
@@ -108,8 +108,8 @@ void WritePoly(const char *filename, TPPLPoly *poly) {
 	fclose(fp);	
 }
 
-void WritePolyList(FILE *fp, list<TPPLPoly> *polys) {
-	list<TPPLPoly>::iterator iter;
+void WritePolyList(FILE *fp, list<ToveTPPLPoly> *polys) {
+	list<ToveTPPLPoly>::iterator iter;
 
 	fprintf(fp,"%ld\n",polys->size());
 
@@ -118,7 +118,7 @@ void WritePolyList(FILE *fp, list<TPPLPoly> *polys) {
 	}
 }
 
-void WritePolyList(const char *filename, list<TPPLPoly> *polys) {
+void WritePolyList(const char *filename, list<ToveTPPLPoly> *polys) {
 	FILE *fp = fopen(filename,"w");
 	if(!fp) {
 		printf("Error writing file %s\n", filename);
@@ -128,7 +128,7 @@ void WritePolyList(const char *filename, list<TPPLPoly> *polys) {
 	fclose(fp);	
 }
 
-void DrawPoly(Image *img, TPPLPoly *poly, tppl_float xmin, tppl_float xmax, tppl_float ymin, tppl_float ymax) {
+void DrawPoly(Image *img, ToveTPPLPoly *poly, tppl_float xmin, tppl_float xmax, tppl_float ymin, tppl_float ymax) {
 	TPPLPoint p1,p2,p1img,p2img,polymin,imgmin;
 	long i;
 	Image::Pixel color={0,0,0};
@@ -162,7 +162,7 @@ void DrawPoly(Image *img, TPPLPoly *poly, tppl_float xmin, tppl_float xmax, tppl
 	}
 }
 
-void DrawPoly(const char *filename, TPPLPoly *poly) {
+void DrawPoly(const char *filename, ToveTPPLPoly *poly) {
 	Image img(500,500);
 	Image::Pixel white={255,255,255};
 	img.Clear(white);
@@ -184,13 +184,13 @@ void DrawPoly(const char *filename, TPPLPoly *poly) {
 	io.SaveImage(filename,&img);
 }
 
-void DrawPolyList(const char *filename, list<TPPLPoly> *polys) {
+void DrawPolyList(const char *filename, list<ToveTPPLPoly> *polys) {
 	Image img(500,500);
 	Image::Pixel white={255,255,255};
 	img.Clear(white);
 
 	ImageIO io;
-	list<TPPLPoly>::iterator iter;
+	list<ToveTPPLPoly>::iterator iter;
 
 	tppl_float xmin = std::numeric_limits<tppl_float>::max();
 	tppl_float xmax = std::numeric_limits<tppl_float>::min();
@@ -216,7 +216,7 @@ void DrawPolyList(const char *filename, list<TPPLPoly> *polys) {
 	io.SaveImage(filename,&img);
 }
 
-bool ComparePoly(TPPLPoly *p1, TPPLPoly *p2) {
+bool ComparePoly(ToveTPPLPoly *p1, ToveTPPLPoly *p2) {
 	long i,n = p1->GetNumPoints();
 	if(n!=p2->GetNumPoints()) return false;
 	for(i=0;i<n;i++) {
@@ -225,8 +225,8 @@ bool ComparePoly(TPPLPoly *p1, TPPLPoly *p2) {
 	return true;
 }
 
-bool ComparePoly(list<TPPLPoly> *polys1, list<TPPLPoly> *polys2) {
-	list<TPPLPoly>::iterator iter1, iter2;
+bool ComparePoly(list<ToveTPPLPoly> *polys1, list<ToveTPPLPoly> *polys2) {
+	list<ToveTPPLPoly>::iterator iter1, iter2;
 	long i,n = (long)polys1->size();
 	if(n!=(signed)polys2->size()) return false;
 	iter1 = polys1->begin();
@@ -243,7 +243,7 @@ bool ComparePoly(list<TPPLPoly> *polys1, list<TPPLPoly> *polys2) {
 void GenerateTestData() {
 	TPPLPartition pp;
 	
-	list<TPPLPoly> testpolys,result,expectedResult;
+	list<ToveTPPLPoly> testpolys,result,expectedResult;
 
 	ReadPolyList("test_input.txt",&testpolys);
 
@@ -283,7 +283,7 @@ void GenerateTestData() {
 
 int main() {
 	TPPLPartition pp;
-	list<TPPLPoly> testpolys,result;
+	list<ToveTPPLPoly> testpolys,result;
 
 	ReadPolyList("failing_mono_clean - copy.txt",&testpolys);
 	DrawPolyList("test.bmp", &testpolys);
@@ -296,7 +296,7 @@ int main() {
 {
 	TPPLPartition pp;
 	
-	list<TPPLPoly> testpolys,result,expectedResult;
+	list<ToveTPPLPoly> testpolys,result,expectedResult;
 
 	ReadPolyList("test_input.txt",&testpolys);
 

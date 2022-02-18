@@ -16,26 +16,23 @@ void VGGradient::_bind_methods() {
 
 VGGradient::VGGradient() {
 	Ref<Gradient> g;
-	g.instance();
+	g.instantiate();
 	set_color_ramp(g);
 }
 
 void VGGradient::_gradient_changed() {
-	_change_notify("color");
 }
 
 void VGGradient::set_color_ramp(const Ref<Gradient> &p_color_ramp) {
 	if (color_ramp.is_valid()) {
-		color_ramp->disconnect(CoreStringNames::get_singleton()->changed, this, "_gradient_changed");
+		color_ramp->disconnect(SNAME("_gradient_changed"), callable_mp(this, &VGGradient::_gradient_changed));
 	}
 
 	color_ramp = p_color_ramp;
 
 	if (color_ramp.is_valid()) {
-		color_ramp->connect(CoreStringNames::get_singleton()->changed, this, "_gradient_changed");
+		color_ramp->connect(SNAME("_gradient_changed"), callable_mp(this, &VGGradient::_gradient_changed));
 	}
-
-	_change_notify("color");
 }
 
 Ref<Gradient> VGGradient::get_color_ramp() const {

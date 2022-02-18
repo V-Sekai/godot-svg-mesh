@@ -79,7 +79,7 @@ struct TPPLPoint {
 
 
 //Polygon implemented as an array of points with a 'hole' flag
-class TPPLPoly {
+class ToveTPPLPoly {
     protected:
         
         TPPLPoint *points;
@@ -89,11 +89,11 @@ class TPPLPoly {
     public:
         
         //constructors/destructors
-        TPPLPoly();
-        ~TPPLPoly();
+        ToveTPPLPoly();
+        ~ToveTPPLPoly();
         
-        TPPLPoly(const TPPLPoly &src);
-        TPPLPoly& operator=(const TPPLPoly &src);
+        ToveTPPLPoly(const ToveTPPLPoly &src);
+        ToveTPPLPoly& operator=(const ToveTPPLPoly &src);
         
         //getters and setters
         long GetNumPoints() const {
@@ -164,12 +164,12 @@ class TPPLPoly {
 };
 
 #ifdef TPPL_ALLOCATOR
-typedef std::list<TPPLPoly, TPPL_ALLOCATOR(TPPLPoly)> TPPLPolyList;
+typedef std::list<ToveTPPLPoly, TPPL_ALLOCATOR(ToveTPPLPoly)> TPPLPolyList;
 #else
-typedef std::list<TPPLPoly> TPPLPolyList;
+typedef std::list<ToveTPPLPoly> TPPLPolyList;
 #endif
 
-class TPPLPartition {
+class ToveTPPLPartition {
     protected:
         struct PartitionVertex {
             bool isActive;
@@ -263,7 +263,7 @@ class TPPLPartition {
             std::set<ScanLineEdge> *edgeTree, long *helpers);
         
         //triangulates a monotone polygon, used in Triangulate_MONO
-        int TriangulateMonotone(TPPLPoly *inPoly, TPPLPolyList *triangles);
+        int TriangulateMonotone(ToveTPPLPoly *inPoly, TPPLPolyList *triangles);
         
     public:
         
@@ -287,7 +287,7 @@ class TPPLPartition {
         //          vertices have to be in counter-clockwise order
         //   triangles : a list of triangles (result)
         //returns 1 on success, 0 on failure
-        int Triangulate_EC(TPPLPoly *poly, TPPLPolyList *triangles);
+        int Triangulate_EC(ToveTPPLPoly *poly, TPPLPolyList *triangles);
         
         //triangulates a list of polygons that may contain holes by ear clipping algorithm
         //first calls RemoveHoles to get rid of the holes, and then Triangulate_EC for each resulting polygon
@@ -309,7 +309,7 @@ class TPPLPartition {
         //          vertices have to be in counter-clockwise order
         //   triangles : a list of triangles (result)
         //returns 1 on success, 0 on failure
-        int Triangulate_OPT(TPPLPoly *poly, TPPLPolyList *triangles);
+        int Triangulate_OPT(ToveTPPLPoly *poly, TPPLPolyList *triangles);
         
         //triangulates a polygons by firstly partitioning it into monotone polygons
         //time complexity: O(n*log(n)), n is the number of vertices
@@ -319,7 +319,7 @@ class TPPLPartition {
         //          vertices have to be in counter-clockwise order
         //   triangles : a list of triangles (result)
         //returns 1 on success, 0 on failure
-        int Triangulate_MONO(TPPLPoly *poly, TPPLPolyList *triangles);
+        int Triangulate_MONO(ToveTPPLPoly *poly, TPPLPolyList *triangles);
         
         //triangulates a list of polygons by firstly partitioning them into monotone polygons
         //time complexity: O(n*log(n)), n is the number of vertices
@@ -354,7 +354,7 @@ class TPPLPartition {
         //          vertices have to be in counter-clockwise order
         //   parts : resulting list of convex polygons
         //returns 1 on success, 0 on failure
-        int ConvexPartition_HM(TPPLPoly *poly, TPPLPolyList *parts);
+        int ConvexPartition_HM(ToveTPPLPoly *poly, TPPLPolyList *parts);
         
         //partitions a list of polygons into convex parts by using Hertel-Mehlhorn algorithm
         //the algorithm gives at most four times the number of parts as the optimal algorithm
@@ -379,7 +379,7 @@ class TPPLPartition {
         //          vertices have to be in counter-clockwise order
         //   parts : resulting list of convex polygons
         //returns 1 on success, 0 on failure
-        int ConvexPartition_OPT(TPPLPoly *poly, TPPLPolyList *parts);
+        int ConvexPartition_OPT(ToveTPPLPoly *poly, TPPLPolyList *parts);
 };
 
 

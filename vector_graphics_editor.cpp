@@ -245,7 +245,7 @@ public:
 	virtual bool forward_gui_input(const Ref<InputEvent> &p_event) {
 		Ref<InputEventMouseButton> mb = p_event;
 		if (mb.is_valid()) {
-			if (mb->get_button_index() == BUTTON_LEFT && mb->is_pressed()) {
+			if (mb->get_button_index() == MouseButton::LEFT && mb->is_pressed()) {
 				const CanvasItem *pi = path->get_parent_item();
 				const Transform2D xform = canvas_item_editor->get_canvas_transform() * (pi ? pi->get_global_transform() : Transform2D());
 
@@ -315,7 +315,7 @@ public:
 					clicked = WIDGET_ROTATE;
 					return true;
 				}
-			} else if (mb->get_button_index() == BUTTON_LEFT && clicked != WIDGET_NONE) {
+			} else if (mb->get_button_index() == MouseButton::LEFT && clicked != WIDGET_NONE) {
 				if (clicked != WIDGET_NONE) {
 					if (clicked != WIDGET_ROTATE) {
 						undo_redo->create_action(TTR("Transform Path"));
@@ -340,12 +340,12 @@ public:
 
 		Ref<InputEventMouseMotion> mm = p_event;
 
-		if (clicked == WIDGET_NONE && path && mm.is_valid() && (mm->get_button_mask() & BUTTON_MASK_LEFT)) {
+		if (clicked == WIDGET_NONE && path && mm.is_valid() && (mm->get_button_mask() & MouseButton::MASK_LEFT) != MouseButton::NONE) {
 			return false;
 		}
 
 		if (clicked != WIDGET_NONE && path && mm.is_valid()) {
-			if (mm->get_button_mask() & BUTTON_MASK_LEFT) {
+			if ((mm->get_button_mask() & MouseButton::MASK_LEFT) != MouseButton::NONE) {
 				Vector2 g = mm->get_position();
 
 				const CanvasItem *pi = path->get_parent_item();
@@ -401,7 +401,7 @@ public:
 
 	virtual void forward_canvas_draw_over_viewport(Control *p_overlay) {
 		Transform2D xform = canvas_item_editor->get_canvas_transform() * path->get_global_transform();
-		const Ref<Texture> handle = vg_editor->get_icon("EditorHandle", "EditorIcons");
+		const Ref<Texture2D> handle = vg_editor->get_theme_icon("EditorHandle", "EditorIcons");
 		Control *vpc = canvas_item_editor->get_viewport_control();
 
 		Pos4 p;
@@ -445,7 +445,7 @@ public:
 	virtual bool forward_gui_input(const Ref<InputEvent> &p_event) {
 		Ref<InputEventMouseButton> mb = p_event;
 		if (mb.is_valid()) {
-			if (mb->get_button_index() == BUTTON_LEFT) {
+			if (mb->get_button_index() == MouseButton::LEFT) {
 				if (mb->is_pressed() && path == NULL) {
 					path = memnew(VGPath);
 					root->add_child(path);
@@ -493,23 +493,16 @@ public:
 		Ref<InputEventMouseMotion> mm = p_event;
 
 		if (path && mm.is_valid()) {
-			if (mm->get_button_mask() & BUTTON_MASK_LEFT) {
-				// Vector2 gpoint = mm->get_position();
+			if ((mm->get_button_mask() & MouseButton::MASK_LEFT) != MouseButton::NONE) {
 				Vector2 point1 = global_to_local(root, mm->get_position());
 
 				Vector2 center = (point0 + point1) / 2;
 				Vector2 radius = (point1 - center).abs();
-				// float tx, ty = cx, cy
 
 				tove::SubpathRef tove_subpath = std::make_shared<tove::Subpath>();
 				tove_subpath->drawEllipse(0, 0, radius.x, radius.y);
-				// tove_path->getSubpath(0)->set(tove_subpath);
-
 				path->set_points(0, subpath_points_array(tove_subpath));
 				path->set_position(center);
-
-				// const float *bounds = path->get_tove_path()->getBounds();
-				// printf("%f %f\n", bounds[0], bounds[1]);
 			}
 
 			return true;
@@ -662,12 +655,11 @@ public:
 
 	virtual bool forward_gui_input(const Ref<InputEvent> &p_event) {
 		Ref<InputEventMouseButton> mb = p_event;
-
+		Ref<InputEventWithModifiers> event_with_mod = p_event;
 		if (mb.is_valid()) {
-
 			Transform2D xform = canvas_item_editor->get_canvas_transform() * node_vg->get_global_transform();
 
-			if (mb->get_button_index() == BUTTON_LEFT && mb->is_pressed() && mb->is_doubleclick()) {
+			if (mb->get_button_index() == MouseButton::LEFT && mb->is_pressed() && mb->is_double_click()) {
 				Point2 p = xform.affine_inverse().xform(mb->get_position());
 				VGPath *clicked = node_vg->find_clicked_child(p);
 				if (clicked) {
@@ -677,109 +669,94 @@ public:
 			}
 
 			Vector2 gpoint = mb->get_position();
-			// Vector2 cpoint = node_vg->get_global_transform().affine_inverse().xform(canvas_item_editor->snap_point(canvas_item_editor->get_canvas_transform().affine_inverse().xform(mb->get_position())));
+			if (mb->get_button_index() == MouseButton::LEFT) {
 
-			if (true) {
+				if (mb->is_pressed()) {
 
-				if (mb->get_button_index() == BUTTON_LEFT) {
+					const PosVertex closest = closest_point(gpoint, true);
+					const SubpathPos insert = closest.valid() ? SubpathPos() : closest_subpath_point(gpoint);
 
-					if (mb->is_pressed()) {
+					edited_point = PosVertex();
+					edited_path = SubpathId();
+					hover_point = Vertex();
+					if (event_with_mod.is_valid()) {
+						aligned_move = !event_with_mod->is_alt_pressed();
+					}
 
-						const PosVertex closest = closest_point(gpoint, true);
-						const SubpathPos insert = closest.valid() ? SubpathPos() : closest_subpath_point(gpoint);
+					if (insert.valid()) {
 
-						edited_point = PosVertex();
-						edited_path = SubpathId();
-						hover_point = Vertex();
-						aligned_move = !mb->get_alt();
+						pre_move_edit = _get_points(insert);
+						mb_down_time = OS::get_singleton()->get_ticks_msec();
+						mb_down_where = gpoint;
+						mb_down_at = insert;
 
-						if (insert.valid()) {
+						return true;
+					} else if (closest.valid()) {
 
-							pre_move_edit = _get_points(insert);
-							mb_down_time = OS::get_singleton()->get_ticks_msec();
-							mb_down_where = gpoint;
-							mb_down_at = insert;
-
-							return true;
-						} else if (closest.valid()) {
-
-							pre_move_edit = _get_points(closest);
-							edited_point = PosVertex(closest, xform.affine_inverse().xform(closest.pos));
-							edited_path = edited_point;
-							mb_down_time = 0;
-							if (!is_control_point(closest.pt)) {
-								selected_point = closest;
-							}
-							canvas_item_editor->get_viewport_control()->update();
-							return true;
-						} else {
-
-							if (selected_point.valid()) {
-								selected_point = Vertex();
-								canvas_item_editor->get_viewport_control()->update();
-							}
-
-							return false;
-						}
-					} else {
-						const bool clicked = !edited_path.valid() && mb_down_time > 0 &&
-											 OS::get_singleton()->get_ticks_msec() - mb_down_time < 500;
+						pre_move_edit = _get_points(closest);
+						edited_point = PosVertex(closest, xform.affine_inverse().xform(closest.pos));
+						edited_path = edited_point;
 						mb_down_time = 0;
-						edited_point = PosVertex();
-
-						if (clicked) {
-							undo_redo->create_action(TTR("Insert Curve"));
-
-							const SubpathPos insert = mb_down_at;
-							undo_redo->add_do_method(node_vg, "insert_curve",
-									insert.subpath, insert.t);
-							undo_redo->add_undo_method(node_vg, "set_points",
-									insert.subpath, pre_move_edit);
-
-							_commit_action();
-
-							selected_point = Vertex(insert.subpath, 3 * (1 + int(Math::floor(insert.t))));
-							return true;
-						} else if (edited_path.valid()) {
-
-							undo_redo->create_action(TTR("Edit Path"));
-
-							undo_redo->add_do_method(node_vg, "set_points",
-									edited_path.subpath, _get_points(edited_path));
-							undo_redo->add_undo_method(node_vg, "set_points",
-									edited_path.subpath, pre_move_edit);
-
-							edited_path = SubpathId();
-							_commit_action();
-
-							return true;
+						if (!is_control_point(closest.pt)) {
+							selected_point = closest;
 						}
+						canvas_item_editor->get_viewport_control()->update();
+						return true;
+					} else {
+
+						if (selected_point.valid()) {
+							selected_point = Vertex();
+							canvas_item_editor->get_viewport_control()->update();
+						}
+
+						return false;
 					}
-				} else if (mb->get_button_index() == BUTTON_RIGHT && mb->is_pressed() && !edited_point.valid()) {
+				} else {
+					const bool clicked = !edited_path.valid() && mb_down_time > 0 &&
+										 OS::get_singleton()->get_ticks_msec() - mb_down_time < 500;
+					mb_down_time = 0;
+					edited_point = PosVertex();
 
-					const PosVertex closest = closest_point(gpoint);
+					if (clicked) {
+						undo_redo->create_action(TTR("Insert Curve"));
 
-					if (closest.valid()) {
+						const SubpathPos insert = mb_down_at;
+						undo_redo->add_do_method(node_vg, "insert_curve",
+								insert.subpath, insert.t);
+						undo_redo->add_undo_method(node_vg, "set_points",
+								insert.subpath, pre_move_edit);
 
-						remove_point(closest);
+						_commit_action();
+
+						selected_point = Vertex(insert.subpath, 3 * (1 + int(Math::floor(insert.t))));
+						return true;
+					} else if (edited_path.valid()) {
+
+						undo_redo->create_action(TTR("Edit Path"));
+
+						undo_redo->add_do_method(node_vg, "set_points",
+								edited_path.subpath, _get_points(edited_path));
+						undo_redo->add_undo_method(node_vg, "set_points",
+								edited_path.subpath, pre_move_edit);
+
+						edited_path = SubpathId();
+						_commit_action();
+
 						return true;
 					}
 				}
-			} /*else if (mode == MODE_DELETE) {
+			} else if (mb->get_button_index() == MouseButton::LEFT && mb->is_pressed() && !edited_point.valid()) {
 
-				if (mb->get_button_index() == BUTTON_LEFT && mb->is_pressed()) {
+				const PosVertex closest = closest_point(gpoint);
 
-					const PosVertex closest = closest_point(gpoint);
+				if (closest.valid()) {
 
-					if (closest.valid()) {
-
-						remove_point(closest);
-						return true;
-					}
+					remove_point(closest);
+					return true;
 				}
-			}*/
+			}
 
-			if (mb->get_button_index() == BUTTON_LEFT && mb->is_pressed()) {
+			if (mb->get_button_index() == MouseButton::LEFT && mb->is_pressed()) {
 
 				return true;
 			}
@@ -791,7 +768,7 @@ public:
 
 			Vector2 gpoint = mm->get_position();
 
-			if (mm->get_button_mask() & BUTTON_MASK_LEFT) {
+			if ((mm->get_button_mask() & MouseButton::MASK_LEFT) != MouseButton::NONE) {
 				if (mb_down_time > 0 && gpoint.distance_to(mb_down_where) > 2) {
 					edited_path = mb_down_at;
 					mb_down_time = 0;
@@ -799,7 +776,6 @@ public:
 
 				if (edited_point.valid()) {
 					Vector2 cpoint = _get_node()->get_global_transform().affine_inverse().xform(canvas_item_editor->snap_point(canvas_item_editor->get_canvas_transform().affine_inverse().xform(gpoint)));
-					// cpoint = node_vg->get_vg_transform().affine_inverse().xform(cpoint);
 					edited_point = PosVertex(edited_point, cpoint);
 
 					tove::SubpathRef subpath = node_vg->get_subpath(edited_point.subpath);
@@ -831,7 +807,7 @@ public:
 
 		if (k.is_valid() && k->is_pressed()) {
 
-			if (k->get_scancode() == KEY_DELETE || k->get_scancode() == KEY_BACKSPACE) {
+			if (k->get_keycode() == Key::KEY_DELETE || k->get_keycode() == Key::BACKSPACE) {
 
 				const Vertex active_point = get_active_point();
 
@@ -850,7 +826,7 @@ public:
 		Control *vpc = canvas_item_editor->get_viewport_control();
 		Transform2D xform = canvas_item_editor->get_canvas_transform() *
 							_get_node()->get_global_transform();
-		const Ref<Texture> handle = vg_editor->get_icon("EditorHandle", "EditorIcons");
+		const Ref<Texture2D> handle = vg_editor->get_theme_icon("EditorHandle", "EditorIcons");
 
 		const tove::PathRef path = node_vg->get_tove_path();
 
@@ -908,13 +884,7 @@ Node2D *VGEditor::_get_node() const {
 }
 
 void VGEditor::_set_node(Node *p_node_vg) {
-	if (node_vg) {
-		node_vg->remove_change_receptor(this);
-	}
 	node_vg = Object::cast_to<VGPath>(p_node_vg);
-	if (node_vg) {
-		node_vg->add_change_receptor(this);
-	}
 	if (!node_vg) {
 		tool = Ref<VGTool>();
 	}
@@ -1111,15 +1081,15 @@ void VGEditor::_notification(int p_what) {
 
 		case NOTIFICATION_READY: {
 
-			tool_buttons[0]->set_icon(EditorNode::get_singleton()->get_gui_base()->get_icon("ToolSelect", "EditorIcons"));
-			tool_buttons[1]->set_icon(EditorNode::get_singleton()->get_gui_base()->get_icon("EditBezier", "EditorIcons"));
-			// tool_buttons[2]->set_icon(EditorNode::get_singleton()->get_gui_base()->get_icon("SphereShape", "EditorIcons"));
+			tool_buttons[0]->set_icon(EditorNode::get_singleton()->get_gui_base()->get_theme_icon("ToolSelect", "EditorIcons"));
+			tool_buttons[1]->set_icon(EditorNode::get_singleton()->get_gui_base()->get_theme_icon("EditBezier", "EditorIcons"));
+			// tool_buttons[2]->set_icon(EditorNode::get_singleton()->get_gui_base()->get_theme_icon("SphereShape", "EditorIcons"));
 
-			button_bake->set_icon(EditorNode::get_singleton()->get_gui_base()->get_icon("MeshInstance2D", "EditorIcons"));
+			button_bake->set_icon(EditorNode::get_singleton()->get_gui_base()->get_theme_icon("MeshInstance2D", "EditorIcons"));
 
-			get_tree()->connect("node_removed", this, "_node_removed");
+			get_tree()->connect("node_removed", callable_mp(this, &VGEditor::_node_removed));
 
-			create_resource->connect("confirmed", this, "_create_resource");
+			create_resource->connect("confirmed", callable_mp(this, &VGEditor::_create_resource));
 
 		} break;
 		case NOTIFICATION_PHYSICS_PROCESS: {
@@ -1142,7 +1112,7 @@ bool VGEditor::forward_gui_input(const Ref<InputEvent> &p_event) {
 
 	if (tool_buttons[TOOL_TRANSFORM]->is_pressed()) {
 		Ref<InputEventMouseButton> mb = p_event;
-		if (mb.is_valid() && mb->get_button_index() == BUTTON_LEFT && mb->is_pressed() && mb->is_doubleclick()) {
+		if (mb.is_valid() && mb->get_button_index() == MouseButton::LEFT && mb->is_pressed() && mb->is_double_click()) {
 			_tool_selected(TOOL_CURVE);
 		}
 	}
@@ -1158,11 +1128,11 @@ bool VGEditor::forward_gui_input(const Ref<InputEvent> &p_event) {
 
 	if (!_has_resource()) {
 
-		if (mb.is_valid() && mb->get_button_index() == 1 && mb->is_pressed()) {
+		if (mb.is_valid() && mb->get_button_index() == MouseButton::LEFT && mb->is_pressed()) {
 			create_resource->set_text(String("No vector graphics resource on this node.\nCreate and assign one?"));
-			create_resource->popup_centered_minsize();
+			create_resource->popup_centered();
 		}
-		return (mb.is_valid() && mb->get_button_index() == 1);
+		return (mb.is_valid() && mb->get_button_index() == MouseButton::LEFT);
 	}
 
 	return false;
@@ -1312,12 +1282,12 @@ void VGEditor::forward_canvas_draw_over_viewport(Control *p_overlay) {
 	Control *vpc = canvas_item_editor->get_viewport_control();
 	/* Transform2D xform = canvas_item_editor->get_canvas_transform() *
 		_get_node()->get_global_transform(); */
-	const Ref<Texture> handle = get_icon("EditorHandle", "EditorIcons");
+	const Ref<Texture2D> handle = get_theme_icon("EditorHandle", "EditorIcons");
 
 	_update_overlay();
 	if (overlay.is_valid()) {
 		vpc->draw_set_transform_matrix(overlay_draw_xform);
-		vpc->draw_mesh(overlay, Ref<Texture>(), Ref<Texture>());
+		vpc->draw_mesh(overlay, Ref<Texture>(), Transform2D());
 		vpc->draw_set_transform_matrix(Transform2D());
 	}
 
@@ -1571,9 +1541,9 @@ VGEditor::VGEditor(EditorNode *p_editor) {
 
 	const int n_tools = 3;
 	for (int i = 0; i < n_tools; i++) {
-		ToolButton *button = memnew(ToolButton);
+		Button *button = memnew(Button);
 		add_child(button);
-		button->connect("pressed", this, "_tool_selected", varray(i));
+		button->connect("pressed", callable_mp(this, &VGEditor::_tool_selected), varray(i));
 		button->set_toggle_mode(true);
 		button->set_pressed(i == 0);
 		tool_buttons.push_back(button);
@@ -1583,13 +1553,13 @@ VGEditor::VGEditor(EditorNode *p_editor) {
 	sep->set_h_size_flags(SIZE_EXPAND_FILL);
 	add_child(sep);
 
-	button_bake = memnew(ToolButton);
+	button_bake = memnew(Button);
 	add_child(button_bake);
-	button_bake->connect("pressed", this, "_create_mesh_node");
+	button_bake->connect("pressed", callable_mp(this, &VGEditor::_create_mesh_node));
 	button_bake->set_tooltip(TTR("Bake into mesh"));
 
 	create_resource = memnew(ConfirmationDialog);
 	add_child(create_resource);
-	create_resource->get_ok()->set_text(TTR("Create"));
+	create_resource->get_ok_button()->set_text(TTR("Create"));
 }
 #endif

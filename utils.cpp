@@ -3,7 +3,7 @@
 /*************************************************************************/
 
 #include "utils.h"
-#include "core/string_builder.h"
+#include "core/string/string_builder.h"
 #include "scene/resources/surface_tool.h"
 
 #include "tove2d/src/cpp/mesh/mesh.h"
@@ -38,50 +38,41 @@ Ref<ShaderMaterial> copy_mesh(
 	const int stride = isPaintMesh ? sizeof(float) * 3 : sizeof(float) * 2 + 4;
 	const int size = n * stride;
 
-	PoolVector<uint8_t> vvertices;
-	ERR_FAIL_COND_V(vvertices.resize(size) != OK, Ref<ShaderMaterial>());
-	PoolVector<uint8_t>::Write wvertices = vvertices.write();
-	uint8_t *vertices = wvertices.ptr();
-	p_tove_mesh->copyVertexData(vertices, size);
+	Vector<uint8_t> vvertices;
+	p_tove_mesh->copyVertexData(vvertices.ptrw(), size);
 
 	const int index_count = p_tove_mesh->getIndexCount();
-	PoolVector<ToveVertexIndex> vindices;
-	ERR_FAIL_COND_V(vindices.resize(index_count) != OK, Ref<ShaderMaterial>());
-	PoolVector<ToveVertexIndex>::Write windices = vindices.write();
-	ToveVertexIndex *indices = windices.ptr();
-	p_tove_mesh->copyIndexData(indices, index_count);
+	Vector<ToveVertexIndex> vindices;
+	p_tove_mesh->copyIndexData(vindices.ptrw(), index_count);
 
-	PoolVector<int> iarr;
+	Vector<int> iarr;
 	ERR_FAIL_COND_V(iarr.resize(index_count) != OK, Ref<ShaderMaterial>());
 	{
-		PoolVector<int>::Write w = iarr.write();
 		for (int i = 0; i < index_count; i++) {
-			w[i] = indices[i];
+			iarr.write[i] = vindices[i];
 		}
 	}
 
-	PoolVector<Vector3> varr;
+	Vector<Vector3> varr;
 	ERR_FAIL_COND_V(varr.resize(n) != OK, Ref<ShaderMaterial>());
 
 	{
-		PoolVector<Vector3>::Write w = varr.write();
 		for (int i = 0; i < n; i++) {
-			float *p = (float *)(vertices + i * stride);
-			w[i] = Vector3(p[0], p[1], 0) * Vector3(0.001, -0.001, 0.001);
+			float *p = (float *)(vvertices.ptrw() + i * stride);
+			varr.write[i] = Vector3(p[0], p[1], 0) * Vector3(0.001, -0.001, 0.001);
 		}
 	}
 
-	PoolVector<Color> carr;
+	Vector<Color> carr;
 	if (!isPaintMesh) {
 		ERR_FAIL_COND_V(carr.resize(n) != OK, Ref<ShaderMaterial>());
-		PoolVector<Color>::Write w = carr.write();
 		for (int i = 0; i < n; i++) {
-			uint8_t *p = vertices + i * stride + 2 * sizeof(float);
-			w[i] = Color(p[0] / 255.0, p[1] / 255.0, p[2] / 255.0, p[3] / 255.0).to_linear();
+			uint8_t *p = vvertices.ptrw() + i * stride + 2 * sizeof(float);
+			carr.write[i] = Color(p[0] / 255.0, p[1] / 255.0, p[2] / 255.0, p[3] / 255.0).to_linear();
 		}
 	}
 
-	PoolVector<Vector2> uvs;
+	Vector<Vector2> uvs;
 	Ref<Material> material;
 
 	if (isPaintMesh) {
@@ -90,32 +81,29 @@ Ref<ShaderMaterial> copy_mesh(
 		const int matrix_rows = 3;
 		const int npaints = alloc.numPaints;
 
-		PoolVector<float> matrix_data;
+		Vector<float> matrix_data;
 		ERR_FAIL_COND_V(matrix_data.resize(alloc.numPaints * 3 * matrix_rows) != OK, Ref<ShaderMaterial>());
-		PoolVector<float>::Write matrix_data_write = matrix_data.write();
 		for (int i = 0; i < alloc.numPaints * 3 * matrix_rows; i++) {
-			matrix_data_write[i] = 0.0f;
+			matrix_data.write[i] = 0.0f;
 		}
 
-		PoolVector<float> arguments_data;
+		Vector<float> arguments_data;
 		ERR_FAIL_COND_V(arguments_data.resize(alloc.numPaints) != OK, Ref<ShaderMaterial>());
-		PoolVector<float>::Write arguments_data_write = arguments_data.write();
 		for (int i = 0; i < alloc.numPaints; i++) {
-			arguments_data_write[i] = 0.0f;
+			arguments_data.write[i] = 0.0f;
 		}
 
-		PoolVector<uint8_t> pixels;
+		Vector<uint8_t> pixels;
 		ERR_FAIL_COND_V(pixels.resize(npaints * 4 * alloc.numColors) != OK, Ref<ShaderMaterial>());
 
 		ToveGradientData gradientData;
 
-		PoolVector<uint8_t>::Write pixels_write = pixels.write();
-		memset(pixels_write.ptr(), 0, npaints * 4 * alloc.numColors);
+		memset(pixels.ptrw(), 0, npaints * 4 * alloc.numColors);
 
-		gradientData.matrix = matrix_data_write.ptr();
+		gradientData.matrix = matrix_data.ptrw();
 		gradientData.matrixRows = matrix_rows;
-		gradientData.arguments = arguments_data_write.ptr();
-		gradientData.colorsTexture = pixels_write.ptr();
+		gradientData.arguments = arguments_data.ptrw();
+		gradientData.colorsTexture = pixels.ptrw();
 		gradientData.colorsTextureRowBytes = npaints * 4;
 		gradientData.colorsTextureHeight = alloc.numColors;
 
@@ -129,11 +117,10 @@ Ref<ShaderMaterial> copy_mesh(
 
 		ERR_FAIL_COND_V(uvs.resize(n) != OK, Ref<ShaderMaterial>());
 		{
-			PoolVector<Vector2>::Write w = uvs.write();
 			for (int i = 0; i < n; i++) {
-				const float *p = (float *)(vertices + i * stride);
+				const float *p = (float *)(vvertices.ptrw() + i * stride);
 				int paint_index = p[2];
-				w[i] = Vector2((paint_index + 0.5f) / npaints, 0.0f);
+				uvs.write[i] = Vector2((paint_index + 0.5f) / npaints, 0.0f);
 				paint_seen.write[paint_index] = 1;
 			}
 		}
@@ -146,11 +133,11 @@ Ref<ShaderMaterial> copy_mesh(
 				pixels));
 
 		Ref<ImageTexture> texture = Ref<ImageTexture>(memnew(ImageTexture));
-		texture->create_from_image(image, ImageTexture::FLAG_FILTER);
+		texture->create_from_image(image);
 		r_texture = texture;
 
 		Ref<Shader> shader;
-		shader.instance();
+		shader.instantiate();
 
 		StringBuilder code;
 		String s;
@@ -165,7 +152,7 @@ Ref<ShaderMaterial> copy_mesh(
 			code += s;
 			code += "){";
 
-			const float &v = arguments_data_write[paint_i];
+			const float &v = arguments_data.write[paint_i];
 			code += "a=";
 			s = String::num_real(v);
 			if (!s.is_numeric()) {
@@ -186,7 +173,7 @@ Ref<ShaderMaterial> copy_mesh(
 					if (k > 0) {
 						code += ",";
 					}
-					float elem = matrix_data_write[j0 + j + k * 3];
+					float elem = matrix_data[j0 + j + k * 3];
 					if (!Math::is_nan(elem)) {
 						s = String::num_real(elem);
 					} else {
@@ -237,12 +224,12 @@ void fragment()
 					String npaints_str = String::num_real(npaints);
 			String cstep_str = String::num_real(0.5f / alloc.numColors);
 
-			shader_code = shader_code.replace("NPAINTS", npaints_str.c_str());
-			shader_code = shader_code.replace("CSTEP", cstep_str.c_str());
+			shader_code = shader_code.replace("NPAINTS", npaints_str.utf8().get_data());
+			shader_code = shader_code.replace("CSTEP", cstep_str.utf8().get_data());
 			shader->set_code(shader_code);
 
 			Ref<ShaderMaterial> shader_material;
-			shader_material.instance();
+			shader_material.instantiate();
 			shader_material->set_shader(shader);
 			material = shader_material;
 		} else {
@@ -284,12 +271,12 @@ void fragment()
 					String npaints_str = String::num_real(npaints);
 			String cstep_str = String::num_real(0.5f / alloc.numColors);
 
-			shader_code = shader_code.replace("NPAINTS", npaints_str.c_str());
-			shader_code = shader_code.replace("CSTEP", cstep_str.c_str());
+			shader_code = shader_code.replace("NPAINTS", npaints_str.utf8().get_data());
+			shader_code = shader_code.replace("CSTEP", cstep_str.utf8().get_data());
 			shader->set_code(shader_code);
 
 			Ref<ShaderMaterial> mat;
-			mat.instance();
+			mat.instantiate();
 			mat->set_shader_param("tex", texture);
 			mat->set_shader(shader);
 			material = mat;
@@ -304,11 +291,11 @@ void fragment()
 		arr[Mesh::ARRAY_COLOR] = carr;
 	}
 	if (uvs.size() > 0) {
-		arr[VS::ARRAY_TEX_UV] = uvs;
+		arr[RS::ARRAY_TEX_UV] = uvs;
 	}
 
 	Ref<SurfaceTool> surface_tool;
-	surface_tool.instance();
+	surface_tool.instantiate();
 	surface_tool->create_from_triangle_arrays(arr);
 	surface_tool->index();
 	surface_tool->generate_normals();

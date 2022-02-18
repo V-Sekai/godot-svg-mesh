@@ -3,9 +3,9 @@
 /*************************************************************************/
 
 #include "vector_graphics_path.h"
-#include "core/os/file_access.h"
+#include "core/io/file_access.h"
 #include "editor/editor_node.h"
-#include "scene/2d/sprite.h"
+#include "scene/2d/sprite_2d.h"
 #include "vector_graphics_adaptive_renderer.h"
 #include "vector_graphics_color.h"
 #include "vector_graphics_linear_gradient.h"
@@ -63,7 +63,7 @@ static Ref<VGPaint> from_tove_paint(const tove::PaintRef &p_paint) {
 	if (p_paint) {
 		if (p_paint->isGradient()) {
 			Ref<Gradient> color_ramp;
-			color_ramp.instance();
+			color_ramp.instantiate();
 
 			auto grad = std::dynamic_pointer_cast<tove::AbstractGradient>(p_paint);
 
@@ -84,14 +84,14 @@ static Ref<VGPaint> from_tove_paint(const tove::PaintRef &p_paint) {
 			auto rgrad = std::dynamic_pointer_cast<tove::RadialGradient>(p_paint);
 			if (lgrad.get()) {
 				Ref<VGLinearGradient> linear_gradient;
-				linear_gradient.instance();
+				linear_gradient.instantiate();
 				linear_gradient->set_p1(Vector2(params.values[0], params.values[1]));
 				linear_gradient->set_p2(Vector2(params.values[2], params.values[3]));
 				linear_gradient->set_color_ramp(color_ramp);
 				return linear_gradient;
 			} else if (rgrad.get()) {
 				Ref<VGRadialGradient> radial_gradient;
-				radial_gradient.instance();
+				radial_gradient.instantiate();
 				radial_gradient->set_center(Vector2(params.values[0], params.values[1]));
 				radial_gradient->set_focal(Vector2(params.values[2], params.values[3]));
 				radial_gradient->set_radius(params.values[4]);
@@ -104,7 +104,7 @@ static Ref<VGPaint> from_tove_paint(const tove::PaintRef &p_paint) {
 			ToveRGBA rgba;
 			p_paint->getRGBA(rgba, 1.0f);
 			Ref<VGColor> color;
-			color.instance();
+			color.instantiate();
 			color->set_color(Color(rgba.r, rgba.g, rgba.b, rgba.a));
 			return color;
 		}
@@ -335,7 +335,7 @@ void VGPath::_notification(int p_what) {
 		case NOTIFICATION_DRAW: {
 			update_mesh_representation();
 			if (!is_empty()) {
-				draw_mesh(mesh, texture, Ref<Texture>());
+				draw_mesh(mesh, texture, Transform2D());
 			}
 		} break;
 		case NOTIFICATION_PARENTED: {
@@ -375,7 +375,7 @@ void VGPath::_bind_methods() {
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "renderer", PROPERTY_HINT_RESOURCE_TYPE, "VGRenderer"), "set_renderer", "get_renderer");
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "fill_color", PROPERTY_HINT_RESOURCE_TYPE, "VGPaint"), "set_fill_color", "get_fill_color");
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "line_color", PROPERTY_HINT_RESOURCE_TYPE, "VGPaint"), "set_line_color", "get_line_color");
-	ADD_PROPERTY(PropertyInfo(Variant::REAL, "line_width", PROPERTY_HINT_RANGE, "0,100,0.01"), "set_line_width", "get_line_width");
+	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "line_width", PROPERTY_HINT_RANGE, "0,100,0.01"), "set_line_width", "get_line_width");
 
 	ClassDB::bind_method(D_METHOD("insert_curve", "subpath", "t"), &VGPath::insert_curve);
 	ClassDB::bind_method(D_METHOD("remove_curve", "subpath", "curve"), &VGPath::remove_curve);
@@ -421,7 +421,7 @@ bool VGPath::_set(const StringName &p_name, const Variant &p_value) {
 			tove_subpath->setIsClosed(p_value);
 		}
 		if (subwhat == "points") {
-			PoolVector2Array pts = p_value;
+			PackedVector2Array pts = p_value;
 			const int n = pts.size();
 			float *buf = new float[n * 2];
 			for (int i = 0; i < n; i++) {
@@ -469,13 +469,12 @@ bool VGPath::_get(const StringName &p_name, Variant &r_ret) const {
 			r_ret = tove_subpath->isClosed();
 		} else if (subwhat == "points") {
 			const int n = tove_subpath->getNumPoints();
-			PoolVector2Array out;
+			PackedVector2Array out;
 			out.resize(n);
 			{
-				PoolVector2Array::Write w = out.write();
 				const float *pts = tove_subpath->getPoints();
 				for (int i = 0; i < n; i++) {
-					w[i] = Vector2(pts[2 * i + 0], pts[2 * i + 1]);
+					out.write[i] = Vector2(pts[2 * i + 0], pts[2 * i + 1]);
 				}
 			}
 			r_ret = out;
@@ -491,15 +490,15 @@ bool VGPath::_get(const StringName &p_name, Variant &r_ret) const {
 
 void VGPath::_get_property_list(List<PropertyInfo> *p_list) const {
 
-	p_list->push_back(PropertyInfo(Variant::STRING, "name", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NOEDITOR | PROPERTY_USAGE_INTERNAL));
-	p_list->push_back(PropertyInfo(Variant::REAL, "line_width", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NOEDITOR | PROPERTY_USAGE_INTERNAL));
-	p_list->push_back(PropertyInfo(Variant::INT, "fill_rule", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NOEDITOR | PROPERTY_USAGE_INTERNAL));
+	p_list->push_back(PropertyInfo(Variant::STRING, "name", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NO_EDITOR | PROPERTY_USAGE_INTERNAL));
+	p_list->push_back(PropertyInfo(Variant::FLOAT, "line_width", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NO_EDITOR | PROPERTY_USAGE_INTERNAL));
+	p_list->push_back(PropertyInfo(Variant::INT, "fill_rule", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NO_EDITOR | PROPERTY_USAGE_INTERNAL));
 
 	for (int j = 0; j < tove_path->getNumSubpaths(); j++) {
 		const String subpath_prefix = "subpaths/" + itos(j);
 
-		p_list->push_back(PropertyInfo(Variant::BOOL, subpath_prefix + "/closed", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NOEDITOR | PROPERTY_USAGE_INTERNAL));
-		p_list->push_back(PropertyInfo(Variant::POOL_VECTOR2_ARRAY, subpath_prefix + "/points", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NOEDITOR | PROPERTY_USAGE_INTERNAL));
+		p_list->push_back(PropertyInfo(Variant::BOOL, subpath_prefix + "/closed", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NO_EDITOR | PROPERTY_USAGE_INTERNAL));
+		p_list->push_back(PropertyInfo(Variant::PACKED_VECTOR2_ARRAY, subpath_prefix + "/points", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NO_EDITOR | PROPERTY_USAGE_INTERNAL));
 	}
 }
 
@@ -510,11 +509,11 @@ Ref<VGRenderer> VGPath::get_renderer() {
 void VGPath::set_renderer(const Ref<VGRenderer> &p_renderer) {
 
 	if (renderer.is_valid()) {
-		renderer->disconnect("changed", this, "_renderer_changed");
+		renderer->disconnect("changed", callable_mp(this, &VGPath::_renderer_changed));
 	}
 	renderer = p_renderer;
 	if (renderer.is_valid()) {
-		renderer->connect("changed", this, "_renderer_changed");
+		renderer->connect("changed", callable_mp( this, &VGPath::_renderer_changed));
 	}
 
 	set_inherited_dirty(this);
@@ -531,13 +530,7 @@ void VGPath::set_fill_color(const Ref<VGPaint> &p_paint) {
 		return;
 	}
 
-	if (fill_color.is_valid()) {
-		fill_color->remove_change_receptor(this);
-	}
 	fill_color = p_paint;
-	if (fill_color.is_valid()) {
-		fill_color->add_change_receptor(this);
-	}
 
 	update_tove_fill_color();
 	set_dirty();
@@ -548,19 +541,10 @@ Ref<VGPaint> VGPath::get_line_color() const {
 }
 
 void VGPath::set_line_color(const Ref<VGPaint> &p_paint) {
-
 	if (line_color == p_paint) {
 		return;
 	}
-
-	if (line_color.is_valid()) {
-		line_color->remove_change_receptor(this);
-	}
 	line_color = p_paint;
-	if (line_color.is_valid()) {
-		line_color->add_change_receptor(this);
-	}
-
 	update_tove_line_color();
 	set_dirty();
 }
@@ -582,14 +566,16 @@ VGPath *VGPath::find_clicked_child(const Point2 &p_point) {
 	const int n = get_child_count();
 	for (int i = 0; i < n; i++) {
 		Node *child = get_child(i);
-		if (child->is_class_ptr(get_class_ptr_static())) {
-			VGPath *path = Object::cast_to<VGPath>(child);
-			if (path->is_visible()) {
-				Point2 p = (path->get_transform() * vg_transform).affine_inverse().xform(p_point);
-				if (path->is_inside(p)) {
-					return path;
-				}
-			}
+		if (!child->is_class_ptr(get_class_ptr_static())) {
+			continue;
+		}
+		VGPath *path = Object::cast_to<VGPath>(child);
+		if (!path->is_visible()) {
+			continue;
+		}
+		Point2 p = (path->get_transform() * vg_transform).affine_inverse().xform(p_point);
+		if (path->is_inside(p)) {
+			return path;
 		}
 	}
 
@@ -680,7 +666,6 @@ void VGPath::set_dirty(bool p_children) {
 	}
 
 	dirty = true;
-	_change_notify("path_shape");
 	update();
 }
 
@@ -719,7 +704,7 @@ Node2D *VGPath::create_mesh_node() {
 	Ref<VGRenderer> renderer = get_inherited_renderer();
 	if (renderer.is_valid()) {
 		if (renderer->prefer_sprite()) {
-			Sprite *sprite = memnew(Sprite);
+			Sprite2D *sprite = memnew(Sprite2D);
 			sprite->set_texture(renderer->render_texture(this, true));
 
 			// Size2 s = get_global_transform().get_scale();
@@ -737,7 +722,7 @@ Node2D *VGPath::create_mesh_node() {
 		} else {
 			MeshInstance2D *mesh_inst = memnew(MeshInstance2D);
 			Ref<ArrayMesh> mesh;
-			mesh.instance();
+			mesh.instantiate();
 			Ref<Material> material;
 			Ref<Texture> texture;
 			renderer->render_mesh(mesh, material, texture, this, true, false);
@@ -777,7 +762,7 @@ VGPath::VGPath() {
 	// when created as a unique item from the UI, populate with default content.
 
 	Ref<VGMeshRenderer> renderer;
-	renderer.instance();
+	renderer.instantiate();
 	set_renderer(renderer);
 
 	tove::SubpathRef tove_subpath = tove::tove_make_shared<tove::Subpath>();
@@ -798,12 +783,6 @@ VGPath::VGPath(tove::PathRef p_path) {
 }
 
 VGPath::~VGPath() {
-	if (fill_color.is_valid()) {
-		fill_color->remove_change_receptor(this);
-	}
-	if (line_color.is_valid()) {
-		line_color->remove_change_receptor(this);
-	}
 }
 
 VGPath *VGPath::create_from_svg(Ref<Resource> p_resource) {
@@ -814,7 +793,7 @@ VGPath *VGPath::create_from_svg(Ref<Resource> p_resource) {
 	VGPath *root = memnew(VGPath(tove::tove_make_shared<tove::Path>()));
 
 	Ref<VGMeshRenderer> renderer;
-	renderer.instance();
+	renderer.instantiate();
 	root->set_renderer(renderer);
 
 	return root;
@@ -825,14 +804,14 @@ Node *createVectorSprite(Ref<Resource> p_resource) {
 	if (path) {
 		return path;
 	} else {
-		return memnew(Sprite); // not a vector file
+		return memnew(Sprite2D); // not a vector file
 	}
 }
 
 void configureVectorSprite(Node *p_child, Ref<Resource> p_resource) {
 #ifdef TOOLS_ENABLED
 	if (p_child->is_class_ptr(VGPath::get_class_ptr_static())) {
-		EditorData *editor_data = EditorNode::get_singleton()->get_scene_tree_dock()->get_editor_data();
+		EditorData *editor_data = &EditorNode::get_singleton()->get_editor_data();
 		editor_data->get_undo_redo().add_do_method(p_child, "import_svg", p_resource->get_path());
 		editor_data->get_undo_redo().add_do_reference(p_child);
 	}
