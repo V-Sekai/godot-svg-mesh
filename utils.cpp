@@ -39,10 +39,12 @@ Ref<ShaderMaterial> copy_mesh(
 	const int size = n * stride;
 
 	Vector<uint8_t> vvertices;
+	vvertices.resize(size);
 	p_tove_mesh->copyVertexData(vvertices.ptrw(), size);
 
 	const int index_count = p_tove_mesh->getIndexCount();
 	Vector<ToveVertexIndex> vindices;
+	vindices.resize(index_count);
 	p_tove_mesh->copyIndexData(vindices.ptrw(), index_count);
 
 	Vector<int> iarr;

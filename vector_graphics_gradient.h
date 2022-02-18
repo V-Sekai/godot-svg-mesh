@@ -13,8 +13,6 @@ class VGGradient : public VGPaint {
 
 	Ref<Gradient> color_ramp;
 
-	void _gradient_changed();
-
 protected:
 	static void _bind_methods();
 

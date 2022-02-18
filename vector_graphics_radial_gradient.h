@@ -14,8 +14,6 @@ class VGRadialGradient : public VGGradient {
 	Vector2 focal;
 	float radius;
 
-	void _gradient_changed();
-
 protected:
 	static void _bind_methods();
 
