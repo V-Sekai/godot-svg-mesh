@@ -47,7 +47,7 @@ Node *EditorSceneImporterSVG::import_scene(const String &p_path, uint32_t p_flag
 		mesh.instantiate();
 		Ref<Texture> texture;
 		Ref<Material> renderer_material;
-		renderer->render_mesh(mesh, renderer_material, texture, path, true, true);
+		_ALLOW_DISCARD_ renderer->render_mesh(mesh, renderer_material, texture, path, true, true);
 		Transform3D xform;
 		MeshInstance3D *mesh_inst = memnew(MeshInstance3D);
 		mesh_inst->translate(Vector3(center.x * 0.001f, -center.y * 0.001f, 0.0f));
@@ -56,7 +56,7 @@ Node *EditorSceneImporterSVG::import_scene(const String &p_path, uint32_t p_flag
 			mat.instantiate();
 			mat->set_texture(StandardMaterial3D::TEXTURE_ALBEDO, texture);
 			mat->set_flag(StandardMaterial3D::FLAG_ALBEDO_FROM_VERTEX_COLOR, true);
-			mat->set_depth_draw(StandardMaterial3D::DEPTH_DRAW_ALWAYS);
+			mat->set_depth_draw_mode(StandardMaterial3D::DEPTH_DRAW_ALWAYS);
 			mat->set_flag(StandardMaterial3D::FLAG_DISABLE_DEPTH_TEST, true);
 			mat->set_cull_mode(StandardMaterial3D::CULL_DISABLED);
 			mesh->surface_set_material(0, mat);
