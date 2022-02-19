@@ -60,6 +60,7 @@ Node *EditorSceneImporterSVG::import_scene(const String &p_path, uint32_t p_flag
 		if (mesh.is_null()) {
 			continue;
 		}
+		st->set_smooth_group(true);
 		st->append_from(mesh, 0, xform);
 	}
 	memdelete(root_path);
