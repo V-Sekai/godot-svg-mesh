@@ -1,5 +1,8 @@
 #include "image_loader_svg_spatial.h"
 
+#include "scene/3d/importer_mesh_instance_3d.h"
+#include "scene/resources/importer_mesh.h"
+
 EditorSceneImporterSVG::EditorSceneImporterSVG() {
 }
 
@@ -60,28 +63,30 @@ Node *EditorSceneImporterSVG::import_scene(const String &p_path, uint32_t p_flag
 		st->append_from(mesh, 0, xform);
 	}
 	memdelete(root_path);
-	Ref<ArrayMesh> combined_mesh = st->commit();
-	if (combined_mesh.is_null()) {
-		return nullptr;
-	}
+	Ref<ImporterMesh> combined_mesh;
+	combined_mesh.instantiate();
 	Ref<StandardMaterial3D> standard_material;
 	standard_material.instantiate();
 	standard_material->set_flag(StandardMaterial3D::FLAG_ALBEDO_FROM_VERTEX_COLOR, true);
 	standard_material->set_depth_draw_mode(StandardMaterial3D::DEPTH_DRAW_ALWAYS);
 	standard_material->set_flag(StandardMaterial3D::FLAG_DISABLE_DEPTH_TEST, true);
 	standard_material->set_cull_mode(StandardMaterial3D::CULL_DISABLED);
-	combined_mesh->surface_set_material(0, standard_material);
-	MeshInstance3D *mesh_inst = memnew(MeshInstance3D);
-	mesh_inst->set_mesh(combined_mesh);
-	mesh_inst->set_name(String("Path"));
-	root->add_child(mesh_inst, true);
-	mesh_inst->set_owner(root);
-	Vector3 translate = combined_mesh->get_aabb().get_size();
+	combined_mesh->add_surface(Mesh::PRIMITIVE_TRIANGLES, st->commit_to_arrays(), Array(), Dictionary(), standard_material, "", 0);
+	st->commit();
+	if (combined_mesh.is_null()) {
+		return nullptr;
+	}
+	Vector3 translate = combined_mesh->get_mesh()->get_aabb().get_size();
 	translate.x = -translate.x / 2.0f;
 	translate.y = translate.y / 2.0f;
 	Transform3D xform;
 	xform.origin = translate;
-	mesh_inst->set_transform(xform);
+
+	ImporterMeshInstance3D *mesh_instance = memnew(ImporterMeshInstance3D);
+	mesh_instance->set_mesh(combined_mesh);
+	root->add_child(mesh_instance, true);
+	mesh_instance->set_owner(root);
+	mesh_instance->set_transform(xform);
 	return root;
 }
 
