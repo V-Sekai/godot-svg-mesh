@@ -1,4 +1,4 @@
-# Vector Graphics for Godot.
+# SVG Mesh for Godot.
 
 Work in progress.
 
