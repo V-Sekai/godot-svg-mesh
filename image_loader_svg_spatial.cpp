@@ -36,8 +36,8 @@ Node *EditorSceneImporterSVG::import_scene(const String &p_path, uint32_t p_flag
 	Node3D *root = memnew(Node3D);
 	Ref<SurfaceTool> st;
 	st.instantiate();
-	for (int i = 0; i < n; i++) {
-		tove::PathRef tove_path = tove_graphics->getPath(i);
+	for (int mesh_i = 0; mesh_i < n; mesh_i++) {
+		tove::PathRef tove_path = tove_graphics->getPath(mesh_i);
 		Point2 center = compute_center(tove_path);
 		tove_path->set(tove_path, tove::nsvg::Transform(1, 0, -center.x, 0, 1, -center.y));
 		VGPath *path = memnew(VGPath(tove_path));
@@ -56,7 +56,8 @@ Node *EditorSceneImporterSVG::import_scene(const String &p_path, uint32_t p_flag
 			mesh->surface_set_material(0, renderer_material);
 		}
 		Transform3D xform;
-		xform.origin = Vector3(center.x * 0.001f, center.y * -0.001f, 0.0f);
+		real_t gap = mesh_i * CMP_POINT_IN_PLANE_EPSILON * 16.0f;
+		xform.origin = Vector3(center.x * 0.001f, center.y * -0.001f, gap);
 		if (mesh.is_null()) {
 			continue;
 		}
