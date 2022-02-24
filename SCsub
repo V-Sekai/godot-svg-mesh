@@ -5,10 +5,12 @@ Import('env_modules')
 
 env_tove = env_modules.Clone()
 
+env_thirdparty = env_tove.Clone()
+env_thirdparty.disable_warnings()
 import os 
 dir_path = Dir('.').abspath
 
-env_tove.Append(CXXFLAGS=[
+env_thirdparty.Append(CXXFLAGS=[
     '-DTOVE_GODOT',
     '-I' + os.path.join(dir_path, 'tove2d/src/thirdparty/fp16/include')])
 
@@ -19,19 +21,17 @@ def package_sl(target, source, env):
 			out.write(sl.read())
 			out.write(')GLSL";\n')
 
-env_tove.Append(BUILDERS={
+env_thirdparty.Append(BUILDERS={
 	'PackageSL':Builder(action=package_sl)})
 
-env_tove.PackageSL(
+env_thirdparty.PackageSL(
 	'tove2d/src/glsl/fill.frag.inc',
 	Glob('tove2d/src/glsl/fill.frag'))
 
-env_tove.PackageSL(
+env_thirdparty.PackageSL(
 	'tove2d/src/glsl/line.vert.inc',
 	Glob('tove2d/src/glsl/line.vert'))
 
-env_thirdparty = env_tove.Clone()
-env_thirdparty.disable_warnings()
 env_thirdparty.add_source_files(env.modules_sources, "tove2d/src/cpp/*.cpp")
 env_thirdparty.add_source_files(env.modules_sources, "tove2d/src/cpp/mesh/*.cpp")
 env_thirdparty.add_source_files(env.modules_sources, "tove2d/src/cpp/shader/*.cpp")

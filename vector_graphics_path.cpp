@@ -276,7 +276,7 @@ void VGPath::update_mesh_representation() {
 		if (renderer.is_valid()) {
 			Ref<Material> ignored_material; // ignored
 			Ref<Texture> ignored_texture; // ignored
-			renderer->render_mesh(mesh, ignored_material, ignored_texture, this, false, false);
+			_ALLOW_DISCARD_ renderer->render_mesh(mesh, ignored_material, ignored_texture, this, false, false);
 			texture = renderer->render_texture(this, false);
 		}
 	}
@@ -720,7 +720,7 @@ Node2D *VGPath::create_mesh_node() {
 			mesh.instantiate();
 			Ref<Material> material;
 			Ref<Texture> texture;
-			renderer->render_mesh(mesh, material, texture, this, true, false);
+			_ALLOW_DISCARD_ renderer->render_mesh(mesh, material, texture, this, true, false);
 			mesh_inst->set_mesh(mesh);
 			if (material.is_valid()) {
 				mesh_inst->set_material(material);

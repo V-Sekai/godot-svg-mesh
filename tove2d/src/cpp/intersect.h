@@ -16,6 +16,8 @@ BEGIN_TOVE_NAMESPACE
 
 class AbstractRay {
 public:
+	AbstractRay() {}
+	virtual ~AbstractRay() {}
 	virtual void computeP(double *P, const coeff *bx, const coeff *by) const = 0;
 };
 
@@ -24,6 +26,8 @@ protected:
 	virtual int at(const coeff *bx, const coeff *by, double t) = 0;
 
 public:
+	AbstractIntersecter() {}
+	virtual ~AbstractIntersecter() {}
 	int intersect(const coeff *bx, const coeff *by, const AbstractRay &ray) {
 		double P[4];
 		ray.computeP(P, bx, by);
@@ -225,6 +229,7 @@ protected:
 	}
 
 public:
+	virtual ~AbstractInsideTest() {}
     inline AbstractInsideTest() {
         for (int i = 0; i < 3; i++) {
             counts[i] = 0;
