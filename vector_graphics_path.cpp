@@ -581,7 +581,7 @@ VGPath *VGPath::find_clicked_child(const Point2 &p_point) {
 
 	return nullptr;
 }
-
+#ifdef TOOLS_ENABLED
 Rect2 VGPath::_edit_get_rect() const {
 	return tove_bounds_to_rect2(get_subtree_graphics()->getBounds());
 }
@@ -606,6 +606,7 @@ void VGPath::_changed_callback(Object *p_changed, const char *p_prop) {
 		set_dirty();
 	}
 }
+#endif
 
 void VGPath::set_points(int p_subpath, Array p_points) {
 	ERR_FAIL_INDEX(p_subpath, tove_path->getNumSubpaths());
