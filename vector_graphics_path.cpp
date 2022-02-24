@@ -587,22 +587,12 @@ Rect2 VGPath::_edit_get_rect() const {
 }
 
 bool VGPath::_edit_is_selected_on_click(const Point2 &p_point, double p_tolerance) const {
-	/*if (const_cast<VGPath*>(this)->get_root_path() != this) {
-		return false;
-	}*/
 	return get_subtree_graphics()->hit(p_point.x, p_point.y) != tove::PathRef();
 }
 
 void VGPath::_edit_set_position(const Point2 &p_position) {
 	set_position(p_position);
 	update();
-}
-
-void VGPath::_edit_set_scale(const Size2 &p_scale) {
-	/*Transform2D t;
-	t.scale(p_scale);
-	set_vg_transform(t);
-	update();*/
 }
 
 void VGPath::_changed_callback(Object *p_changed, const char *p_prop) {

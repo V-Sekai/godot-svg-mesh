@@ -53,12 +53,12 @@ protected:
 	static void _bind_methods();
 
 public:
+#ifdef TOOLS_ENABLED
 	virtual Rect2 _edit_get_rect() const override;
 	virtual bool _edit_is_selected_on_click(const Point2 &p_point, double p_tolerance) const override;
 	virtual void _edit_set_position(const Point2 &p_position) override;
-	virtual void _edit_set_scale(const Size2 &p_scale) override;
-
 	virtual void _changed_callback(Object *p_changed, const char *p_prop);
+#endif
 
 	VGPath *get_root_path();
 	Ref<VGRenderer> get_inherited_renderer() const;
