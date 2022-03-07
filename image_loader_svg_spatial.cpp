@@ -1,3 +1,5 @@
+
+#ifdef TOOLS_ENABLED
 #include "image_loader_svg_spatial.h"
 
 #include "scene/3d/importer_mesh_instance_3d.h"
@@ -95,3 +97,4 @@ Node *EditorSceneImporterSVG::import_scene(const String &p_path, uint32_t p_flag
 void EditorSceneImporterSVG::get_extensions(List<String> *r_extensions) const {
 	r_extensions->push_back("svg");
 }
+#endif

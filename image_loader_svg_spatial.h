@@ -2,6 +2,7 @@
 #ifndef LOADER_SVG_SPATIAL_H
 #define LOADER_SVG_SPATIAL_H
 
+#ifdef TOOLS_ENABLED
 #include "core/io/file_access.h"
 #include "editor/editor_file_system.h"
 #include "editor/import/resource_importer_scene.h"
@@ -30,5 +31,5 @@ public:
 	virtual Ref<Animation> import_animation(const String &p_path,
 			uint32_t p_flags, const Map<StringName, Variant> &p_options, int p_bake_fps) override { return Ref<Animation>(); }
 };
-
+#endif
 #endif

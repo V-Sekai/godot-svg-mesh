@@ -35,7 +35,10 @@ void register_svg_mesh_types() {
 	ClassDB::register_virtual_class<VGRenderer>();
 	ClassDB::register_class<VGMeshRenderer>();
 #ifdef TOOLS_ENABLED
-	ClassDB::register_class<EditorSceneImporterSVG>();
+	ClassDB::APIType prev_api = ClassDB::get_current_api();
+	ClassDB::set_current_api(ClassDB::API_EDITOR);
+	GDREGISTER_CLASS(EditorSceneImporterSVG);
+	ClassDB::set_current_api(prev_api);
 	EditorNode::add_init_callback(editor_init_callback);
 #endif
 }
