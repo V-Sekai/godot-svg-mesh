@@ -26,13 +26,13 @@ static void editor_init_callback() {
 
 void register_svg_mesh_types() {
 	ClassDB::register_class<VGPath>();
-	ClassDB::register_virtual_class<VGPaint>();
+	ClassDB::register_abstract_class<VGPaint>();
 	ClassDB::register_class<VGColor>();
 	ClassDB::register_class<VGGradient>();
 	ClassDB::register_class<VGLinearGradient>();
 	ClassDB::register_class<VGRadialGradient>();
 
-	ClassDB::register_virtual_class<VGRenderer>();
+	ClassDB::register_abstract_class<VGRenderer>();
 	ClassDB::register_class<VGMeshRenderer>();
 #ifdef TOOLS_ENABLED
 	ClassDB::APIType prev_api = ClassDB::get_current_api();
