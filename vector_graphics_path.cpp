@@ -372,9 +372,9 @@ void VGPath::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_line_width", "width"), &VGPath::set_line_width);
 	ClassDB::bind_method(D_METHOD("get_line_width"), &VGPath::get_line_width);
 
-	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "renderer", PROPERTY_HINT_RESOURCE_TYPE, "VGRenderer"), "set_renderer", "get_renderer");
-	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "fill_color", PROPERTY_HINT_RESOURCE_TYPE, "VGPaint"), "set_fill_color", "get_fill_color");
-	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "line_color", PROPERTY_HINT_RESOURCE_TYPE, "VGPaint"), "set_line_color", "get_line_color");
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "renderer", PROPERTY_HINT_RESOURCE_TYPE, "VGMeshRenderer"), "set_renderer", "get_renderer");
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "fill_color", PROPERTY_HINT_RESOURCE_TYPE, "VGColor", PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_EDITOR_INSTANTIATE_OBJECT), "set_fill_color", "get_fill_color");
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "line_color", PROPERTY_HINT_RESOURCE_TYPE, "VGColor", PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_EDITOR_INSTANTIATE_OBJECT), "set_line_color", "get_line_color");
 	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "line_width", PROPERTY_HINT_RANGE, "0,100,0.01"), "set_line_width", "get_line_width");
 
 	ClassDB::bind_method(D_METHOD("insert_curve", "subpath", "t"), &VGPath::insert_curve);
@@ -736,20 +736,11 @@ void VGPath::set_tove_path(tove::PathRef p_path) {
 	set_dirty();
 }
 
-/*void VGPath::set_vg_transform(const Transform2D &p_transform) {
-	vg_transform = p_transform;
-	set_dirty();
-}*/
-
 VGPath::VGPath() {
 	tove_path = tove::tove_make_shared<tove::Path>();
 	set_notify_transform(true);
 
 	// when created as a unique item from the UI, populate with default content.
-
-	Ref<VGMeshRenderer> renderer;
-	renderer.instantiate();
-	set_renderer(renderer);
 
 	tove::SubpathRef tove_subpath = tove::tove_make_shared<tove::Subpath>();
 	tove_subpath->drawEllipse(0, 0, 100, 100);
@@ -757,8 +748,6 @@ VGPath::VGPath() {
 
 	tove_path->setFillColor(tove::tove_make_shared<tove::Color>(0.8, 0.1, 0.1));
 	tove_path->setLineColor(tove::tove_make_shared<tove::Color>(0, 0, 0));
-	create_fill_color();
-	create_line_color();
 
 	set_dirty();
 }
