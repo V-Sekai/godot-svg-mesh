@@ -318,14 +318,14 @@ public:
 			} else if (mb->get_button_index() == MouseButton::LEFT && clicked != WIDGET_NONE) {
 				if (clicked != WIDGET_NONE) {
 					if (clicked != WIDGET_ROTATE) {
-						undo_redo->create_action(TTR("Transform Path"));
+						undo_redo->create_action(RTR("Transform Path"));
 						undo_redo->add_do_method(path, "set_transform", transform1);
 						undo_redo->add_do_method(path, "recenter");
 						undo_redo->add_undo_method(path, "set_transform", transform0);
 						undo_redo->add_undo_method(path, "recenter");
 						_commit_action();
 					} else {
-						undo_redo->create_action(TTR("Rotate Path"));
+						undo_redo->create_action(RTR("Rotate Path"));
 						undo_redo->add_do_method(path, "_edit_set_rotation", path->_edit_get_rotation());
 						undo_redo->add_undo_method(path, "_edit_set_rotation", rotate_widget.initial_angle);
 						_commit_action();
@@ -718,7 +718,7 @@ public:
 					edited_point = PosVertex();
 
 					if (clicked) {
-						undo_redo->create_action(TTR("Insert Curve"));
+						undo_redo->create_action(RTR("Insert Curve"));
 
 						const SubpathPos insert = mb_down_at;
 						undo_redo->add_do_method(node_vg, "insert_curve",
@@ -732,7 +732,7 @@ public:
 						return true;
 					} else if (edited_path.valid()) {
 
-						undo_redo->create_action(TTR("Edit Path"));
+						undo_redo->create_action(RTR("Edit Path"));
 
 						undo_redo->add_do_method(node_vg, "set_points",
 								edited_path.subpath, _get_points(edited_path));
@@ -1054,7 +1054,7 @@ void VGEditor::_create_mesh_node() {
 
 	Node *parent = node_vg->get_parent();
 
-	undo_redo->create_action(TTR("Meshify"));
+	undo_redo->create_action(RTR("Meshify"));
 
 	undo_redo->add_do_method(parent, "remove_child", node_vg);
 	undo_redo->add_do_method(parent, "add_child", baked);
@@ -1071,7 +1071,7 @@ void VGEditor::_create_mesh_node() {
 	_node_replace_owner_undo(node_vg, node_vg, node_vg->get_owner());
 	undo_redo->add_undo_reference(node_vg);
 
-	// undo_redo->create_action(TTR("Remove VG Node"));
+	// undo_redo->create_action(RTR("Remove VG Node"));
 	undo_redo->commit_action();
 }
 
@@ -1356,7 +1356,7 @@ void VGCurveTool::remove_point(const Vertex &p_vertex) {
 
 	if (subpath->getNumPoints() >= 4) {
 
-		undo_redo->create_action(TTR("Remove Subpath Curve"));
+		undo_redo->create_action(RTR("Remove Subpath Curve"));
 
 		Array previous = subpath_points_array(subpath);
 		undo_redo->add_do_method(node_vg, "remove_curve",
@@ -1556,10 +1556,10 @@ VGEditor::VGEditor(EditorNode *p_editor) {
 	button_bake = memnew(Button);
 	add_child(button_bake, true);
 	button_bake->connect("pressed", callable_mp(this, &VGEditor::_create_mesh_node));
-	button_bake->set_tooltip(TTR("Bake into mesh"));
+	button_bake->set_tooltip(RTR("Bake into mesh"));
 
 	create_resource = memnew(ConfirmationDialog);
 	add_child(create_resource, true);
-	create_resource->get_ok_button()->set_text(TTR("Create"));
+	create_resource->get_ok_button()->set_text(RTR("Create"));
 }
 #endif
