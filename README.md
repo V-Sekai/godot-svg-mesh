@@ -1,6 +1,6 @@
 # SVG Mesh for Godot.
 
-Work in progress.
+Usable quality. Stablizing the code.
 
 # Install and build
 
