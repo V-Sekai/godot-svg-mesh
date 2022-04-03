@@ -4,7 +4,7 @@ Usable quality. Stablizing the code.
 
 # Install and build
 
-- Rename the whole repo folder to `svg_mesh` and move it into your Godot `/modules` folder (i.e. as `/modules/svg_mesh`).
+- Rename the whole repo folder to `svg_mesh` and move it into your Godot `/modules` folder (Like `/modules/svg_mesh`).
 - Build godot using `scons platform=your_platform`.
 
 # Usage in Godot
