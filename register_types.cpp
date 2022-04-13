@@ -20,7 +20,7 @@
 static void editor_init_callback() {
 	Ref<EditorSceneImporterSVG> svg_spatial_loader;
 	svg_spatial_loader.instantiate();
-	ResourceImporterScene::get_singleton()->add_importer(svg_spatial_loader, true);
+	ResourceImporterScene::add_importer(svg_spatial_loader, true);
 }
 #endif
 
