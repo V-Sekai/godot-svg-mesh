@@ -70,7 +70,7 @@ Ref<ShaderMaterial> copy_mesh(
 		ERR_FAIL_COND_V(carr.resize(n) != OK, Ref<ShaderMaterial>());
 		for (int i = 0; i < n; i++) {
 			uint8_t *p = vvertices.ptrw() + i * stride + 2 * sizeof(float);
-			carr.write[i] = Color(p[0] / 255.0, p[1] / 255.0, p[2] / 255.0, p[3] / 255.0).to_linear();
+			carr.write[i] = Color(p[0] / 255.0, p[1] / 255.0, p[2] / 255.0, p[3] / 255.0).srgb_to_linear();
 		}
 	}
 

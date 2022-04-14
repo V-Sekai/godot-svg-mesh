@@ -66,6 +66,8 @@ Node *EditorSceneImporterSVG::import_scene(const String &p_path, uint32_t p_flag
 		st->set_smooth_group(true);
 		st->append_from(mesh, 0, xform);
 	}
+	String root_name;
+	root_name = root_path->get_name();
 	memdelete(root_path);
 	Ref<ImporterMesh> combined_mesh;
 	combined_mesh.instantiate();
@@ -91,6 +93,7 @@ Node *EditorSceneImporterSVG::import_scene(const String &p_path, uint32_t p_flag
 	root->add_child(mesh_instance, true);
 	mesh_instance->set_owner(root);
 	mesh_instance->set_transform(xform);
+	mesh_instance->set_name(root_name);
 	return root;
 }
 
