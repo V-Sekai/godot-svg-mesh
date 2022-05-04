@@ -166,7 +166,7 @@ void VGPath::recenter() {
 	tove_path->set(tove_path, tove::nsvg::Transform(1, 0, -center.x, 0, 1, -center.y));
 	vg_transform.translate(center.x, center.y);
 
-	set_position(get_position() + get_transform().untranslated().xform(vg_transform.elements[2]));
+	set_position(get_position() + get_transform().untranslated().xform(vg_transform.columns[2]));
 	vg_transform = vg_transform.untranslated();
 	set_dirty();
 }
@@ -180,9 +180,9 @@ tove::GraphicsRef VGPath::create_tove_graphics() const {
 void VGPath::add_tove_path(const tove::GraphicsRef &p_tove_graphics) const {
 	const Transform2D t = get_transform() * vg_transform;
 
-	const Vector2 &tx = t.elements[0];
-	const Vector2 &ty = t.elements[1];
-	const Vector2 &to = t.elements[2];
+	const Vector2 &tx = t.columns[0];
+	const Vector2 &ty = t.columns[1];
+	const Vector2 &to = t.columns[2];
 	tove::nsvg::Transform tove_transform(tx.x, ty.x, to.x, tx.y, ty.y, to.y);
 
 	const tove::PathRef transformed_path = tove::tove_make_shared<tove::Path>();

@@ -223,7 +223,7 @@ class VGTransformTool : public VGTool {
 	void update(const Vector2 &u1, const Vector2 &v1, const Vector2 &u2, const Vector2 &v2, const Vector2 &u3, const Vector2 &v3) {
 		Transform2D t = mapping_to_transform(u1, v1, u2, v2, u3, v3);
 		const float eps = 1e-3;
-		if (t.elements[0].length() > eps && t.elements[1].length() > eps) {
+		if (t.columns[0].length() > eps && t.columns[1].length() > eps) {
 			transform1 = t;
 			path->set_transform(t);
 		}
@@ -1484,12 +1484,12 @@ void VGEditor::_update_overlay(bool p_always_update) {
 	Transform2D xform = canvas_item_editor->get_canvas_transform() *
 						node_vg->get_global_transform();
 
-	overlay_draw_xform = Transform2D().translated(xform.elements[2]);
+	overlay_draw_xform = Transform2D().translated(xform.columns[2]);
 
 	if (!p_always_update) {
 		float err = 0.0f;
 		for (int i = 0; i < 2; i++) {
-			err += (xform.elements[i] - overlay_full_xform.elements[i]).length_squared();
+			err += (xform.columns[i] - overlay_full_xform.columns[i]).length_squared();
 		}
 		if (err < 0.001) {
 			return;
@@ -1497,8 +1497,8 @@ void VGEditor::_update_overlay(bool p_always_update) {
 	}
 
 	tove::nsvg::Transform transform(
-			xform.elements[0].x, xform.elements[1].x, 0,
-			xform.elements[0].y, xform.elements[1].y, 0);
+			xform.columns[0].x, xform.columns[1].x, 0,
+			xform.columns[0].y, xform.columns[1].y, 0);
 
 	tove::PathRef tove_path = tove::tove_make_shared<tove::Path>();
 	tove_path->set(node_vg->get_tove_path(), transform);

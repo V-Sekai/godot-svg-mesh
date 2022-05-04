@@ -11,9 +11,9 @@
 #include "tove2d/src/cpp/shader/feed/color_feed.h"
 
 tove::PathRef new_transformed_path(const tove::PathRef &p_tove_path, const Transform2D &p_transform) {
-	const Vector2 &tx = p_transform.elements[0];
-	const Vector2 &ty = p_transform.elements[1];
-	const Vector2 &to = p_transform.elements[2];
+	const Vector2 &tx = p_transform.columns[0];
+	const Vector2 &ty = p_transform.columns[1];
+	const Vector2 &to = p_transform.columns[2];
 	tove::nsvg::Transform tove_transform(tx.x, ty.x, to.x, tx.y, ty.y, to.y);
 	tove::PathRef tove_path = tove::tove_make_shared<tove::Path>();
 	tove_path->set(p_tove_path, tove_transform);
