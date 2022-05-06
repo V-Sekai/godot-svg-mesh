@@ -9,7 +9,6 @@
 	<members>
 		<member name="center" type="Vector2" setter="set_center" getter="get_center" default="Vector2(50, 50)">
 		</member>
-		<member name="color_ramp" type="Gradient" setter="set_color_ramp" getter="get_color_ramp" overrides="VGGradient" />
 		<member name="focal" type="Vector2" setter="set_focal" getter="get_focal" default="Vector2(0, 0)">
 		</member>
 		<member name="radius" type="float" setter="set_radius" getter="get_radius" default="200.0">
