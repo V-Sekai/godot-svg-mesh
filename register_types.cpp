@@ -24,7 +24,7 @@ static void editor_init_callback() {
 }
 #endif
 
-void register_svg_mesh_types() {
+void initialize_svg_mesh_module(ModuleInitializationLevel p_level) {
 	ClassDB::register_class<VGPath>();
 	ClassDB::register_abstract_class<VGPaint>();
 	ClassDB::register_class<VGColor>();
@@ -43,5 +43,5 @@ void register_svg_mesh_types() {
 #endif
 }
 
-void unregister_svg_mesh_types() {
+void uninitialize_svg_mesh_module(ModuleInitializationLevel p_level) {
 }

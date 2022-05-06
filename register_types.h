@@ -2,5 +2,9 @@
 /*  register_types.h                                                     */
 /*************************************************************************/
 
-void register_svg_mesh_types();
-void unregister_svg_mesh_types();
+#pragma once
+
+#include "modules/register_module_types.h"
+
+void initialize_svg_mesh_module(ModuleInitializationLevel p_level);
+void uninitialize_svg_mesh_module(ModuleInitializationLevel p_level);
