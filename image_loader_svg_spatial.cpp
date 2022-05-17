@@ -11,7 +11,7 @@ EditorSceneImporterSVG::EditorSceneImporterSVG() {
 EditorSceneImporterSVG::~EditorSceneImporterSVG() {
 }
 
-Node *EditorSceneImporterSVG::import_scene(const String &p_path, uint32_t p_flags, const Map<StringName, Variant> &p_options, int p_bake_fps, List<String> *r_missing_deps, Error *r_err) {
+Node *EditorSceneImporterSVG::import_scene(const String &p_path, uint32_t p_flags, const HashMap<StringName, Variant> &p_options, int p_bake_fps, List<String> *r_missing_deps, Error *r_err) {
 	String units = "px";
 	float dpi = 96.0;
 	Vector<uint8_t> buf = FileAccess::get_file_as_array(p_path);
