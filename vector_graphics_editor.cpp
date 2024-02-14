@@ -5,12 +5,12 @@
 #include "core/error/error_macros.h"
 #include "core/input/input_enums.h"
 #include "core/object/callable_method_pointer.h"
-#include "editor/editor_settings.h"
-#include "editor/editor_undo_redo_manager.h"
 #include "scene/gui/dialogs.h"
 #include "scene/gui/separator.h"
 #include <cstdint>
 #ifdef TOOLS_ENABLED
+#include "editor/editor_settings.h"
+#include "editor/editor_undo_redo_manager.h"
 #include "vector_graphics_editor.h"
 
 #include "core/os/keyboard.h"
@@ -1369,10 +1369,8 @@ void VGCurveTool::remove_point(const Vertex &p_vertex) {
 		undo_redo->create_action(RTR("Remove Subpath Curve"));
 
 		Array previous = subpath_points_array(subpath);
-		undo_redo->add_do_method(Callable(node_vg, "remove_curve").bind(
-				p_vertex.subpath, p_vertex.pt / 3));
-		undo_redo->add_undo_method(Callable(node_vg, "set_points").bind(
-				p_vertex.subpath, previous));
+		undo_redo->add_do_method(Callable(node_vg, "remove_curve").bind(p_vertex.subpath, p_vertex.pt / 3));
+		undo_redo->add_undo_method(Callable(node_vg, "set_points").bind(p_vertex.subpath, previous));
 
 		_commit_action();
 	} else {
