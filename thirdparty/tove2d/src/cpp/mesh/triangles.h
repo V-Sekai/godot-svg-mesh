@@ -137,8 +137,8 @@ private:
 	}
 
 public:
-	inline TriangleCache(int cacheSize = 2) :
-		current(0), cacheSize(cacheSize) {
+	inline TriangleCache(int p_cacheSize = 2) :
+		current(0), cacheSize(p_cacheSize) {
 		assert(cacheSize >= 2);
 	}
 

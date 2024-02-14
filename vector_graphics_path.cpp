@@ -1,6 +1,32 @@
-/*************************************************************************/
-/*  vg_path.cpp  	                                                     */
-/*************************************************************************/
+/**************************************************************************/
+/*  vector_graphics_path.cpp                                              */
+/**************************************************************************/
+/*                         This file is part of:                          */
+/*                             GODOT ENGINE                               */
+/*                        https://godotengine.org                         */
+/**************************************************************************/
+/* Copyright (c) 2014-present Godot Engine contributors (see AUTHORS.md). */
+/* Copyright (c) 2007-2014 Juan Linietsky, Ariel Manzur.                  */
+/*                                                                        */
+/* Permission is hereby granted, free of charge, to any person obtaining  */
+/* a copy of this software and associated documentation files (the        */
+/* "Software"), to deal in the Software without restriction, including    */
+/* without limitation the rights to use, copy, modify, merge, publish,    */
+/* distribute, sublicense, and/or sell copies of the Software, and to     */
+/* permit persons to whom the Software is furnished to do so, subject to  */
+/* the following conditions:                                              */
+/*                                                                        */
+/* The above copyright notice and this permission notice shall be         */
+/* included in all copies or substantial portions of the Software.        */
+/*                                                                        */
+/* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,        */
+/* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF     */
+/* MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. */
+/* IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY   */
+/* CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,   */
+/* TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE      */
+/* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
+/**************************************************************************/
 
 #include "vector_graphics_path.h"
 #include "core/io/file_access.h"
@@ -139,21 +165,21 @@ void VGPath::import_svg(const String &p_path) {
 
 	float s = 256.0f / MAX(bounds[2] - bounds[0], bounds[3] - bounds[1]);
 	if (s > 1.0f) {
-		tove::nsvg::Transform transform(s, 0, 0, 0, s, 0);
-		transform.setWantsScaleLineWidth(true);
-		tove_graphics->set(tove_graphics, transform);
+		tove::nsvg::Transform nsvg_transform(s, 0, 0, 0, s, 0);
+		nsvg_transform.setWantsScaleLineWidth(true);
+		tove_graphics->set(tove_graphics, nsvg_transform);
 	}
 
 	const int n = tove_graphics->getNumPaths();
 	for (int i = 0; i < n; i++) {
-		tove::PathRef tove_path = tove_graphics->getPath(i);
-		Point2 center = compute_center(tove_path);
-		tove_path->set(tove_path, tove::nsvg::Transform(1, 0, -center.x, 0, 1, -center.y));
+		tove::PathRef current_tove_path = tove_graphics->getPath(i);
+		Point2 center = compute_center(current_tove_path);
+		current_tove_path->set(current_tove_path, tove::nsvg::Transform(1, 0, -center.x, 0, 1, -center.y));
 
-		VGPath *path = memnew(VGPath(tove_path));
+		VGPath *path = memnew(VGPath(current_tove_path));
 		path->set_position(center);
 
-		std::string name = tove_path->getName();
+		std::string name = current_tove_path->getName();
 		if (name.empty()) {
 			name = "Path";
 		}
@@ -276,12 +302,12 @@ void VGPath::update_mesh_representation() {
 	dirty = false;
 
 	if (!is_empty()) {
-		Ref<VGRenderer> renderer = get_inherited_renderer();
-		if (renderer.is_valid()) {
+		Ref<VGRenderer> current_renderer = get_inherited_renderer();
+		if (current_renderer.is_valid()) {
 			Ref<Material> ignored_material; // ignored
 			Ref<Texture> ignored_texture; // ignored
-			_ALLOW_DISCARD_ renderer->render_mesh(mesh, ignored_material, ignored_texture, this, false, false);
-			texture = renderer->render_texture(this, false);
+			_ALLOW_DISCARD_ current_renderer->render_mesh(mesh, ignored_material, ignored_texture, this, false, false);
+			texture = current_renderer->render_texture(this, false);
 		}
 	}
 }
@@ -427,14 +453,16 @@ bool VGPath::_set(const StringName &p_name, const Variant &p_value) {
 		if (subwhat == "points") {
 			PackedVector2Array pts = p_value;
 			const int n = pts.size();
-			float *buf = new float[n * 2];
-			for (int i = 0; i < n; i++) {
-				const Vector2 &p = pts[i];
-				buf[2 * i + 0] = p.x;
-				buf[2 * i + 1] = p.y;
+			if (n > 0) {
+				float *buf = new float[n * 2];
+				for (int i = 0; i < n; i++) {
+					const Vector2 &p = pts[i];
+					buf[2 * i + 0] = p.x;
+					buf[2 * i + 1] = p.y;
+				}
+				tove_subpath->setPoints(buf, n, false);
+				delete[] buf;
 			}
-			tove_subpath->setPoints(buf, n, false);
-			delete[] buf;
 		} else {
 			return false;
 		}
@@ -517,7 +545,7 @@ void VGPath::set_renderer(const Ref<VGRenderer> &p_renderer) {
 	}
 	renderer = p_renderer;
 	if (renderer.is_valid()) {
-		renderer->connect("changed", callable_mp( this, &VGPath::_renderer_changed));
+		renderer->connect("changed", callable_mp(this, &VGPath::_renderer_changed));
 	}
 
 	set_inherited_dirty(this);
@@ -691,18 +719,18 @@ tove::GraphicsRef VGPath::get_subtree_graphics() const {
 
 Node2D *VGPath::create_mesh_node() {
 
-	Ref<VGRenderer> renderer = get_inherited_renderer();
-	if (renderer.is_valid()) {
-		if (renderer->prefer_sprite()) {
+	Ref<VGRenderer> current_renderer = get_inherited_renderer();
+	if (current_renderer.is_valid()) {
+		if (current_renderer->prefer_sprite()) {
 			Sprite2D *sprite = memnew(Sprite2D);
-			sprite->set_texture(renderer->render_texture(this, true));
+			sprite->set_texture(current_renderer->render_texture(this, true));
 
 			// Size2 s = get_global_transform().get_scale();
 			Size2 s = get_transform().get_scale();
-			float scale = MAX(s.width, s.height);
+			float current_scale = MAX(s.width, s.height);
 
 			Transform2D t;
-			t.scale(Size2(scale, scale));
+			t.scale(Size2(current_scale, current_scale));
 
 			sprite->set_transform(get_transform() * t.affine_inverse());
 			sprite->set_name(get_name());
@@ -711,17 +739,17 @@ Node2D *VGPath::create_mesh_node() {
 			return sprite;
 		} else {
 			MeshInstance2D *mesh_inst = memnew(MeshInstance2D);
-			Ref<ArrayMesh> mesh;
-			mesh.instantiate();
-			Ref<Material> material;
-			Ref<Texture> texture;
-			_ALLOW_DISCARD_ renderer->render_mesh(mesh, material, texture, this, true, false);
-			mesh_inst->set_mesh(mesh);
-			if (material.is_valid()) {
-				mesh_inst->set_material(material);
+			Ref<ArrayMesh> current_mesh;
+			current_mesh.instantiate();
+			Ref<Material> current_material;
+			Ref<Texture> current_texture;
+			_ALLOW_DISCARD_ current_renderer->render_mesh(current_mesh, current_material, current_texture, this, true, false);
+			mesh_inst->set_mesh(current_mesh);
+			if (current_material.is_valid()) {
+				mesh_inst->set_material(current_material);
 			}
-			if (texture.is_valid()) {
-				mesh_inst->set_texture(texture);
+			if (current_texture.is_valid()) {
+				mesh_inst->set_texture(current_texture);
 			}
 
 			mesh_inst->set_transform(get_transform());

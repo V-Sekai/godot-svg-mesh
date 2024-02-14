@@ -756,10 +756,10 @@ void ReleaseMesh(ToveMeshRef mesh) {
 	meshes.release(mesh);
 }
 
-ToveTesselatorRef NewAdaptiveTesselator(float resolution, int recursionLimit) {
+ToveTesselatorRef NewAdaptiveTesselator(float p_resolution, int p_recursionLimit) {
 	return tesselators.publish(tove_make_shared<AdaptiveTesselator>(
 		new AdaptiveFlattener<DefaultCurveFlattener>(
-			DefaultCurveFlattener(resolution, recursionLimit))));
+			DefaultCurveFlattener(p_resolution, p_recursionLimit))));
 }
 
 ToveTesselatorRef NewRigidTesselator(int subdivisions, ToveHoles holes) {

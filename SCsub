@@ -7,7 +7,7 @@ env_tove = env_modules.Clone()
 
 env_thirdparty = env_tove.Clone()
 env_thirdparty.disable_warnings()
-import os 
+import os
 dir_path = Dir('.').abspath
 
 env_thirdparty.Append(CXXFLAGS=[

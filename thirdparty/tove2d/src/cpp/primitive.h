@@ -51,8 +51,8 @@ public:
 	inline LinePrimitive() {
 	}
 
-	inline LinePrimitive(float x, float y) :
-		x(x), y(y) {
+	inline LinePrimitive(float x_val, float y_val) :
+		x(x_val), y(y_val) {
 	}
 
 	inline int size() const {
@@ -80,13 +80,13 @@ public:
 	inline RectPrimitive() : type(RECT_EMPTY) {
 	}
 
-	RectPrimitive(float x, float y, float w, float h, float rx, float ry) :
-		x(x), y(y), w(w), h(h), rx(rx), ry(ry) {
+	RectPrimitive(float p_x, float p_y, float p_w, float p_h, float p_rx, float p_ry) :
+		x(p_x), y(p_y), w(p_w), h(p_h), rx(p_rx), ry(p_ry) {
 
 		normalize();
 
-		if (w != 0.0f && h != 0.0f) {
-			if (rx < std::numeric_limits<float>::epsilon() || ry < std::numeric_limits<float>::epsilon()) {
+		if (p_w != 0.0f && p_h != 0.0f) {
+			if (p_rx < std::numeric_limits<float>::epsilon() || p_ry < std::numeric_limits<float>::epsilon()) {
 				type = RECT_SHARP;
 			} else {
 				type = RECT_ROUND;
@@ -151,7 +151,7 @@ public:
 	inline EllipsePrimitive() {
 	}
 
-	EllipsePrimitive(float cx, float cy, float rx, float ry) : cx(cx), cy(cy), rx(rx), ry(ry) {
+	EllipsePrimitive(float p_cx, float p_cy, float p_rx, float p_ry) : cx(p_cx), cy(p_cy), rx(p_rx), ry(p_ry) {
 	}
 
 	inline int size() const {

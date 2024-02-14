@@ -88,10 +88,10 @@ struct CachedPaint {
 	const int rowBytes;
 	const int numColors;
 
-	inline CachedPaint(void *colors, int rowBytes, int numColors) :
-	 	colors(reinterpret_cast<uint32_t*>(colors)),
-		rowBytes(rowBytes),
-		numColors(numColors) {
+	inline CachedPaint(void *p_colors, int p_rowBytes, int p_numColors) :
+	 	colors(reinterpret_cast<uint32_t*>(p_colors)),
+		rowBytes(p_rowBytes),
+		numColors(p_numColors) {
 	}
 
 	void init(const NSVGpaint &paint, float opacity);

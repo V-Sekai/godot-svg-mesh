@@ -219,7 +219,7 @@ void fragment()
 	y = gradient_scale.x + gradient_scale.y * y;
 
 	vec2 texture_pos_exact = vec2(paint, y);
-	COLOR = texture(TEXTURE, texture_pos_exact); 
+	COLOR = texture(TEXTURE, texture_pos_exact);
 }
 
 )GLSL");
@@ -265,7 +265,7 @@ void fragment()
 	y = gradient_scale.x + gradient_scale.y * y;
 
 	vec2 texture_pos_exact = vec2(paint, -y);
-	ALBEDO = textureLod(tex, texture_pos_exact, 0).rgb; 
+	ALBEDO = textureLod(tex, texture_pos_exact, 0).rgb;
 	ALPHA = textureLod(tex, texture_pos_exact, 0).a;
 }
 

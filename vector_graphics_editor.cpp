@@ -110,11 +110,11 @@ private:
 	}
 
 public:
-	GaussJordan(Vector3 A1, Vector3 A2, Vector3 A3, Vector3 b) :
-			b(b) {
-		A[0] = A1;
-		A[1] = A2;
-		A[2] = A3;
+	GaussJordan(Vector3 A1_val, Vector3 A2_val, Vector3 A3_val, Vector3 b_val) :
+			b(b_val) {
+		A[0] = A1_val;
+		A[1] = A2_val;
+		A[2] = A3_val;
 	}
 
 	Vector3 solve() {
