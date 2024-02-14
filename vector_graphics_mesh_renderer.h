@@ -5,6 +5,7 @@
 #ifndef VG_MESH_RENDERER_H
 #define VG_MESH_RENDERER_H
 
+#include "scene/resources/image_texture.h"
 #include "utils.h"
 #include "vector_graphics_renderer.h"
 

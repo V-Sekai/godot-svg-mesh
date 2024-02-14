@@ -5,6 +5,7 @@
 #include "vector_graphics_path.h"
 #include "core/io/file_access.h"
 #include "editor/editor_node.h"
+#include "editor/editor_undo_redo_manager.h"
 #include "scene/2d/sprite_2d.h"
 #include "vector_graphics_adaptive_renderer.h"
 #include "vector_graphics_color.h"
@@ -123,7 +124,7 @@ void VGPath::import_svg(const String &p_path) {
 	String units = "px";
 	float dpi = 96.0;
 
-	Vector<uint8_t> buf = FileAccess::get_file_as_array(p_path);
+	Vector<uint8_t> buf = FileAccess::get_file_as_bytes(p_path);
 
 	String str;
 	str.parse_utf8((const char *)buf.ptr(), buf.size());
@@ -164,7 +165,7 @@ void VGPath::import_svg(const String &p_path) {
 void VGPath::recenter() {
 	Point2 center = compute_center(tove_path);
 	tove_path->set(tove_path, tove::nsvg::Transform(1, 0, -center.x, 0, 1, -center.y));
-	vg_transform.translate(center.x, center.y);
+	vg_transform = vg_transform.translated(center);
 
 	set_position(get_position() + get_transform().untranslated().xform(vg_transform.columns[2]));
 	vg_transform = vg_transform.untranslated();
@@ -592,7 +593,7 @@ bool VGPath::_edit_is_selected_on_click(const Point2 &p_point, double p_toleranc
 
 void VGPath::_edit_set_position(const Point2 &p_position) {
 	set_position(p_position);
-	update();
+	notify_property_list_changed();
 }
 
 void VGPath::_changed_callback(Object *p_changed, const char *p_prop) {
@@ -652,7 +653,7 @@ void VGPath::set_dirty(bool p_children) {
 	}
 
 	dirty = true;
-	update();
+	notify_property_list_changed();
 }
 
 bool VGPath::is_empty() const {
@@ -786,9 +787,8 @@ Node *createVectorSprite(Ref<Resource> p_resource) {
 void configureVectorSprite(Node *p_child, Ref<Resource> p_resource) {
 #ifdef TOOLS_ENABLED
 	if (p_child->is_class_ptr(VGPath::get_class_ptr_static())) {
-		EditorData *editor_data = &EditorNode::get_singleton()->get_editor_data();
-		editor_data->get_undo_redo().add_do_method(p_child, "import_svg", p_resource->get_path());
-		editor_data->get_undo_redo().add_do_reference(p_child);
+		EditorUndoRedoManager::get_singleton()->add_do_method(p_child, "import_svg", p_resource->get_path());
+		EditorUndoRedoManager::get_singleton()->add_do_reference(p_child);
 	}
 #endif
 }

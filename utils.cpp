@@ -4,6 +4,7 @@
 
 #include "utils.h"
 #include "core/string/string_builder.h"
+#include "scene/resources/image_texture.h"
 #include "scene/resources/surface_tool.h"
 
 #include "tove2d/src/cpp/mesh/mesh.h"
@@ -279,7 +280,7 @@ void fragment()
 
 			Ref<ShaderMaterial> mat;
 			mat.instantiate();
-			mat->set_shader_param("tex", texture);
+			mat->set_shader_parameter("tex", texture);
 			mat->set_shader(shader);
 			material = mat;
 		}

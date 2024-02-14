@@ -8,6 +8,7 @@
 #ifdef TOOLS_ENABLED
 #include "editor/editor_node.h"
 #include "editor/editor_plugin.h"
+#include "scene/gui/box_container.h"
 #include "scene/gui/button.h"
 #include "vector_graphics_path.h"
 
@@ -53,8 +54,6 @@ class VGEditor : public HBoxContainer {
 	ConfirmationDialog *create_resource;
 
 protected:
-	UndoRedo *undo_redo;
-
 	void _node_replace_owner_do(Node *p_base, Node *p_node, Node *p_root);
 	void _node_replace_owner_undo(Node *p_base, Node *p_node, Node *p_root);
 

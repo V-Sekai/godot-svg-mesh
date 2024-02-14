@@ -5,7 +5,7 @@
 #ifdef TOOLS_ENABLED
 #include "core/io/file_access.h"
 #include "editor/editor_file_system.h"
-#include "editor/import/resource_importer_scene.h"
+#include "editor/import/3d/resource_importer_scene.h"
 #include "scene/3d/mesh_instance_3d.h"
 #include "scene/resources/mesh_data_tool.h"
 #include "scene/resources/packed_scene.h"
@@ -27,7 +27,7 @@ public:
 	~EditorSceneImporterSVG();
 	virtual uint32_t get_import_flags() const override { return EditorSceneFormatImporter::IMPORT_SCENE | EditorSceneFormatImporter::IMPORT_ANIMATION; }
 	virtual void get_extensions(List<String> *r_extensions) const override;
-	virtual Node *import_scene(const String &p_path, uint32_t p_flags, const HashMap<StringName, Variant> &p_options, int p_bake_fps, List<String> *r_missing_deps, Error *r_err = nullptr) override;
+ 	virtual Node *import_scene(const String &p_path, uint32_t p_flags, const HashMap<StringName, Variant> &p_options, List<String> *r_missing_deps, Error *r_err = nullptr) override; 
 };
 #endif
 #endif

@@ -2,12 +2,20 @@
 /*  vg_editor.cpp         						                         */
 /*************************************************************************/
 
+#include "core/error/error_macros.h"
+#include "core/input/input_enums.h"
+#include "core/object/callable_method_pointer.h"
+#include "editor/editor_settings.h"
+#include "editor/editor_undo_redo_manager.h"
+#include "scene/gui/dialogs.h"
+#include "scene/gui/separator.h"
+#include <cstdint>
 #ifdef TOOLS_ENABLED
 #include "vector_graphics_editor.h"
 
 #include "core/os/keyboard.h"
-#include "editor/editor_scale.h"
 #include "editor/plugins/canvas_item_editor_plugin.h"
+#include "editor/themes/editor_scale.h"
 #include "tove2d/src/cpp/mesh/meshifier.h"
 
 static Array subpath_points_array(const tove::SubpathRef &subpath) {
@@ -230,8 +238,9 @@ class VGTransformTool : public VGTool {
 	}
 
 	void _commit_action() {
-		undo_redo->add_do_method(canvas_item_editor->get_viewport_control(), "update");
-		undo_redo->add_undo_method(canvas_item_editor->get_viewport_control(), "update");
+		undo_redo->add_do_method(Callable(canvas_item_editor->get_viewport_control(), "notify_property_list_changed"));
+		undo_redo->add_do_method(Callable(canvas_item_editor->get_viewport_control(), "notify_property_list_changed"));
+		undo_redo->add_undo_method(Callable(canvas_item_editor->get_viewport_control(), "notify_property_list_changed"));
 		undo_redo->commit_action();
 	}
 
@@ -239,7 +248,6 @@ public:
 	VGTransformTool(VGEditor *p_vg_editor, VGPath *p_path) :
 			vg_editor(p_vg_editor), path(p_path) {
 		clicked = WIDGET_NONE;
-		undo_redo = vg_editor->get_editor_node()->get_undo_redo();
 	}
 
 	virtual bool forward_gui_input(const Ref<InputEvent> &p_event) {
@@ -249,7 +257,7 @@ public:
 				const CanvasItem *pi = path->get_parent_item();
 				const Transform2D xform = canvas_item_editor->get_canvas_transform() * (pi ? pi->get_global_transform() : Transform2D());
 
-				const real_t grab_threshold = EDITOR_DEF("editors/poly_editor/point_grab_radius", 8);
+				const real_t grab_threshold = _EDITOR_DEF("editors/poly_editor/point_grab_radius", 8);
 
 				transform0 = path->get_transform();
 				transform1 = transform0;
@@ -319,15 +327,15 @@ public:
 				if (clicked != WIDGET_NONE) {
 					if (clicked != WIDGET_ROTATE) {
 						undo_redo->create_action(RTR("Transform Path"));
-						undo_redo->add_do_method(path, "set_transform", transform1);
-						undo_redo->add_do_method(path, "recenter");
-						undo_redo->add_undo_method(path, "set_transform", transform0);
-						undo_redo->add_undo_method(path, "recenter");
+						undo_redo->add_do_method(Callable(path, "set_transform").bind(transform1));
+						undo_redo->add_do_method(Callable(path, "recenter"));
+						undo_redo->add_undo_method(Callable(path, "set_transform").bind(transform0));
+						undo_redo->add_undo_method(Callable(path, "recenter"));
 						_commit_action();
 					} else {
 						undo_redo->create_action(RTR("Rotate Path"));
-						undo_redo->add_do_method(path, "_edit_set_rotation", path->_edit_get_rotation());
-						undo_redo->add_undo_method(path, "_edit_set_rotation", rotate_widget.initial_angle);
+						undo_redo->add_do_method(Callable(path, "_edit_set_rotation").bind(path->_edit_get_rotation()));
+						undo_redo->add_undo_method(Callable(path, "_edit_set_rotation").bind(rotate_widget.initial_angle));
 						_commit_action();
 					}
 
@@ -340,12 +348,12 @@ public:
 
 		Ref<InputEventMouseMotion> mm = p_event;
 
-		if (clicked == WIDGET_NONE && path && mm.is_valid() && (mm->get_button_mask() & MouseButton::MASK_LEFT) != MouseButton::NONE) {
+		if (clicked == WIDGET_NONE && path && mm.is_valid() && (mm->get_button_mask().has_flag(MouseButtonMask::LEFT) && !mm->get_button_mask().has_flag(MouseButtonMask::NONE))) {
 			return false;
 		}
 
 		if (clicked != WIDGET_NONE && path && mm.is_valid()) {
-			if ((mm->get_button_mask() & MouseButton::MASK_LEFT) != MouseButton::NONE) {
+			if ((mm->get_button_mask().has_flag(MouseButtonMask::LEFT) && !mm->get_button_mask().has_flag(MouseButtonMask::NONE))) {
 				Vector2 g = mm->get_position();
 
 				const CanvasItem *pi = path->get_parent_item();
@@ -389,8 +397,8 @@ public:
 					} break;
 				}
 
-				canvas_item_editor->get_viewport_control()->update();
-				vg_editor->update();
+				canvas_item_editor->get_viewport_control()->notify_property_list_changed();
+				vg_editor->notify_property_list_changed();
 
 				return true;
 			}
@@ -493,7 +501,7 @@ public:
 		Ref<InputEventMouseMotion> mm = p_event;
 
 		if (path && mm.is_valid()) {
-			if ((mm->get_button_mask() & MouseButton::MASK_LEFT) != MouseButton::NONE) {
+			if ((mm->get_button_mask().has_flag(MouseButtonMask::LEFT)) && !mm->get_button_mask().has_flag(MouseButtonMask::NONE)) {
 				Vector2 point1 = global_to_local(root, mm->get_position());
 
 				Vector2 center = (point0 + point1) / 2;
@@ -644,9 +652,6 @@ public:
 			vg_editor(p_vg_editor), editor(p_vg_editor->get_editor_node()) {
 
 		node_vg = p_path;
-
-		undo_redo = editor->get_undo_redo();
-
 		edited_point = PosVertex();
 		edited_path = SubpathId();
 		hover_point = Vertex();
@@ -700,13 +705,13 @@ public:
 						if (!is_control_point(closest.pt)) {
 							selected_point = closest;
 						}
-						canvas_item_editor->get_viewport_control()->update();
+						canvas_item_editor->get_viewport_control()->notify_property_list_changed();
 						return true;
 					} else {
 
 						if (selected_point.valid()) {
 							selected_point = Vertex();
-							canvas_item_editor->get_viewport_control()->update();
+							canvas_item_editor->get_viewport_control()->notify_property_list_changed();
 						}
 
 						return false;
@@ -721,10 +726,12 @@ public:
 						undo_redo->create_action(RTR("Insert Curve"));
 
 						const SubpathPos insert = mb_down_at;
-						undo_redo->add_do_method(node_vg, "insert_curve",
-								insert.subpath, insert.t);
-						undo_redo->add_undo_method(node_vg, "set_points",
-								insert.subpath, pre_move_edit);
+						Callable do_insert_curve(node_vg, "insert_curve");
+						do_insert_curve = do_insert_curve.bind(insert.subpath, insert.t);
+						undo_redo->add_do_method(do_insert_curve);
+						Callable do_set_points(node_vg, "set_points");
+						do_insert_curve = do_insert_curve.bind(insert.subpath, pre_move_edit);
+						undo_redo->add_undo_method(do_set_points);
 
 						_commit_action();
 
@@ -734,10 +741,11 @@ public:
 
 						undo_redo->create_action(RTR("Edit Path"));
 
-						undo_redo->add_do_method(node_vg, "set_points",
-								edited_path.subpath, _get_points(edited_path));
-						undo_redo->add_undo_method(node_vg, "set_points",
-								edited_path.subpath, pre_move_edit);
+						Callable do_set_points(node_vg, "set_points");
+						do_set_points = do_set_points.bind(edited_path.subpath, _get_points(edited_path));
+						undo_redo->add_do_method(do_set_points);
+						do_set_points = do_set_points.bind(edited_path.subpath, pre_move_edit);
+						undo_redo->add_undo_method(do_set_points);
 
 						edited_path = SubpathId();
 						_commit_action();
@@ -768,7 +776,7 @@ public:
 
 			Vector2 gpoint = mm->get_position();
 
-			if ((mm->get_button_mask() & MouseButton::MASK_LEFT) != MouseButton::NONE) {
+			if ((mm->get_button_mask().has_flag(MouseButtonMask::LEFT)) && !mm->get_button_mask().has_flag(MouseButtonMask::NONE)) {
 				if (mb_down_time > 0 && gpoint.distance_to(mb_down_where) > 2) {
 					edited_path = mb_down_at;
 					mb_down_time = 0;
@@ -782,7 +790,7 @@ public:
 					subpath->move(edited_point.pt, cpoint.x, cpoint.y, aligned_move ? TOVE_HANDLE_ALIGNED : TOVE_HANDLE_FREE);
 
 					node_vg->set_dirty();
-					canvas_item_editor->get_viewport_control()->update();
+					canvas_item_editor->get_viewport_control()->notify_property_list_changed();
 				} else if (edited_path.valid()) {
 					Vector2 cpoint = _get_node()->get_global_transform().affine_inverse().xform(canvas_item_editor->snap_point(canvas_item_editor->get_canvas_transform().affine_inverse().xform(gpoint)));
 					// cpoint = node_vg->get_vg_transform().affine_inverse().xform(cpoint);
@@ -790,7 +798,7 @@ public:
 					subpath->mould(mb_down_at.t, cpoint.x, cpoint.y);
 
 					node_vg->set_dirty();
-					canvas_item_editor->get_viewport_control()->update();
+					canvas_item_editor->get_viewport_control()->notify_property_list_changed();
 				}
 			} else if (true) {
 
@@ -798,7 +806,7 @@ public:
 				if (hover_point != new_hover_point) {
 
 					hover_point = new_hover_point;
-					canvas_item_editor->get_viewport_control()->update();
+					canvas_item_editor->get_viewport_control()->notify_property_list_changed();
 				}
 			}
 		}
@@ -848,7 +856,7 @@ public:
 				Vector2 p = xform.xform(pt_iterator.get_pos());
 				const Color modulate = (pt_iterator.get_vertex() == active_point) ?
 											   Color(0.5, 1, 2) :
-												 Color(1, 1, 1);
+											   Color(1, 1, 1);
 				vpc->draw_texture(handle, p - handle->get_size() * 0.5, modulate);
 			}
 		}
@@ -1011,7 +1019,7 @@ void VGEditor::_tool_selected(int p_tool) {
 		}
 	}
 
-	canvas_item_editor->get_viewport_control()->update();
+	notify_property_list_changed();
 }
 
 void VGEditor::_node_replace_owner_do(Node *p_base, Node *p_node, Node *p_root) {
@@ -1029,9 +1037,9 @@ void VGEditor::_node_replace_owner_do(Node *p_base, Node *p_node, Node *p_root) 
 void VGEditor::_node_replace_owner_undo(Node *p_base, Node *p_node, Node *p_root) {
 
 	if (/*p_node->get_owner() == p_base &&*/ p_node != p_root) {
-		undo_redo->add_undo_method(p_node, "set_owner", p_root);
+		EditorUndoRedoManager::get_singleton()->add_undo_method(p_node, "set_owner", p_root);
 	}
-	undo_redo->add_undo_reference(p_node);
+	EditorUndoRedoManager::get_singleton()->add_undo_reference(p_node);
 
 	for (int i = 0; i < p_node->get_child_count(); i++) {
 		// undo_redo->add_undo_method(p_node, "add_child", p_node->get_child(i));
@@ -1054,6 +1062,8 @@ void VGEditor::_create_mesh_node() {
 
 	Node *parent = node_vg->get_parent();
 
+	EditorUndoRedoManager *undo_redo = EditorUndoRedoManager::get_singleton();
+	ERR_FAIL_NULL(undo_redo);
 	undo_redo->create_action(RTR("Meshify"));
 
 	undo_redo->add_do_method(parent, "remove_child", node_vg);
@@ -1104,7 +1114,7 @@ void VGEditor::_node_removed(Node *p_node) {
 		edit(NULL);
 		hide();
 
-		canvas_item_editor->get_viewport_control()->update();
+		canvas_item_editor->get_viewport_control()->notify_property_list_changed();
 	}
 }
 
@@ -1320,7 +1330,7 @@ void VGEditor::edit(Node *p_node_vg) {
 		_update_overlay(true);
 	}
 
-	canvas_item_editor->get_viewport_control()->update();
+	canvas_item_editor->get_viewport_control()->notify_property_list_changed();
 }
 
 void VGEditor::_bind_methods() {
@@ -1333,11 +1343,11 @@ void VGEditor::_bind_methods() {
 
 void VGCurveTool::_commit_action() {
 
-	undo_redo->add_do_method(node_vg, "recenter");
-	undo_redo->add_undo_method(node_vg, "recenter");
+	undo_redo->add_do_method(Callable(node_vg, "recenter"));
+	undo_redo->add_undo_method(Callable(node_vg, "recenter"));
 
-	undo_redo->add_do_method(canvas_item_editor->get_viewport_control(), "update");
-	undo_redo->add_undo_method(canvas_item_editor->get_viewport_control(), "update");
+	undo_redo->add_do_method(Callable(canvas_item_editor->get_viewport_control(), "notify_property_list_changed"));
+	undo_redo->add_undo_method(Callable(canvas_item_editor->get_viewport_control(), "notify_property_list_changed"));
 
 	undo_redo->commit_action();
 }
@@ -1359,16 +1369,16 @@ void VGCurveTool::remove_point(const Vertex &p_vertex) {
 		undo_redo->create_action(RTR("Remove Subpath Curve"));
 
 		Array previous = subpath_points_array(subpath);
-		undo_redo->add_do_method(node_vg, "remove_curve",
-				p_vertex.subpath, p_vertex.pt / 3);
-		undo_redo->add_undo_method(node_vg, "set_points",
-				p_vertex.subpath, previous);
+		undo_redo->add_do_method(Callable(node_vg, "remove_curve").bind(
+				p_vertex.subpath, p_vertex.pt / 3));
+		undo_redo->add_undo_method(Callable(node_vg, "set_points").bind(
+				p_vertex.subpath, previous));
 
 		_commit_action();
 	} else {
 	}
 
-	canvas_item_editor->get_viewport_control()->update();
+	canvas_item_editor->get_viewport_control()->notify_property_list_changed();
 
 	// if (_is_empty())
 	//	_tool_selected(0);
@@ -1526,24 +1536,23 @@ void VGEditor::_update_overlay(bool p_always_update) {
 void VGEditor::_changed_callback(Object *p_changed, const char *p_prop) {
 	if (node_vg && node_vg == p_changed && strcmp(p_prop, "path_shape") == 0) {
 		_update_overlay(true);
-		canvas_item_editor->get_viewport_control()->update();
+		canvas_item_editor->get_viewport_control()->notify_property_list_changed();
 	}
 }
 
 VGEditor::VGEditor(EditorNode *p_editor) {
-	node_vg = NULL;
+	node_vg = nullptr;
 
-	canvas_item_editor = NULL;
+	canvas_item_editor = nullptr;
 	editor = p_editor;
-	undo_redo = editor->get_undo_redo();
 
 	add_child(memnew(VSeparator), true);
 
 	const int n_tools = 3;
-	for (int i = 0; i < n_tools; i++) {
+	for (int64_t i = 0; i < n_tools; i++) {
 		Button *button = memnew(Button);
 		add_child(button, true);
-		button->connect("pressed", callable_mp(this, &VGEditor::_tool_selected), varray(i));
+		button->connect("pressed", callable_mp(this, &VGEditor::_tool_selected).bind(varray(i)));
 		button->set_toggle_mode(true);
 		button->set_pressed(i == 0);
 		tool_buttons.push_back(button);
@@ -1556,7 +1565,7 @@ VGEditor::VGEditor(EditorNode *p_editor) {
 	button_bake = memnew(Button);
 	add_child(button_bake, true);
 	button_bake->connect("pressed", callable_mp(this, &VGEditor::_create_mesh_node));
-	button_bake->set_tooltip(RTR("Bake into mesh"));
+	button_bake->set_tooltip_text(RTR("Bake into mesh"));
 
 	create_resource = memnew(ConfirmationDialog);
 	add_child(create_resource, true);

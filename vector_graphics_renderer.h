@@ -7,6 +7,7 @@
 
 #include "core/object/ref_counted.h"
 #include "scene/2d/mesh_instance_2d.h"
+#include "scene/resources/image_texture.h"
 
 class VGPath;
 
