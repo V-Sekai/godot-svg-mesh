@@ -4,13 +4,16 @@
 
 #include "vector_graphics_path.h"
 #include "core/io/file_access.h"
-#include "editor/editor_node.h"
-#include "editor/editor_undo_redo_manager.h"
 #include "scene/2d/sprite_2d.h"
 #include "vector_graphics_adaptive_renderer.h"
 #include "vector_graphics_color.h"
 #include "vector_graphics_linear_gradient.h"
 #include "vector_graphics_radial_gradient.h"
+
+#ifdef TOOLS_ENABLED
+#include "editor/editor_node.h"
+#include "editor/editor_undo_redo_manager.h"
+#endif
 
 static tove::PaintRef to_tove_paint(Ref<VGPaint> p_paint) {
 	Ref<VGColor> color = p_paint;
