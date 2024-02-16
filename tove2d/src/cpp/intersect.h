@@ -9,8 +9,8 @@
  * All rights reserved.
  */
 
-#ifndef __TOVE_INTERSECT
-#define __TOVE_INTERSECT 1
+#ifndef INTERSECT_H
+#define INTERSECT_H
 
 BEGIN_TOVE_NAMESPACE
 
@@ -271,4 +271,4 @@ public:
 
 END_TOVE_NAMESPACE
 
-#endif // __TOVE_INTERSECT
+#endif // INTERSECT_H
