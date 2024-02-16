@@ -156,14 +156,14 @@ private:
 	const double x;
 	const double y;
 
-	virtual int at(const coeff *bx, const coeff *by, double t) {
+	virtual int at(const coeff *p_bx, const coeff *p_by, double t) {
 		if (t >= 0.0 && t <= 1.0) {
 			double t2 = t * t;
 			double t3 = t2 * t;
 
-			if (DX * (x - dot4(bx, t3, t2, t, 1)) >= 0 &&
-				DY * (y - dot4(by, t3, t2, t, 1)) >= 0) {
-				return sgn(dot3(by, 3 * t2, 2 * t, 1));
+			if (DX * (x - dot4(p_bx, t3, t2, t, 1)) >= 0 &&
+				DY * (y - dot4(p_by, t3, t2, t, 1)) >= 0) {
+				return sgn(dot3(p_by, 3 * t2, 2 * t, 1));
 			}
 		}
 
@@ -173,11 +173,11 @@ private:
 	const CompiledRay<DX, DY> ray;
 
 public:
-	inline NonZeroCounter(double x, double y) : x(x), y(y), ray(x, y) {
+	inline NonZeroCounter(double p_x, double p_y) : x(p_x), y(p_y), ray(p_x, p_y) {
 	}
 
-	inline int operator()(const coeff *bx, const coeff *by) {
-		return intersect(bx, by, ray);
+	inline int operator()(const coeff *p_bx, const coeff *p_by) {
+		return intersect(p_bx, p_by, ray);
 	}
 };
 
