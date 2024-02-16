@@ -2,8 +2,8 @@
 /*  utils.h     	                                                     */
 /*************************************************************************/
 
-#ifndef VG_UTILS_H
-#define VG_UTILS_H
+#ifndef UTILS_H
+#define UTILS_H
 
 #include "core/io/file_access.h"
 #include "scene/2d/mesh_instance_2d.h"
@@ -27,4 +27,4 @@ Ref<ShaderMaterial> copy_mesh(
 		Ref<Texture> &r_texture,
 		bool p_spatial = false);
 
-#endif // VG_UTILS_H
+#endif // UTILS_H
