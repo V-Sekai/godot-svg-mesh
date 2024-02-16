@@ -136,7 +136,7 @@ private:
 	const float x1, y1;
 
 public:
-	inline CompiledRay(float x1, float y1) : x1(x1), y1(y1) {
+	inline CompiledRay(float p_x1, float p_y1) : x1(p_x1), y1(p_y1) {
 	}
 
 	virtual void computeP(double *P, const coeff *bx, const coeff *by) const {
@@ -204,7 +204,7 @@ private:
 	const CompiledRay<DX, DY> ray;
 
 public:
-	inline EvenOddCounter(double x, double y) : x(x), y(y), ray(x, y) {
+	inline EvenOddCounter(double p_x, double p_y) : x(p_x), y(p_y), ray(p_x, p_y) {
 	}
 
 	inline int operator()(const coeff *bx, const coeff *by) {
