@@ -104,8 +104,8 @@ class ToveTPPLPoly {
             return hole;
         }
         
-        void SetHole(bool hole) {
-            this->hole = hole;
+        void SetHole(bool innerHole) {
+            this->hole = innerHole;
         }
         
         TPPLPoint &GetPoint(long i) {

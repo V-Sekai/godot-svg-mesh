@@ -161,8 +161,8 @@ public:
 		strokeDashOffset = offset;
 	}
 
-	inline void setLineWidth(float strokeWidth) {
- 		this->strokeWidth = strokeWidth;
+	inline void setLineWidth(float lineStrokeWidth) {
+ 		this->strokeWidth = lineStrokeWidth;
 	}
 
 	ToveLineJoin getLineJoin() const;

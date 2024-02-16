@@ -27,9 +27,9 @@ public:
 	inline MeshPaint() : cache(cacheColors, sizeof(uint32_t), 256) {
 	}
 
-	inline void initialize(const NSVGpaint &paint, float opacity, float scale) {
+	inline void initialize(const NSVGpaint &paint, float opacity, float sizeScale) {
 		cache.init(paint, opacity);
-		this->scale = scale;
+		this->scale = sizeScale;
 	}
 
 	inline int getType() const {
