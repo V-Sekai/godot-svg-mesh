@@ -42,7 +42,7 @@
 #include "core/os/keyboard.h"
 #include "editor/plugins/canvas_item_editor_plugin.h"
 #include "editor/themes/editor_scale.h"
-#include "tove2d/src/cpp/mesh/meshifier.h"
+#include "modules/svg_mesh/thirdparty/tove2d/src/cpp/mesh/meshifier.h"
 
 static Array subpath_points_array(const tove::SubpathRef &subpath) {
 	const int n = subpath->getNumPoints();

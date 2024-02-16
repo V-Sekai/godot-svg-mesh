@@ -7,9 +7,9 @@
 #include "scene/resources/image_texture.h"
 #include "scene/resources/surface_tool.h"
 
-#include "tove2d/src/cpp/mesh/mesh.h"
-#include "tove2d/src/cpp/mesh/meshifier.h"
-#include "tove2d/src/cpp/shader/feed/color_feed.h"
+#include "modules/svg_mesh/thirdparty/tove2d/src/cpp/mesh/mesh.h"
+#include "modules/svg_mesh/thirdparty/tove2d/src/cpp/mesh/meshifier.h"
+#include "modules/svg_mesh/thirdparty/tove2d/src/cpp/shader/feed/color_feed.h"
 
 tove::PathRef new_transformed_path(const tove::PathRef &p_tove_path, const Transform2D &p_transform) {
 	const Vector2 &tx = p_transform.columns[0];

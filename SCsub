@@ -12,7 +12,7 @@ dir_path = Dir('.').abspath
 
 env_thirdparty.Append(CXXFLAGS=[
     '-DTOVE_GODOT',
-    '-I' + os.path.join(dir_path, 'tove2d/src/thirdparty/fp16/include')])
+    '-I' + os.path.join(dir_path, 'thirdparty/tove2d/src/thirdparty/fp16/include')])
 
 def package_sl(target, source, env):
 	with open(source[0].abspath, "r") as sl:
@@ -25,19 +25,19 @@ env_thirdparty.Append(BUILDERS={
 	'PackageSL':Builder(action=package_sl)})
 
 env_thirdparty.PackageSL(
-	'tove2d/src/glsl/fill.frag.inc',
-	Glob('tove2d/src/glsl/fill.frag'))
+	'thirdparty/tove2d/src/glsl/fill.frag.inc',
+	Glob('thirdparty/tove2d/src/glsl/fill.frag'))
 
 env_thirdparty.PackageSL(
-	'tove2d/src/glsl/line.vert.inc',
-	Glob('tove2d/src/glsl/line.vert'))
+	'thirdparty/tove2d/src/glsl/line.vert.inc',
+	Glob('thirdparty/tove2d/src/glsl/line.vert'))
 
-env_thirdparty.add_source_files(env.modules_sources, "tove2d/src/cpp/*.cpp")
-env_thirdparty.add_source_files(env.modules_sources, "tove2d/src/cpp/mesh/*.cpp")
-env_thirdparty.add_source_files(env.modules_sources, "tove2d/src/cpp/shader/*.cpp")
-env_thirdparty.add_source_files(env.modules_sources, "tove2d/src/cpp/gpux/*.cpp")
-env_thirdparty.add_source_files(env.modules_sources, "tove2d/src/thirdparty/*.cpp")
-env_thirdparty.add_source_files(env.modules_sources, "tove2d/src/thirdparty/polypartition/src/*.cpp")
-env_thirdparty.add_source_files(env.modules_sources, "tove2d/src/thirdparty/tinyxml2/tinyxml2.cpp")
+env_thirdparty.add_source_files(env.modules_sources, "thirdparty/tove2d/src/cpp/*.cpp")
+env_thirdparty.add_source_files(env.modules_sources, "thirdparty/tove2d/src/cpp/mesh/*.cpp")
+env_thirdparty.add_source_files(env.modules_sources, "thirdparty/tove2d/src/cpp/shader/*.cpp")
+env_thirdparty.add_source_files(env.modules_sources, "thirdparty/tove2d/src/cpp/gpux/*.cpp")
+env_thirdparty.add_source_files(env.modules_sources, "thirdparty/tove2d/src/thirdparty/*.cpp")
+env_thirdparty.add_source_files(env.modules_sources, "thirdparty/tove2d/src/thirdparty/polypartition/src/*.cpp")
+env_thirdparty.add_source_files(env.modules_sources, "thirdparty/tove2d/src/thirdparty/tinyxml2/tinyxml2.cpp")
 
 env_tove.add_source_files(env.modules_sources, "*.cpp")

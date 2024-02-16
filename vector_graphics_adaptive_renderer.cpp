@@ -3,7 +3,7 @@
 /*************************************************************************/
 
 #include "vector_graphics_adaptive_renderer.h"
-#include "tove2d/src/cpp/mesh/meshifier.h"
+#include "modules/svg_mesh/thirdparty/tove2d/src/cpp/mesh/meshifier.h"
 
 VGMeshRenderer::VGMeshRenderer() :
 		quality(1) {

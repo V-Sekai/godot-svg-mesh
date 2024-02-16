@@ -3,7 +3,7 @@
 /*************************************************************************/
 
 #include "vector_graphics_mesh_renderer.h"
-#include "tove2d/src/cpp/mesh/meshifier.h"
+#include "modules/svg_mesh/thirdparty/tove2d/src/cpp/mesh/meshifier.h"
 #include "vector_graphics_path.h"
 
 class Renderer {

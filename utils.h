@@ -9,10 +9,10 @@
 #include "scene/2d/mesh_instance_2d.h"
 #include <stdint.h>
 
-#include "tove2d/src/cpp/graphics.h"
-#include "tove2d/src/cpp/paint.h"
-#include "tove2d/src/cpp/path.h"
-#include "tove2d/src/cpp/subpath.h"
+#include "modules/svg_mesh/thirdparty/tove2d/src/cpp/graphics.h"
+#include "modules/svg_mesh/thirdparty/tove2d/src/cpp/paint.h"
+#include "modules/svg_mesh/thirdparty/tove2d/src/cpp/path.h"
+#include "modules/svg_mesh/thirdparty/tove2d/src/cpp/subpath.h"
 
 inline Rect2 tove_bounds_to_rect2(const float *bounds) {
 	return Rect2(bounds[0], bounds[1], bounds[2] - bounds[0], bounds[3] - bounds[1]);
