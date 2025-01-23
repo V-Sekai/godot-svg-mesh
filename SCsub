@@ -6,6 +6,13 @@ Import('env_modules')
 env_tove = env_modules.Clone()
 
 env_thirdparty = env_tove.Clone()
+
+env_thirdparty["disable_exceptions"] = False
+if env_thirdparty.msvc:
+	env_thirdparty.Append(CXXFLAGS=["/EHsc"])
+else:
+	env_thirdparty.Append(CXXFLAGS=["-fexceptions"])
+
 env_thirdparty.disable_warnings()
 import os
 dir_path = Dir('.').abspath
@@ -34,6 +41,7 @@ env_thirdparty.PackageSL(
 	'thirdparty/tove2d/src/glsl/line.vert.inc',
 	Glob('thirdparty/tove2d/src/glsl/line.vert'))
 
+env_thirdparty.add_source_files(env.modules_sources, "thirdparty/clipper.cpp")
 env_thirdparty.add_source_files(env.modules_sources, "thirdparty/tove2d/src/cpp/*.cpp")
 env_thirdparty.add_source_files(env.modules_sources, "thirdparty/tove2d/src/cpp/mesh/*.cpp")
 env_thirdparty.add_source_files(env.modules_sources, "thirdparty/tove2d/src/cpp/shader/*.cpp")
