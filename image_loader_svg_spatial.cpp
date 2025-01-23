@@ -3,7 +3,7 @@
 #include "image_loader_svg_spatial.h"
 
 #include "scene/3d/importer_mesh_instance_3d.h"
-#include "scene/resources/importer_mesh.h"
+#include "scene/resources/3d/importer_mesh.h"
 
 EditorSceneImporterSVG::EditorSceneImporterSVG() {
 }

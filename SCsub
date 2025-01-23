@@ -10,9 +10,11 @@ env_thirdparty.disable_warnings()
 import os
 dir_path = Dir('.').abspath
 
+env_thirdparty.Append(CPPPATH=[os.path.join(dir_path, 'thirdparty/tove2d/src')])
+
 env_thirdparty.Append(CXXFLAGS=[
-    '-DTOVE_GODOT',
-    '-I' + os.path.join(dir_path, 'thirdparty/tove2d/src/thirdparty/fp16/include')])
+	'-DTOVE_GODOT',
+	'-I' + os.path.join(dir_path, 'thirdparty/tove2d/src/thirdparty/fp16/include')])
 
 def package_sl(target, source, env):
 	with open(source[0].abspath, "r") as sl:

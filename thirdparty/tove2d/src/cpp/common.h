@@ -42,7 +42,7 @@ BEGIN_TOVE_NAMESPACE
 #include "../thirdparty/nanosvg/src/nanosvgrast.h"
 END_TOVE_NAMESPACE
 
-#include "thirdparty/misc/clipper.hpp"
+#include "modules/svg_mesh/thirdparty/clipper.hpp"
 #include "../thirdparty/polypartition/src/polypartition.h"
 
 #if _MSC_VER
